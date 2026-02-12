@@ -1,0 +1,7 @@
+{
+  "name": "wealthzer",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
