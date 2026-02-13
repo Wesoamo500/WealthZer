@@ -1,0 +1,128 @@
+<ion-content class="ion-padding">
+  <div class="register-container">
+    
+    <!-- Header -->
+    <div class="header">
+      <ion-button fill="clear" class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
+      </ion-button>
+      <button class="help-btn">Help</button>
+    </div>
+
+    <!-- Title -->
+    <div class="title-section">
+      <h1>Create Account</h1>
+      <p class="subtitle">Join the AI-powered financial revolution. Secure and simple accounting.</p>
+    </div>
+
+    <!-- Registration Form -->
+    <form class="register-form">
+      
+      <!-- Full Name -->
+      <div class="form-group">
+        <label>FULL NAME</label>
+        <input 
+          type="text" 
+          [(ngModel)]="fullName" 
+          name="fullName"
+          placeholder="Enter your full name"
+          class="custom-input"
+        />
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label>EMAIL ADDRESS</label>
+        <input 
+          type="email" 
+          [(ngModel)]="email" 
+          name="email"
+          placeholder="name@example.com"
+          class="custom-input"
+        />
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label>PASSWORD</label>
+        <div class="input-wrapper">
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            [(ngModel)]="password" 
+            name="password"
+            placeholder="Minimum 8 characters"
+            class="custom-input"
+          />
+          <ion-icon 
+            [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" 
+            class="toggle-password"
+            (click)="togglePasswordVisibility()"
+          ></ion-icon>
+        </div>
+      </div>
+
+      <!-- Referral Code -->
+      <div class="form-group">
+        <label>REFERRAL CODE (OPTIONAL)</label>
+        <input 
+          type="text" 
+          [(ngModel)]="referralCode" 
+          name="referralCode"
+          placeholder="Enter code"
+          class="custom-input"
+        />
+      </div>
+
+      <!-- Terms Checkbox -->
+      <div class="terms-section">
+        <ion-checkbox 
+          [(ngModel)]="agreeToTerms" 
+          name="terms"
+          class="custom-checkbox"
+        ></ion-checkbox>
+        <span class="terms-text">
+          I agree to the 
+          <a href="#" class="terms-link">Terms of Service</a> 
+          and 
+          <a href="#" class="terms-link">Privacy Policy</a>
+        </span>
+      </div>
+
+      <!-- Create Account Button -->
+      <ion-button 
+        expand="block" 
+        color="primary" 
+        class="create-btn"
+        (click)="createAccount()"
+      >
+        Create Account
+      </ion-button>
+
+    </form>
+
+    <!-- Social Registration -->
+    <div class="social-section">
+      <div class="divider">
+        <span>OR JOIN WITH</span>
+      </div>
+
+      <div class="social-buttons">
+        <button class="social-btn" (click)="socialRegister('google')">
+          <ion-icon name="logo-google"></ion-icon>
+          <span>Google</span>
+        </button>
+        <button class="social-btn" (click)="socialRegister('apple')">
+          <ion-icon name="logo-apple"></ion-icon>
+          <span>Apple</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Login Link -->
+    <div class="login-section">
+      <span>Already have an account?</span>
+      <a routerLink="/auth/login" class="login-link">Log In</a>
+    </div>
+
+  </div>
+</ion-content>

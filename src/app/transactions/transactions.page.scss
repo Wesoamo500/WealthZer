@@ -1,0 +1,131 @@
+ion-header {
+  ion-toolbar {
+    --background: #101010;
+    --color: white;
+  }
+}
+
+.custom-searchbar {
+  --background: #1C1C1E;
+  --color: white;
+  --placeholder-color: rgba(255, 255, 255, 0.4);
+  --icon-color: rgba(255, 255, 255, 0.4);
+  --border-radius: 12px;
+  padding: 8px 16px;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  ion-chip {
+    --background: #2C2C2E;
+    --color: rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    height: 36px;
+    font-size: 13px;
+    font-weight: 500;
+
+    &[color="primary"] {
+      --background: var(--ion-color-primary);
+      --color: black;
+      font-weight: 600;
+    }
+
+    &[outline="true"] {
+      --background: transparent;
+      border: 1px solid #2C2C2E;
+    }
+
+    ion-icon {
+      font-size: 16px;
+    }
+  }
+}
+
+.date-section {
+  margin-bottom: 32px;
+
+  .date-header {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 1px;
+    margin: 0 0 16px 0;
+    text-transform: uppercase;
+  }
+}
+
+ion-list {
+  background: transparent;
+  padding: 0;
+}
+
+.transaction-item {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 16px;
+
+  .icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+
+    ion-icon {
+      font-size: 24px;
+    }
+  }
+
+  ion-label {
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+      margin: 0 0 4px 0;
+    }
+
+    p {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.5);
+      margin: 0;
+    }
+  }
+
+  .amount {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+
+    &.positive {
+      color: #34C759;
+    }
+  }
+}
+
+.ai-advisor-btn {
+  --background: transparent;
+  --color: var(--ion-color-primary);
+  --border-radius: 12px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  margin-top: 24px;
+  font-weight: 600;
+  font-size: 14px;
+
+  ion-icon {
+    font-size: 20px;
+  }
+}

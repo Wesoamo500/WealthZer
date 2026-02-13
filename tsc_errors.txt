@@ -1,0 +1,5 @@
+src/app/advisor/tab3.page.spec.ts(6,26): error TS2307: Cannot find module './tab3.page' or its corresponding type declarations.
+src/app/home/tab1.page.spec.ts(6,26): error TS2307: Cannot find module './tab1.page' or its corresponding type declarations.
+src/app/markets/tab1.page.spec.ts(6,26): error TS2307: Cannot find module './tab1.page' or its corresponding type declarations.
+src/app/portfolio/tab2.page.spec.ts(6,26): error TS2307: Cannot find module './tab2.page' or its corresponding type declarations.
+src/app/profile/tab1.page.spec.ts(6,26): error TS2307: Cannot find module './tab1.page' or its corresponding type declarations.

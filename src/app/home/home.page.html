@@ -1,0 +1,129 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="background">
+    <div class="header-content">
+      <div class="logo-container">
+        <ion-icon name="wallet" color="primary" size="large"></ion-icon>
+      </div>
+      <ion-buttons slot="end">
+        <ion-button class="notification-btn">
+          <ion-icon name="notifications" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  
+  <!-- Net Worth Section -->
+  <div class="net-worth-section">
+    <ion-text color="medium">
+      <p class="label">TOTAL NET WORTH</p>
+    </ion-text>
+    <ion-text color="light">
+      <h1 class="amount">{{ netWorth | currency }}</h1>
+    </ion-text>
+    
+    <div class="change-badge up">
+      <ion-icon name="trending-up"></ion-icon>
+      <span>+{{ dailyChange | currency }} ({{ dailyChangePercent }}%) Today</span>
+    </div>
+  </div>
+
+  <!-- Quick Stats Grid -->
+  <ion-grid class="stats-grid">
+    <ion-row>
+      <ion-col size="6">
+        <div class="stat-card">
+          <div class="icon-box blue">
+            <ion-icon name="trending-up"></ion-icon>
+          </div>
+          <p class="stat-label">Investments</p>
+          <h3 class="stat-value">{{ investments | currency:'USD':'symbol':'1.0-0' }}</h3>
+          <div class="progress-bar blue"></div>
+        </div>
+      </ion-col>
+      <ion-col size="6">
+        <div class="stat-card">
+          <div class="icon-box orange">
+            <ion-icon name="pie-chart"></ion-icon>
+          </div>
+          <p class="stat-label">Budgets</p>
+          <h3 class="stat-value">{{ budget | currency:'USD':'symbol':'1.0-0' }}</h3>
+          <div class="progress-bar orange"></div>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- AI Insight Card -->
+  <div class="section-header">
+    <h2>AI Financial Insights</h2>
+    <ion-icon name="sparkles" color="primary"></ion-icon>
+  </div>
+
+  <div class="ai-card">
+    <div class="ai-header">
+      <ion-badge color="primary">SMART SUGGESTION</ion-badge>
+      <span class="timestamp">Just now</span>
+    </div>
+    
+    <h3>{{ aiInsight.title }}</h3>
+    <p class="insight-text">"{{ aiInsight.description }}"</p>
+    
+    <div class="ai-actions">
+      <ion-button color="primary" expand="block" class="action-btn">
+        {{ aiInsight.action }}
+      </ion-button>
+      <ion-button fill="clear" color="medium" class="dismiss-btn">
+        Dismiss
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Top Assets -->
+  <div class="section-header">
+    <h2>Top Portfolio Assets</h2>
+    <ion-button fill="clear" size="small" color="primary" routerLink="/tabs/portfolio">See All</ion-button>
+  </div>
+
+  <ion-list lines="none" class="assets-list">
+    <ion-item *ngFor="let asset of assets" class="asset-item">
+      <div class="asset-icon" slot="start">
+        <ion-icon [name]="asset.icon" [style.color]="asset.color"></ion-icon>
+      </div>
+      <ion-label>
+        <h3>{{ asset.name }}</h3>
+        <p>{{ asset.amount }}</p>
+      </ion-label>
+      <div class="asset-value" slot="end">
+        <h3>{{ asset.value | currency }}</h3>
+        <p [class.positive]="asset.change > 0" [class.negative]="asset.change < 0">
+          {{ asset.change > 0 ? '+' : ''}}{{ asset.change }}%
+        </p>
+      </div>
+    </ion-item>
+  </ion-list>
+
+  <!-- Recent Transactions -->
+  <div class="section-header">
+    <h2>Recent Transactions</h2>
+    <ion-button fill="clear" size="small" color="primary" routerLink="/tabs/transactions">See All</ion-button>
+  </div>
+
+  <ion-list lines="none" class="transactions-list">
+    <ion-item *ngFor="let transaction of recentTransactions" class="transaction-item">
+      <div class="transaction-icon" [style.background]="transaction.iconBg" slot="start">
+        <ion-icon [name]="transaction.icon" [style.color]="transaction.iconColor"></ion-icon>
+      </div>
+      <ion-label>
+        <h3>{{ transaction.title }}</h3>
+        <p>{{ transaction.date }}</p>
+      </ion-label>
+      <div class="transaction-amount" slot="end" [class.positive]="transaction.amount > 0">
+        {{ transaction.amount > 0 ? '+' : '' }}{{ transaction.amount | currency }}
+      </div>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

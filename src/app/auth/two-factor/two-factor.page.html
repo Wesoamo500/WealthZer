@@ -1,0 +1,95 @@
+<ion-content class="ion-padding">
+  <div class="twofa-container">
+    
+    <!-- Header -->
+    <div class="header">
+      <ion-button fill="clear" class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
+      </ion-button>
+      <div class="security-badge">
+        <ion-icon name="shield-checkmark"></ion-icon>
+        <span>SECURITY GATE</span>
+      </div>
+    </div>
+
+    <!-- Shield Icon -->
+    <div class="shield-section">
+      <div class="shield-circle">
+        <ion-icon name="shield-checkmark" color="primary"></ion-icon>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <div class="title-section">
+      <h1>Two-Factor<br/>Authentication</h1>
+      <p class="subtitle">
+        Enter the 6-digit verification code sent to<br/>
+        <strong>{{ email }}</strong>
+      </p>
+    </div>
+
+    <!-- Code Input -->
+    <div class="code-input-section">
+      <div class="code-boxes" (click)="focusInput()">
+        <div 
+          *ngFor="let digit of displayCode; let i = index" 
+          class="code-box"
+          [class.filled]="digit !== ''"
+          [class.active]="i === codeInput.length && isFocused"
+        >
+          {{ digit }}
+        </div>
+      </div>
+      
+      <!-- Hidden input for actual typing and pasting -->
+      <input 
+        #hiddenInput
+        type="text"
+        inputmode="numeric"
+        maxlength="6"
+        [(ngModel)]="codeInput"
+        name="code"
+        class="hidden-input"
+        (input)="onInput()"
+        (paste)="onPaste($event)"
+        (focus)="isFocused = true"
+        (blur)="isFocused = false"
+        autocomplete="one-time-code"
+      />
+
+      <!-- Timer -->
+      <div class="timer">
+        <ion-icon name="time-outline"></ion-icon>
+        <span>Code expires in {{ formattedTime }}</span>
+      </div>
+
+      <!-- Resend Code -->
+      <button class="resend-btn" (click)="resendCode()">
+        Resend Code
+      </button>
+    </div>
+
+    <!-- AI Safety Note -->
+    <div class="safety-note">
+      <div class="note-icon">
+        <ion-icon name="information-circle"></ion-icon>
+      </div>
+      <div class="note-content">
+        <h4>AI SAFETY NOTE</h4>
+        <p>Our AI noticed you're logging in from a new device. This extra layer ensures your financial data stays private.</p>
+      </div>
+    </div>
+
+    <!-- Verify Button -->
+    <ion-button 
+      expand="block" 
+      color="primary" 
+      class="verify-btn"
+      (click)="verifyAndContinue()"
+    >
+      Verify & Continue
+      <ion-icon name="arrow-forward" slot="end"></ion-icon>
+    </ion-button>
+
+  </div>
+</ion-content>

@@ -35,3 +35,16 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+/* Add Transaction Modal Styles */
+.add-transaction-modal {
+  --height: 80%;
+  --border-radius: 24px 24px 0 0;
+  align-items: flex-end;
+  
+  ion-backdrop {
+    --backdrop-opacity: 0.6;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+  }
+}

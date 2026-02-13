@@ -1,0 +1,104 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="background">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <div class="advisor-title">
+        <ion-icon name="sparkles" color="primary"></ion-icon>
+        <span>Finner AI</span>
+      </div>
+      <span class="subtitle">ACTIVE ADVISOR</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="settings-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding" #content>
+  
+  <div class="date-divider">
+    <span>Today, 10:24 AM</span>
+  </div>
+
+  <div class="chat-list">
+    <ng-container *ngFor="let msg of messages">
+      
+      <!-- User Message -->
+      <div class="message-wrapper user" *ngIf="msg.sender === 'user'">
+        <div class="message-bubble">
+          {{ msg.text }}
+        </div>
+      </div>
+
+      <!-- AI Message -->
+      <div class="message-wrapper ai" *ngIf="msg.sender === 'ai'">
+        <div class="avatar">
+          <ion-icon name="sparkles"></ion-icon>
+        </div>
+        
+        <div class="message-content">
+          <!-- Text Type -->
+          <div class="message-bubble" *ngIf="msg.type === 'text'">
+            <span [innerHTML]="msg.text"></span>
+          </div>
+
+          <!-- Card Type -->
+          <div class="suggestion-card" *ngIf="msg.type === 'card'">
+            <div class="card-header">
+              <span class="label">SMART SUGGESTION</span>
+              <ion-icon name="trending-up" color="primary"></ion-icon>
+            </div>
+            <h3>{{ msg.title }}</h3>
+            
+            <div class="chart-placeholder">
+              <div class="bar" style="height: 60%"></div>
+              <div class="bar" style="height: 40%"></div>
+              <div class="bar active" style="height: 90%"></div>
+              <div class="bar" style="height: 30%"></div>
+            </div>
+
+            <div class="card-footer">
+              <div class="nav-info">
+                <span>Proposed Weekly Cap</span>
+                <span class="amount">{{ msg.data?.cap | currency }}</span>
+              </div>
+              <ion-progress-bar value="0.75" color="primary"></ion-progress-bar>
+            </div>
+
+            <div class="card-actions">
+              <ion-button expand="block" color="primary" class="apply-btn">
+                <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+                Apply Budget
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <ion-toolbar color="background">
+    <div class="input-area">
+      <ion-button fill="clear" class="add-btn">
+        <ion-icon name="add" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-input 
+        placeholder="Ask Finner anything..." 
+        [(ngModel)]="newMessage"
+        (keyup.enter)="sendMessage()"
+        class="chat-input"
+      ></ion-input>
+      <ion-button fill="solid" shape="round" color="primary" class="send-btn" (click)="sendMessage()">
+        <ion-icon name="arrow-up" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>

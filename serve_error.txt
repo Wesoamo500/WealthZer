@@ -1,0 +1,79 @@
+2026-02-12T16:58:22.904Z ionic:lib Terminal info: { ci: false, shell: 'C:\\WINDOWS\\system32\\cmd.exe', tty: false, windows: true }
+2026-02-12T16:58:22.910Z ionic:lib CLI global options: { _: [ 'serve' ], help: null, h: null, verbose: true, quiet: null, interactive: false, color: true, confirm: null, json: null, open: false, project: null, '--': [] }
+2026-02-12T16:58:24.190Z ionic:lib:project Project type from config: @ionic/angular (angular)
+2026-02-12T16:58:24.190Z ionic:lib:project Project details: { context: 'app', type: 'angular', errors: [], configPath: 'C:\\Users\\AbdulSuleman\\Desktop\\WealthZer\\ionic.config.json' }
+2026-02-12T16:58:24.204Z ionic Context: { binPath: 'C:\\Users\\AbdulSuleman\\AppData\\Roaming\\npm\\node_modules\\@ionic\\cli\\bin\\ionic', libPath: 'C:\\Users\\AbdulSuleman\\AppData\\Roaming\\npm\\node_modules\\@ionic\\cli', execPath: 'C:\\Users\\AbdulSuleman\\Desktop\\WealthZer', version: '7.2.0' }
+2026-02-12T16:58:24.303Z ionic:lib:serve serve options: {
+  '--': [],
+  host: 'localhost',
+  browser: undefined,
+  browserOption: undefined,
+  engine: 'browser',
+  externalAddressRequired: false,
+  livereload: true,
+  open: false,
+  platform: undefined,
+  port: 8100,
+  proxy: true,
+  project: 'app',
+  publicHost: undefined,
+  verbose: true,
+  consolelogs: undefined,
+  consolelogsPort: undefined,
+  ssl: undefined,
+  configuration: undefined,
+  sourcemaps: undefined
+}
+2026-02-12T16:58:24.313Z ionic:lib:hooks Looking for ionic:serve:before npm script.
+2026-02-12T16:58:24.317Z ionic:utils-network checking for open port on 0.0.0.0:8100
+2026-02-12T16:58:24.353Z ionic:utils-network checking for open port on fe80::4ce7:c1a2:bcdb:ee83:8100
+2026-02-12T16:58:24.365Z ionic:utils-network checking for open port on 192.168.21.1:8100
+2026-02-12T16:58:24.368Z ionic:utils-network checking for open port on fe80::a108:f84a:c97d:ea97:8100
+2026-02-12T16:58:24.374Z ionic:utils-network checking for open port on 192.168.245.1:8100
+2026-02-12T16:58:24.378Z ionic:utils-network checking for open port on fe80::f73f:ca56:5a51:de19:8100
+2026-02-12T16:58:24.381Z ionic:utils-network checking for open port on 10.11.7.195:8100
+2026-02-12T16:58:24.384Z ionic:utils-network checking for open port on ::1:8100
+2026-02-12T16:58:24.388Z ionic:utils-network checking for open port on 127.0.0.1:8100
+2026-02-12T16:58:24.391Z ionic:utils-network checking for open port on fe80::7b1b:8acc:ae94:d944:8100
+2026-02-12T16:58:24.394Z ionic:utils-network checking for open port on 172.21.64.1:8100
+2026-02-12T16:58:24.398Z ionic:lib:serve Looking for ionic:serve npm script.
+> ng.cmd run app:serve --host=localhost --port=8100 --verbose
+[ng] Node.js version v22.0.0 detected.
+[ng] The Angular CLI requires a minimum Node.js version of v20.19 or v22.12.
+[ng] Please update your Node.js version or visit https://nodejs.org/ for additional instructions.
+2026-02-12T16:58:24.791Z ionic:lib:serve received unexpected close for ng (code: 3)
+
+[[40mERROR[49m] ng has unexpectedly closed (exit code 3).
+        
+        The Ionic CLI will exit. Please check any output above for error details.
+2026-02-12T16:58:24.796Z ionic:utils-process onBeforeExit handler: 'process.exit' received
+2026-02-12T16:58:24.796Z ionic:utils-process onBeforeExit handler: running 1 functions
+2026-02-12T16:58:25.240Z ionic:utils-process error while killing process tree for 16116: Error: Command failed: taskkill /pid 16116 /T /F
+ERROR: The process "16116" not found.
+
+    at genericNodeError (node:internal/errors:984:15)
+    at wrappedFn (node:internal/errors:538:14)
+    at ChildProcess.exithandler (node:child_process:422:12)
+    at ChildProcess.emit (node:events:520:28)
+    at maybeClose (node:internal/child_process:1105:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:305:5) {
+  code: 128,
+  killed: false,
+  signal: null,
+  cmd: 'taskkill /pid 16116 /T /F'
+}
+2026-02-12T16:58:25.241Z ionic:utils-process onBeforeExit handler: error from function: Error: Command failed: taskkill /pid 16116 /T /F
+ERROR: The process "16116" not found.
+
+    at genericNodeError (node:internal/errors:984:15)
+    at wrappedFn (node:internal/errors:538:14)
+    at ChildProcess.exithandler (node:child_process:422:12)
+    at ChildProcess.emit (node:events:520:28)
+    at maybeClose (node:internal/child_process:1105:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:305:5) {
+  code: 128,
+  killed: false,
+  signal: null,
+  cmd: 'taskkill /pid 16116 /T /F'
+}
+2026-02-12T16:58:25.241Z ionic:utils-process processExit: exiting (exit code: 1)

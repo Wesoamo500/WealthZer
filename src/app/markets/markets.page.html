@@ -1,0 +1,82 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="background">
+    <ion-title>Markets</ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="search" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar color="background">
+    <div class="categories-wrapper">
+      <ion-chip color="primary" mode="ios" outline="false">
+        <ion-label>All</ion-label>
+      </ion-chip>
+      <ion-chip mode="ios" outline="true">
+        <ion-label>Crypto</ion-label>
+      </ion-chip>
+      <ion-chip mode="ios" outline="true">
+        <ion-label>Stocks</ion-label>
+      </ion-chip>
+      <ion-chip mode="ios" outline="true">
+        <ion-label>Commodities</ion-label>
+      </ion-chip>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <div class="section-header">
+    <h2>Trending</h2>
+    <ion-button fill="clear" size="small" color="primary">See All</ion-button>
+  </div>
+
+  <ion-list lines="none">
+    <ion-item class="market-item">
+      <div class="rank" slot="start">1</div>
+      <div class="coin-icon" slot="start">
+        <ion-icon name="logo-bitcoin" style="color: #f7931a;"></ion-icon>
+      </div>
+      <ion-label>
+        <h3>Bitcoin</h3>
+        <p>BTC</p>
+      </ion-label>
+      <div class="price-info" slot="end">
+        <h3>$54,231.20</h3>
+        <p class="positive">+3.2%</p>
+      </div>
+    </ion-item>
+
+    <ion-item class="market-item">
+      <div class="rank" slot="start">2</div>
+      <div class="coin-icon" slot="start">
+        <ion-icon name="logo-electron" style="color: #627eea;"></ion-icon>
+      </div>
+      <ion-label>
+        <h3>Ethereum</h3>
+        <p>ETH</p>
+      </ion-label>
+      <div class="price-info" slot="end">
+        <h3>$12,145.00</h3>
+        <p class="negative">-1.4%</p>
+      </div>
+    </ion-item>
+
+    <ion-item class="market-item">
+      <div class="rank" slot="start">3</div>
+      <div class="coin-icon" slot="start">
+        <ion-icon name="logo-apple" style="color: #A2AAAD;"></ion-icon>
+      </div>
+      <ion-label>
+        <h3>Apple Inc.</h3>
+        <p>AAPL</p>
+      </ion-label>
+      <div class="price-info" slot="end">
+        <h3>$186.20</h3>
+        <p class="positive">+0.8%</p>
+      </div>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

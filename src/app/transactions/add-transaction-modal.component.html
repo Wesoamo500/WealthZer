@@ -1,0 +1,99 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">ADD TRANSACTION</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" color="dark">
+  
+  <!-- Amount Input -->
+  <div class="amount-section" (click)="focusAmountInput()">
+    <p class="enter-amount-label">ENTER AMOUNT</p>
+    <div class="amount-display">
+      <span class="currency-symbol">$</span>
+      <span class="amount-value">{{ displayAmount }}</span>
+      <span class="cursor" *ngIf="isAmountFocused">|</span>
+    </div>
+    <input 
+      #amountInput
+      type="number" 
+      [(ngModel)]="amount" 
+      (focus)="isAmountFocused = true"
+      (blur)="isAmountFocused = false"
+      (input)="updateDisplayAmount()"
+      class="hidden-input"
+      inputmode="decimal"
+      step="0.01"
+    />
+  </div>
+
+  <!-- Category Selection -->
+  <div class="category-section">
+    <div class="section-header">
+      <span>CATEGORY</span>
+      <ion-badge color="primary">AI SUGGESTED</ion-badge>
+    </div>
+    
+    <div class="category-grid">
+      <div 
+        *ngFor="let cat of categories" 
+        class="category-item"
+        [class.selected]="selectedCategory === cat.id"
+        (click)="selectCategory(cat.id)"
+      >
+        <div class="category-icon">
+          <ion-icon [name]="cat.icon"></ion-icon>
+        </div>
+        <span>{{ cat.label }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date and Account -->
+  <div class="details-section">
+    <div class="detail-row">
+      <div class="detail-item">
+        <label>DATE</label>
+        <ion-button fill="clear" class="detail-value">
+          {{ selectedDate }}
+          <ion-icon name="calendar-outline" slot="end"></ion-icon>
+        </ion-button>
+      </div>
+      
+      <div class="detail-item">
+        <label>ACCOUNT</label>
+        <ion-button fill="clear" class="detail-value">
+          {{ selectedAccount }}
+          <ion-icon name="chevron-down" slot="end"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note -->
+  <div class="note-section">
+    <label>ADD NOTE</label>
+    <ion-input 
+      [(ngModel)]="note" 
+      placeholder="Lunch at The Bistro..."
+      class="note-input"
+    ></ion-input>
+  </div>
+
+  <!-- Confirm Button -->
+  <ion-button 
+    expand="block" 
+    color="primary" 
+    class="confirm-btn"
+    (click)="confirmTransaction()"
+  >
+    <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+    CONFIRM TRANSACTION
+  </ion-button>
+
+</ion-content>
