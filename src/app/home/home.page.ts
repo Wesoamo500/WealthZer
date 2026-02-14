@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
+import { FinancialService } from '../core/services/financial.service';
 
 @Component({
   selector: 'app-home',
@@ -26,41 +27,54 @@ export class HomePage implements OnInit {
     action: 'Analyze Subscriptions'
   };
 
-  assets = [
-    { name: 'Bitcoin', symbol: 'BTC', amount: '0.82 BTC', value: 54231.20, change: 3.2, icon: 'logo-bitcoin', color: '#f7931a' },
-    { name: 'Ethereum', symbol: 'ETH', amount: '4.5 ETH', value: 12145.00, change: -1.4, icon: 'logo-electron', color: '#627eea' }, // Using electron as placeholder for eth
-    { name: 'Apple Inc.', symbol: 'AAPL', amount: '42 SHARES', value: 7812.84, change: 0.8, icon: 'logo-apple', color: '#A2AAAD' },
-  ];
+  assets: any[] = [];
+  recentTransactions: any[] = [];
 
-  recentTransactions = [
-    { 
-      title: 'Starbucks Coffee', 
-      date: 'Today, 08:24 AM', 
-      amount: -5.50, 
-      icon: 'cafe', 
-      iconBg: 'rgba(255, 149, 0, 0.2)',
-      iconColor: '#FF9500'
-    },
-    { 
-      title: 'Salary Deposit', 
-      date: 'Today, 06:00 AM', 
-      amount: 4200.00, 
-      icon: 'cash', 
-      iconBg: 'rgba(52, 199, 89, 0.2)',
-      iconColor: '#34C759'
-    },
-    { 
-      title: 'Amazon Prime', 
-      date: 'Today, 02:15 AM', 
-      amount: -14.99, 
-      icon: 'cart', 
-      iconBg: 'rgba(0, 122, 255, 0.2)',
-      iconColor: '#007AFF'
-    },
-  ];
+  constructor(private financialService: FinancialService) {}
 
-  constructor() {}
+  ngOnInit() {
+    this.loadData();
+  }
 
-  ngOnInit() {}
+  loadData() {
+    this.financialService.getNetWorth().subscribe(res => {
+      this.netWorth = res.totalNetWorth;
+    });
 
+    this.financialService.getTransactions().subscribe(res => {
+      this.recentTransactions = res.slice(0, 3).map(t => ({
+        title: t.title,
+        date: new Date(t.date).toLocaleDateString(),
+        amount: Number(t.amount),
+        icon: this.getIconForCategory(t.category),
+        iconBg: this.getBgForCategory(t.category),
+        iconColor: this.getColorForCategory(t.category)
+      }));
+    });
+
+    this.financialService.getPortfolio().subscribe(res => {
+      this.assets = res.map(a => ({
+        name: a.name,
+        symbol: a.symbol,
+        amount: `${a.amount} ${a.symbol}`,
+        value: a.currentValue || a.purchasePrice,
+        change: 0, // In real app, calculate from history
+        icon: a.type === 'CRYPTO' ? 'logo-bitcoin' : 'briefcase',
+        color: '#f7931a'
+      }));
+    });
+  }
+
+  private getIconForCategory(cat: string): string {
+    const map: any = { 'DINING': 'cafe', 'GROCERIES': 'cart', 'TRANSPORT': 'car', 'FUN': 'game-controller-outline' };
+    return map[cat] || 'cash';
+  }
+
+  private getBgForCategory(cat: string): string {
+    return 'rgba(255, 149, 0, 0.2)';
+  }
+
+  private getColorForCategory(cat: string): string {
+    return '#FF9500';
+  }
 }

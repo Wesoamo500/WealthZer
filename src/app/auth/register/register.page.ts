@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -19,7 +20,10 @@ export class RegisterPage implements OnInit {
   agreeToTerms: boolean = false;
   showPassword: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {}
 
@@ -28,7 +32,6 @@ export class RegisterPage implements OnInit {
   }
 
   async createAccount() {
-    // Validation
     if (!this.fullName || !this.email || !this.password) {
       console.log('Please fill in all required fields');
       return;
@@ -44,16 +47,34 @@ export class RegisterPage implements OnInit {
       return;
     }
 
-    // Simulate account creation
-    console.log('Creating account for:', this.email);
-    
-    // Navigate to 2FA
-    this.router.navigate(['/auth/two-factor']);
+    this.authService.register({
+      fullName: this.fullName,
+      email: this.email,
+      password: this.password,
+      referralCode: this.referralCode
+    }).subscribe({
+      next: (res) => {
+        console.log('Registration successful', res);
+        this.router.navigate(['/auth/login']);
+      },
+      error: (err) => {
+        console.error('Registration failed', err);
+      }
+    });
   }
 
-  socialRegister(provider: string) {
+  socialRegister(provider: 'GOOGLE' | 'APPLE') {
     console.log(`Social register with ${provider}`);
-    this.router.navigate(['/auth/two-factor']);
+    // Similar to socialLogin
+    const idToken = 'SIMULATED_TOKEN';
+    this.authService.socialLogin(provider, idToken, this.fullName).subscribe({
+      next: (res) => {
+        this.router.navigate(['/tabs']);
+      },
+      error: (err) => {
+        console.error('Social registration failed', err);
+      }
+    });
   }
 
   goBack() {

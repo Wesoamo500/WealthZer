@@ -2,7 +2,9 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { Device } from '@capacitor/device';
 
 @Component({
   selector: 'app-two-factor',
@@ -20,11 +22,19 @@ export class TwoFactorPage implements OnInit, OnDestroy {
   timerInterval: any;
   isFocused: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      if (params['email']) {
+        this.email = params['email'];
+      }
+    });
     this.startTimer();
-    // Auto-focus input on page load
     setTimeout(() => this.focusInput(), 300);
   }
 
@@ -96,10 +106,17 @@ export class TwoFactorPage implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('Verifying code:', this.codeInput);
-    
-    // Navigate to main app
-    this.router.navigate(['/tabs']);
+    const device = await Device.getId();
+
+    this.authService.verify2fa(this.email, this.codeInput, device.identifier).subscribe({
+      next: (res) => {
+        console.log('2FA Verified', res);
+        this.router.navigate(['/tabs']);
+      },
+      error: (err) => {
+        console.error('2FA Verification failed', err);
+      }
+    });
   }
 
   goBack() {

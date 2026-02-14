@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { Device } from '@capacitor/device';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +18,10 @@ export class LoginPage implements OnInit {
   password: string = '';
   showPassword: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {}
 
@@ -25,23 +30,47 @@ export class LoginPage implements OnInit {
   }
 
   async login() {
-    // Basic validation
     if (!this.email || !this.password) {
+      // In a real app, use a toast or alert
       console.log('Please fill in all fields');
       return;
     }
 
-    // Simulate login - in production, call authentication service
-    console.log('Logging in with:', this.email);
+    const device = await Device.getId();
     
-    // Navigate to 2FA page
-    this.router.navigate(['/auth/two-factor']);
+    this.authService.login({
+      email: this.email,
+      password: this.password,
+      deviceId: device.identifier
+    }).subscribe({
+      next: (res) => {
+        // If the backend returns a user but requires 2FA, 
+        // we might still navigate to 2FA if that's the flow.
+        // Assuming the current login returns tokens and user.
+        console.log('Login successful', res);
+        this.router.navigate(['/auth/two-factor'], { 
+          queryParams: { email: this.email } 
+        });
+      },
+      error: (err) => {
+        console.error('Login failed', err);
+      }
+    });
   }
 
-  socialLogin(provider: string) {
+  async socialLogin(provider: 'GOOGLE' | 'APPLE') {
     console.log(`Social login with ${provider}`);
-    // In production, implement OAuth flow
-    this.router.navigate(['/auth/two-factor']);
+    // In a real app, use Capacitor Google/Apple Sign-in plugins to get the idToken
+    const idToken = 'SIMULATED_TOKEN'; 
+    
+    this.authService.socialLogin(provider, idToken).subscribe({
+      next: (res) => {
+        this.router.navigate(['/tabs']);
+      },
+      error: (err) => {
+        console.error('Social login failed', err);
+      }
+    });
   }
 
   forgotPassword() {

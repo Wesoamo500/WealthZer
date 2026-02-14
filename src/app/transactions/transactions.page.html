@@ -36,32 +36,14 @@
     </ion-chip>
   </div>
 
-  <!-- Today Section -->
-  <div class="date-section">
-    <h6 class="date-header">TODAY, OCT 24</h6>
-    
-    <ion-list lines="none">
-      <ion-item *ngFor="let item of todayTransactions" class="transaction-item">
-        <div class="icon-box" [style.background]="item.iconBg" slot="start">
-          <ion-icon [name]="item.icon" [style.color]="item.iconColor"></ion-icon>
-        </div>
-        <ion-label>
-          <h3>{{ item.title }}</h3>
-          <p>{{ item.subtitle }}</p>
-        </ion-label>
-        <div class="amount" slot="end" [class.positive]="item.amount > 0">
-          {{ item.amount > 0 ? '+' : '' }}{{ item.amount | currency }}
-        </div>
-      </ion-item>
-    </ion-list>
-  </div>
+  <!-- Transactions List -->
+  <div class="transactions-container">
+    <div class="section-header" *ngIf="transactions.length > 0">
+      <h2>Recent activity</h2>
+    </div>
 
-  <!-- Yesterday Section -->
-  <div class="date-section">
-    <h6 class="date-header">YESTERDAY, OCT 23</h6>
-    
-    <ion-list lines="none">
-      <ion-item *ngFor="let item of yesterdayTransactions" class="transaction-item">
+    <ion-list lines="none" class="transactions-list">
+      <ion-item *ngFor="let item of transactions" class="transaction-item">
         <div class="icon-box" [style.background]="item.iconBg" slot="start">
           <ion-icon [name]="item.icon" [style.color]="item.iconColor"></ion-icon>
         </div>
@@ -69,35 +51,21 @@
           <h3>{{ item.title }}</h3>
           <p>{{ item.subtitle }}</p>
         </ion-label>
-        <div class="amount" slot="end" [class.positive]="item.amount > 0">
+        <div class="amount" slot="end" [class.negative]="item.amount < 0">
           {{ item.amount > 0 ? '+' : '' }}{{ item.amount | currency }}
         </div>
       </ion-item>
     </ion-list>
-  </div>
 
-  <!-- Oct 22 Section -->
-  <div class="date-section">
-    <h6 class="date-header">OCT 22</h6>
-    
-    <ion-list lines="none">
-      <ion-item *ngFor="let item of oct22Transactions" class="transaction-item">
-        <div class="icon-box" [style.background]="item.iconBg" slot="start">
-          <ion-icon [name]="item.icon" [style.color]="item.iconColor"></ion-icon>
-        </div>
-        <ion-label>
-          <h3>{{ item.title }}</h3>
-          <p>{{ item.subtitle }}</p>
-        </ion-label>
-        <div class="amount" slot="end" [class.positive]="item.amount > 0">
-          {{ item.amount > 0 ? '+' : '' }}{{ item.amount | currency }}
-        </div>
-      </ion-item>
-    </ion-list>
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="transactions.length === 0">
+      <ion-icon name="receipt-outline"></ion-icon>
+      <p>No transactions found</p>
+    </div>
   </div>
 
   <!-- AI Advisor Button -->
-  <ion-button class="ai-advisor-btn" expand="block" fill="clear">
+  <ion-button class="ai-advisor-btn" expand="block" fill="clear" routerLink="/tabs/advisor">
     <ion-icon name="bulb" slot="start"></ion-icon>
     Ask AI Advisor
   </ion-button>
