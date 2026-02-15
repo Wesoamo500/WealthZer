@@ -3,8 +3,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'auth/login',
-    pathMatch: 'full'
+    loadComponent: () => import('./splash/splash.page').then(m => m.SplashPage)
   },
   {
     path: 'auth/login',

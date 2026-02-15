@@ -1,0 +1,36 @@
+<ion-content [fullscreen]="true">
+  <div class="splash-container">
+    <div class="logo-section">
+      <div class="icon-box">
+        <div class="money-symbol">
+          <div class="bill-body">
+            <div class="bill-circle"></div>
+          </div>
+          <div class="bill-shadow"></div>
+        </div>
+      </div>
+      <div class="brand-name">
+        <span class="wealth">wealth</span><span class="zer">Zer</span>
+      </div>
+      <div class="tagline">EMPOWERING YOUR FINANCIAL FUTURE</div>
+    </div>
+
+    <div class="loading-section">
+      <div class="status-header">
+        <span class="status-text">{{ statusText }}</span>
+        <span class="percentage">{{ progress }}%</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" [style.width.%]="progress"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="encryption-badge">
+        <ion-icon name="shield-checkmark" color="primary"></ion-icon>
+        <span>AES-256 Bank-Grade Encryption</span>
+      </div>
+      <div class="copyright">© 2024 WEALTHZER GLOBAL INC.</div>
+    </div>
+  </div>
+</ion-content>
