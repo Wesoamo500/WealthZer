@@ -66,29 +66,47 @@
       </div>
     </div>
 
-    <!-- Budget Impact -->
-    <div class="impact-card">
-      <div class="impact-header">
-        <div class="impact-title">
-          <h4>Budget Impact</h4>
-          <p>Based on $4,500 monthly income</p>
-        </div>
-        <ion-badge class="calculated-badge">CALCULATED</ion-badge>
+    <!-- Budget Impact Section -->
+    <div class="impact-section">
+      <div class="section-header">
+        <h3>Budget Impact</h3>
       </div>
 
-      <div class="progress-container">
-        <div class="progress-bar">
-          <div class="progress-fill" [style.width.%]="28"></div>
+      <!-- Empty State -->
+      <div class="empty-impact" *ngIf="budgets.length === 0">
+        <div class="placeholder-icon">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
         </div>
+        <h4>No Budgets Yet</h4>
+        <p>Stay on track by setting spending limits for your categories.</p>
       </div>
 
-      <div class="impact-footer">
-        <div class="breakdown-item">
-          <span class="dot"></span>
-          <span class="label">Dining (28%)</span>
-        </div>
-        <div class="remaining">
-          Remaining: $3,250.00
+      <!-- Budget Impact Cards -->
+      <div class="impact-list" *ngIf="budgets.length > 0">
+        <div class="impact-card" *ngFor="let budget of budgets">
+          <div class="impact-header">
+            <div class="impact-title">
+              <h4>{{ budget.category | titlecase }}</h4>
+              <p>Based on ${{ totalMonthlyIncome | number }} monthly income</p>
+            </div>
+            <ion-badge class="calculated-badge">CALCULATED</ion-badge>
+          </div>
+
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="getImpactPercentage(budget.category)"></div>
+            </div>
+          </div>
+
+          <div class="impact-footer">
+            <div class="breakdown-item">
+              <span class="dot"></span>
+              <span class="label">{{ budget.category | titlecase }} ({{ getImpactPercentage(budget.category) }}%)</span>
+            </div>
+            <div class="remaining">
+              Remaining: ${{ getRemainingAmount(budget.category) | number:'1.2-2' }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -97,7 +115,7 @@
   <!-- Create Button -->
   <ion-footer class="ion-no-border">
     <div class="footer-container">
-      <ion-button expand="block" class="create-budget-btn">
+      <ion-button expand="block" class="create-budget-btn" (click)="createBudget()">
         Create Budget
         <ion-icon name="add-circle" slot="end"></ion-icon>
       </ion-button>

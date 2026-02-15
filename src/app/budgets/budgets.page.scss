@@ -167,6 +167,62 @@ ion-content {
   }
 }
 
+/* Impact Section */
+.impact-section {
+  .section-header {
+    margin-bottom: 20px;
+    h3 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+    }
+  }
+}
+
+.empty-impact {
+  text-align: center;
+  background: #1a1a1a;
+  border-radius: 24px;
+  padding: 40px 20px;
+  border: 1px dashed #333;
+
+  .placeholder-icon {
+    width: 60px;
+    height: 60px;
+    background: #0d0d0d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    ion-icon {
+      font-size: 30px;
+      color: #cca43b;
+    }
+  }
+
+  h4 {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+
+  p {
+    color: #888;
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+.impact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
 /* Impact Card */
 .impact-card {
   background: #1a1a1a;

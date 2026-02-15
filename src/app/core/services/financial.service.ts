@@ -23,12 +23,23 @@ export interface PortfolioAsset {
   currentValue?: number;
 }
 
+export interface Budget {
+  id?: string;
+  category: string;
+  amount: number;
+  period: 'monthly' | 'weekly';
+  spent: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class FinancialService {
   private transactionUpdateSubject = new Subject<void>();
   public transactionUpdate$ = this.transactionUpdateSubject.asObservable();
+
+  private budgetUpdateSubject = new Subject<void>();
+  public budgetUpdate$ = this.budgetUpdateSubject.asObservable();
 
   constructor(private apiService: ApiService) {}
 
@@ -44,6 +55,10 @@ export class FinancialService {
     return this.apiService.get<{ totalNetWorth: number; currency: string }>('financial/net-worth');
   }
 
+  getBudgets(): Observable<Budget[]> {
+    return this.apiService.get<Budget[]>('financial/budgets');
+  }
+
   addTransaction(transaction: any): Observable<Transaction> {
     return this.apiService.post<Transaction>('financial/transactions', transaction).pipe(
       tap(() => this.transactionUpdateSubject.next())
@@ -53,6 +68,12 @@ export class FinancialService {
   addAsset(asset: any): Observable<PortfolioAsset> {
     return this.apiService.post<PortfolioAsset>('financial/assets', asset).pipe(
       tap(() => this.transactionUpdateSubject.next())
+    );
+  }
+
+  addBudget(budget: Budget): Observable<Budget> {
+    return this.apiService.post<Budget>('financial/budgets', budget).pipe(
+      tap(() => this.budgetUpdateSubject.next())
     );
   }
 }
