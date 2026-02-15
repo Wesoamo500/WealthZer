@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { FinancialService } from '../../core/services/financial.service';
+import { forkJoin, catchError, of } from 'rxjs';
 import { Device } from '@capacitor/device';
 
 @Component({
@@ -25,7 +27,8 @@ export class TwoFactorPage implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private financialService: FinancialService
   ) {}
 
   ngOnInit() {
@@ -111,7 +114,18 @@ export class TwoFactorPage implements OnInit, OnDestroy {
     this.authService.verify2fa(this.email, this.codeInput, device.identifier).subscribe({
       next: (res) => {
         console.log('2FA Verified', res);
-        this.router.navigate(['/tabs']);
+        
+        // Fetch data to determine if we should show the welcome page
+        forkJoin({
+          transactions: this.financialService.getTransactions().pipe(catchError(() => of([]))),
+          portfolio: this.financialService.getPortfolio().pipe(catchError(() => of([])))
+        }).subscribe(data => {
+          if (data.transactions.length === 0 && data.portfolio.length === 0) {
+            this.router.navigate(['/welcome']);
+          } else {
+            this.router.navigate(['/tabs']);
+          }
+        });
       },
       error: (err) => {
         console.error('2FA Verification failed', err);

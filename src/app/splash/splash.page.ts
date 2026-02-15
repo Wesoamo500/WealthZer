@@ -55,11 +55,13 @@ export class SplashPage implements OnInit {
       await this.delay(500);
 
       if (user) {
+        // Fetch data to determine if we should show the welcome page
         const data = await firstValueFrom(forkJoin({
           transactions: this.financialService.getTransactions().pipe(catchError(() => of([]))),
           portfolio: this.financialService.getPortfolio().pipe(catchError(() => of([])))
         }));
         
+        // If user has no information (0 assets and 0 transactions), show welcome page
         if (data.transactions.length === 0 && data.portfolio.length === 0) {
           this.router.navigate(['/welcome'], { replaceUrl: true });
         } else {

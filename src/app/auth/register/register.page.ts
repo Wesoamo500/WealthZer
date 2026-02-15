@@ -69,7 +69,8 @@ export class RegisterPage implements OnInit {
     const idToken = 'SIMULATED_TOKEN';
     this.authService.socialLogin(provider, idToken, this.fullName).subscribe({
       next: (res) => {
-        this.router.navigate(['/tabs']);
+        // Since it's a new social registration, user has no data yet
+        this.router.navigate(['/welcome']);
       },
       error: (err) => {
         console.error('Social registration failed', err);
