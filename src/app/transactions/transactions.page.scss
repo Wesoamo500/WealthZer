@@ -2,83 +2,58 @@ ion-header {
   ion-toolbar {
     --background: #101010;
     --color: white;
+    --border-style: none;
   }
 }
 
-.custom-searchbar {
-  --background: #1C1C1E;
-  --color: white;
-  --placeholder-color: rgba(255, 255, 255, 0.4);
-  --icon-color: rgba(255, 255, 255, 0.4);
-  --border-radius: 12px;
-  padding: 8px 16px;
+.filters-toolbar {
+  --padding-top: 0;
+  --padding-bottom: 12px;
 }
 
-.filters {
+.filters-container {
   display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: 12px;
+  padding: 0 16px;
   overflow-x: auto;
-  padding-bottom: 8px;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  &::-webkit-scrollbar { display: none; }
 
   ion-chip {
-    --background: #2C2C2E;
-    --color: rgba(255, 255, 255, 0.7);
-    border-radius: 20px;
-    height: 36px;
-    font-size: 13px;
+    --background: #1c1c1e;
+    --color: #888;
+    margin: 0;
+    height: 44px;
+    padding: 0 20px;
+    border-radius: 22px;
     font-weight: 500;
+    font-size: 15px;
+    transition: all 0.2s ease;
 
-    &[color="primary"] {
+    &.active {
       --background: var(--ion-color-primary);
-      --color: black;
+      --color: #000;
       font-weight: 600;
     }
-
-    &[outline="true"] {
-      --background: transparent;
-      border: 1px solid #2C2C2E;
-    }
-
-    ion-icon {
-      font-size: 16px;
-    }
   }
 }
 
-.date-section {
-  margin-bottom: 32px;
-
-  .date-header {
-    font-size: 11px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.4);
-    letter-spacing: 1px;
-    margin: 0 0 16px 0;
-    text-transform: uppercase;
-  }
-}
-
-ion-list {
-  background: transparent;
-  padding: 0;
+.main-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .transaction-item {
   --background: transparent;
-  --padding-start: 0;
-  --padding-end: 0;
+  --padding-start: 16px;
+  --padding-end: 16px;
   --inner-padding-end: 0;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 
   .icon-box {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -91,16 +66,14 @@ ion-list {
 
   ion-label {
     h3 {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 600;
       color: white;
-      margin: 0 0 4px 0;
+      margin-bottom: 4px;
     }
-
     p {
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.5);
-      margin: 0;
+      color: #666;
     }
   }
 
@@ -108,24 +81,96 @@ ion-list {
     font-size: 16px;
     font-weight: 700;
     color: white;
-
-    &.positive {
-      color: #34C759;
-    }
+    &.negative { color: #ff3b30; }
   }
 }
 
-.ai-advisor-btn {
-  --background: transparent;
-  --color: var(--ion-color-primary);
-  --border-radius: 12px;
-  --padding-top: 12px;
-  --padding-bottom: 12px;
-  margin-top: 24px;
-  font-weight: 600;
-  font-size: 14px;
+// Empty State Styling
+.empty-state-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
 
-  ion-icon {
-    font-size: 20px;
+.empty-state-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 280px;
+}
+
+.receipt-icon-container {
+  width: 140px;
+  height: 140px;
+  background: rgba(28, 28, 30, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.receipt-shape {
+  width: 50px;
+  height: 60px;
+  background: #2c2c2e;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+
+  .receipt-lines {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    .line {
+      height: 4px;
+      background: #3a3a3c;
+      border-radius: 2px;
+      width: 100%;
+      &:nth-child(2) { width: 60%; }
+    }
   }
+
+  .diag-line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 4px;
+    background: var(--ion-color-primary);
+    transform: translate(-50%, -50%) rotate(-45deg);
+    box-shadow: 0 0 10px rgba(244, 211, 94, 0.5);
+  }
+}
+
+.empty-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 12px;
+}
+
+.empty-subtitle {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 40px;
+}
+
+.add-transaction-btn {
+  --background: var(--ion-color-primary);
+  --color: #000;
+  --border-radius: 16px;
+  --padding-top: 18px;
+  --padding-bottom: 18px;
+  width: 100%;
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: none;
+  margin: 0;
+  box-shadow: 0 10px 20px rgba(244, 211, 94, 0.2);
 }

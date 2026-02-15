@@ -32,6 +32,16 @@
     />
   </div>
 
+  <!-- Title Input -->
+  <div class="note-section" style="margin-bottom: 20px;">
+    <label>TRANSACTION TITLE</label>
+    <ion-input 
+      [(ngModel)]="title" 
+      placeholder="e.g. Starbucks, Rent, Grocery"
+      class="note-input"
+    ></ion-input>
+  </div>
+
   <!-- Category Selection -->
   <div class="category-section">
     <div class="section-header">
@@ -59,28 +69,29 @@
     <div class="detail-row">
       <div class="detail-item">
         <label>DATE</label>
-        <ion-button fill="clear" class="detail-value">
-          {{ selectedDate }}
-          <ion-icon name="calendar-outline" slot="end"></ion-icon>
-        </ion-button>
+        <ion-datetime-button datetime="datetime"></ion-datetime-button>
+        <ion-popover [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime id="datetime" presentation="date" [(ngModel)]="selectedDate"></ion-datetime>
+          </ng-template>
+        </ion-popover>
       </div>
       
       <div class="detail-item">
         <label>ACCOUNT</label>
-        <ion-button fill="clear" class="detail-value">
-          {{ selectedAccount }}
-          <ion-icon name="chevron-down" slot="end"></ion-icon>
-        </ion-button>
+        <ion-select [(ngModel)]="selectedAccount" interface="popover" toggleIcon="v-down" class="detail-select">
+          <ion-select-option *ngFor="let acc of accounts" [value]="acc.id">{{ acc.label }}</ion-select-option>
+        </ion-select>
       </div>
     </div>
   </div>
 
   <!-- Note -->
-  <div class="note-section">
+  <div class="note-section" style="margin-top: 20px;">
     <label>ADD NOTE</label>
     <ion-input 
       [(ngModel)]="note" 
-      placeholder="Lunch at The Bistro..."
+      placeholder="Extra context here..."
       class="note-input"
     ></ion-input>
   </div>
@@ -91,6 +102,7 @@
     color="primary" 
     class="confirm-btn"
     (click)="confirmTransaction()"
+    [disabled]="!title || !amount"
   >
     <ion-icon name="checkmark-circle" slot="start"></ion-icon>
     CONFIRM TRANSACTION

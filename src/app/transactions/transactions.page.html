@@ -1,73 +1,74 @@
 <ion-header class="ion-no-border">
   <ion-toolbar color="background">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/home" icon="chevron-back-outline" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>Transaction History</ion-title>
     <ion-buttons slot="end">
       <ion-button>
-        <ion-icon name="download-outline"></ion-icon>
+        <ion-icon name="options-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-  <ion-toolbar color="background">
-    <ion-searchbar placeholder="Search merchants or categories" class="custom-searchbar"></ion-searchbar>
+
+  <ion-toolbar color="background" class="filters-toolbar">
+    <div class="filters-container">
+      <ion-chip [class.active]="selectedFilter === 'all'" (click)="setFilter('all')">
+        <ion-label>All</ion-label>
+      </ion-chip>
+      <ion-chip [class.active]="selectedFilter === 'income'" (click)="setFilter('income')">
+        <ion-label>Income</ion-label>
+      </ion-chip>
+      <ion-chip [class.active]="selectedFilter === 'expenses'" (click)="setFilter('expenses')">
+        <ion-label>Expenses</ion-label>
+      </ion-chip>
+      <ion-chip [class.active]="selectedFilter === 'transfers'" (click)="setFilter('transfers')">
+        <ion-label>Transfers</ion-label>
+      </ion-chip>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-
-  <div class="filters">
-    <ion-chip color="primary">
-      <ion-icon name="calendar"></ion-icon>
-      <ion-label>Date</ion-label>
-    </ion-chip>
-    <ion-chip outline="true">
-      <ion-label>Type</ion-label>
-      <ion-icon name="chevron-down"></ion-icon>
-    </ion-chip>
-    <ion-chip outline="true">
-      <ion-label>Category</ion-label>
-      <ion-icon name="chevron-down"></ion-icon>
-    </ion-chip>
-    <ion-chip outline="true">
-      <ion-icon name="options"></ion-icon>
-      <ion-label>Filter</ion-label>
-    </ion-chip>
-  </div>
-
-  <!-- Transactions List -->
-  <div class="transactions-container">
-    <div class="section-header" *ngIf="transactions.length > 0">
-      <h2>Recent activity</h2>
+<ion-content [fullscreen]="true">
+  <div class="main-container">
+    <div class="transactions-list-container" *ngIf="filteredTransactions.length > 0">
+      <ion-list lines="none">
+        <ion-item *ngFor="let item of filteredTransactions" class="transaction-item">
+          <div class="icon-box" [style.background]="item.iconBg" slot="start">
+            <ion-icon [name]="item.icon" [style.color]="item.iconColor"></ion-icon>
+          </div>
+          <ion-label>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.subtitle }}</p>
+          </ion-label>
+          <div class="amount" slot="end" [class.negative]="item.amount < 0">
+            {{ item.amount > 0 ? '+' : '' }}{{ item.amount | currency }}
+          </div>
+        </ion-item>
+      </ion-list>
     </div>
-
-    <ion-list lines="none" class="transactions-list">
-      <ion-item *ngFor="let item of transactions" class="transaction-item">
-        <div class="icon-box" [style.background]="item.iconBg" slot="start">
-          <ion-icon [name]="item.icon" [style.color]="item.iconColor"></ion-icon>
-        </div>
-        <ion-label>
-          <h3>{{ item.title }}</h3>
-          <p>{{ item.subtitle }}</p>
-        </ion-label>
-        <div class="amount" slot="end" [class.negative]="item.amount < 0">
-          {{ item.amount > 0 ? '+' : '' }}{{ item.amount | currency }}
-        </div>
-      </ion-item>
-    </ion-list>
 
     <!-- Empty State -->
-    <div class="empty-state" *ngIf="transactions.length === 0">
-      <ion-icon name="receipt-outline"></ion-icon>
-      <p>No transactions found</p>
+    <div class="empty-state-wrapper" *ngIf="filteredTransactions.length === 0">
+      <div class="empty-state-content">
+        <div class="receipt-icon-container">
+          <div class="receipt-shape">
+            <div class="receipt-lines">
+              <div class="line"></div>
+              <div class="line"></div>
+            </div>
+            <div class="diag-line"></div>
+          </div>
+        </div>
+        
+        <h2 class="empty-title">No transactions found</h2>
+        <p class="empty-subtitle">Your spending and income history will appear here once you start using the app.</p>
+        
+        <ion-button class="add-transaction-btn" (click)="openAddTransaction()">
+          <ion-icon name="add-circle" slot="start"></ion-icon>
+          Add Transaction
+        </ion-button>
+      </div>
     </div>
   </div>
-
-  <!-- AI Advisor Button -->
-  <ion-button class="ai-advisor-btn" expand="block" fill="clear" routerLink="/tabs/advisor">
-    <ion-icon name="bulb" slot="start"></ion-icon>
-    Ask AI Advisor
-  </ion-button>
-
 </ion-content>

@@ -3,90 +3,65 @@
     <ion-title>Portfolio</ion-title>
     <ion-buttons slot="end">
       <ion-button>
-        <ion-icon name="eye" slot="icon-only"></ion-icon>
+        <ion-icon name="eye-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true">
+  <div class="main-container">
+    <div class="balance-card">
+      <p class="balance-label">Total Balance</p>
+      <h1 class="balance-amount">{{ totalBalance | currency:currency }}</h1>
+    </div>
 
-  <div class="total-balance">
-    <p>Total Balance</p>
-    <h1>$42,692.10</h1>
-  </div>
+    <!-- Active Assets -->
+    <div class="assets-section" *ngIf="assets.length > 0">
+      <div class="section-header">
+        <h2>Your Assets</h2>
+        <ion-button fill="clear" color="primary" (click)="openAddAsset()">
+          <ion-icon name="add" slot="start"></ion-icon>
+          Add
+        </ion-button>
+      </div>
 
-  <!-- Donut Chart Placeholder -->
-  <div class="chart-container">
-    <div class="donut-chart">
-      <div class="center-text">
-        <p>GROWTH</p>
-        <h2 class="positive">+18.4%</h2>
+      <ion-list lines="none">
+        <ion-item *ngFor="let asset of assets" class="asset-item">
+          <div class="icon-box" [style.background]="getBgForAsset(asset.type)" slot="start">
+            <ion-icon [name]="getIconForAsset(asset.type)" [style.color]="getColorForAsset(asset.type)"></ion-icon>
+          </div>
+          <ion-label>
+            <h3>{{ asset.name }}</h3>
+            <p>{{ asset.amount }} {{ asset.symbol }}</p>
+          </ion-label>
+          <div class="value" slot="end">
+            <h3>{{ (asset.currentValue || 0) | currency:currency }}</h3>
+            <p class="positive">+0.00%</p>
+          </div>
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state-wrapper" *ngIf="assets.length === 0">
+      <div class="empty-state-content">
+        <div class="asset-icon-container">
+          <div class="cube-shape">
+            <div class="cube-face top"></div>
+            <div class="cube-face front"></div>
+            <div class="diag-line"></div>
+          </div>
+        </div>
+        
+        <h2 class="empty-title">No assets found</h2>
+        <p class="empty-subtitle">Start building your wealth by adding your first investment or savings account.</p>
+        
+        <ion-button class="add-asset-btn" (click)="openAddAsset()">
+          <ion-icon name="wallet-outline" slot="start"></ion-icon>
+          Add Asset
+        </ion-button>
       </div>
     </div>
-    <div class="chart-legend">
-      <div class="legend-item">
-        <span class="dot crypto"></span>
-        <span>Crypto 65%</span>
-      </div>
-      <div class="legend-item">
-        <span class="dot stocks"></span>
-        <span>Stocks 20%</span>
-      </div>
-      <div class="legend-item">
-        <span class="dot savings"></span>
-        <span>Savings 15%</span>
-      </div>
-    </div>
   </div>
-
-  <div class="section-header">
-    <h2>Holdings</h2>
-    <ion-button fill="clear" size="small" color="primary">See All</ion-button>
-  </div>
-
-  <ion-list lines="none">
-    <ion-item class="holding-item">
-      <div class="icon-box orange" slot="start">
-        <ion-icon name="logo-bitcoin"></ion-icon>
-      </div>
-      <ion-label>
-        <h3>Bitcoin</h3>
-        <p>0.428 BTC</p>
-      </ion-label>
-      <div class="value" slot="end">
-        <h3>$27,742.15</h3>
-        <p class="negative">-3.24%</p>
-      </div>
-    </ion-item>
-
-    <ion-item class="holding-item">
-      <div class="icon-box blue" slot="start">
-        <ion-icon name="flash"></ion-icon>
-      </div>
-      <ion-label>
-        <h3>Tesla, Inc.</h3>
-        <p>12.5 TSLA</p>
-      </ion-label>
-      <div class="value" slot="end">
-        <h3>$3,125.50</h3>
-        <p class="negative">-1.12%</p>
-      </div>
-    </ion-item>
-
-    <ion-item class="holding-item">
-      <div class="icon-box green" slot="start">
-        <ion-icon name="wallet"></ion-icon>
-      </div>
-      <ion-label>
-        <h3>USDT Savings</h3>
-        <p>Flexible Earn</p>
-      </ion-label>
-      <div class="value" slot="end">
-        <h3>$5,824.45</h3>
-        <p class="positive">+5.20% APY</p>
-      </div>
-    </ion-item>
-  </ion-list>
-
 </ion-content>

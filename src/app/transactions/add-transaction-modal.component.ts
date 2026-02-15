@@ -13,20 +13,27 @@ import { IonicModule, ModalController } from '@ionic/angular';
 export class AddTransactionModalComponent implements OnInit {
   @ViewChild('amountInput') amountInput!: ElementRef<HTMLInputElement>;
   
+  title: string = '';
   amount: number = 0;
   displayAmount: string = '0.00';
   isAmountFocused: boolean = false;
-  selectedCategory = 'dining';
-  selectedDate = 'Today';
-  selectedAccount = 'Main Bank';
+  selectedCategory = 'OTHERS';
+  selectedDate = new Date().toISOString();
+  selectedAccount = 'BANK';
   note = '';
 
   categories = [
-    { id: 'dining', label: 'Dining', icon: 'restaurant' },
-    { id: 'groceries', label: 'Groceries', icon: 'cart' },
-    { id: 'transport', label: 'Transport', icon: 'car' },
-    { id: 'fun', label: 'Fun', icon: 'game-controller' },
-    { id: 'others', label: 'Others', icon: 'ellipsis-horizontal' }
+    { id: 'DINING', label: 'Dining', icon: 'restaurant' },
+    { id: 'GROCERIES', label: 'Groceries', icon: 'cart' },
+    { id: 'TRANSPORT', label: 'Transport', icon: 'car' },
+    { id: 'FUN', label: 'Fun', icon: 'game-controller' },
+    { id: 'OTHERS', label: 'Others', icon: 'ellipsis-horizontal' }
+  ];
+
+  accounts = [
+    { id: 'BANK', label: 'Main Bank', icon: 'business' },
+    { id: 'CASH', label: 'Cash Wallet', icon: 'wallet' },
+    { id: 'CREDIT', label: 'Credit Card', icon: 'card' }
   ];
 
   constructor(private modalCtrl: ModalController) {}
@@ -49,7 +56,6 @@ export class AddTransactionModalComponent implements OnInit {
     }
   }
 
-
   dismiss() {
     this.modalCtrl.dismiss();
   }
@@ -59,8 +65,14 @@ export class AddTransactionModalComponent implements OnInit {
   }
 
   confirmTransaction() {
+    if (!this.title) {
+        // Basic validation before sending
+        return;
+    }
+
     const transaction = {
-      amount: this.amount,
+      title: this.title,
+      amount: -Math.abs(this.amount), // Most transactions are expenses
       category: this.selectedCategory,
       date: this.selectedDate,
       account: this.selectedAccount,
