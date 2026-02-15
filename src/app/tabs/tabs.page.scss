@@ -20,23 +20,81 @@ ion-tab-button {
   }
 }
 
-.fab-placeholder {
-  pointer-events: none;
-  opacity: 0;
-}
-
 .main-fab {
-  margin-bottom: 8px;
+  margin-bottom: calc(env(safe-area-inset-bottom) + 80px);
+  margin-inline-end: 20px;
+  z-index: 999;
   
   ion-fab-button {
     --background: var(--ion-color-primary);
     --color: black;
-    --box-shadow: 0 4px 16px rgba(244, 211, 94, 0.4);
+    --box-shadow: 0 8px 24px rgba(244, 211, 94, 0.4);
     width: 60px;
     height: 60px;
     
+    .main-icon {
+      font-size: 28px;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+  }
+
+  &.fab-activated {
+    .main-icon {
+      transform: rotate(90deg) scale(0.8);
+    }
+  }
+}
+
+ion-fab-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  .sub-fab-btn {
+    --background: #2C2C2E;
+    --color: white;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    width: 52px;
+    height: 52px;
+    margin: 0;
+    position: relative;
+    overflow: visible;
+
+    &.advisor-btn {
+      --background: #1C1C1E;
+      --color: var(--ion-color-primary);
+      border: 1px solid rgba(244, 211, 94, 0.2);
+    }
+
     ion-icon {
-      font-size: 32px;
+      font-size: 24px;
+    }
+
+    .fab-label {
+      position: absolute;
+      right: 64px;
+      background: rgba(44, 44, 46, 0.95);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transform: translateX(10px);
+      transition: all 0.3s ease;
+    }
+  }
+
+  &.fab-list-active {
+    .fab-label {
+      opacity: 1;
+      transform: translateX(0);
     }
   }
 }

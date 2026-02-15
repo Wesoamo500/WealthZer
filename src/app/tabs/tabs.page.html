@@ -10,10 +10,6 @@
       <ion-label>Portfolio</ion-label>
     </ion-tab-button>
 
-    <!-- FAB Placeholder -->
-    <ion-tab-button class="fab-placeholder">
-    </ion-tab-button>
-
     <ion-tab-button tab="transactions" href="/tabs/transactions">
       <ion-icon aria-hidden="true" name="receipt"></ion-icon>
       <ion-label>History</ion-label>
@@ -26,9 +22,20 @@
   </ion-tab-bar>
 
   <!-- Floating Action Button -->
-  <ion-fab vertical="bottom" horizontal="center" slot="fixed" class="main-fab">
-    <ion-fab-button color="primary" (click)="openAddTransaction()">
-      <ion-icon name="add"></ion-icon>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="main-fab">
+    <ion-fab-button color="primary">
+      <ion-icon name="grid-outline" class="main-icon"></ion-icon>
     </ion-fab-button>
+    
+    <ion-fab-list side="top">
+      <ion-fab-button (click)="openAddTransaction()" class="sub-fab-btn">
+        <ion-icon name="add-circle-outline"></ion-icon>
+        <ion-label class="fab-label">Add Transaction</ion-label>
+      </ion-fab-button>
+      <ion-fab-button (click)="navigateToAdvisor()" class="sub-fab-btn advisor-btn">
+        <ion-icon name="sparkles-outline"></ion-icon>
+        <ion-label class="fab-label">Ask Finner AI</ion-label>
+      </ion-fab-button>
+    </ion-fab-list>
   </ion-fab>
 </ion-tabs>

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { AddTransactionModalComponent } from '../transactions/add-transaction-modal.component';
 import { FinancialService } from '../core/services/financial.service';
@@ -14,7 +15,8 @@ export class TabsPage {
 
   constructor(
     private modalCtrl: ModalController,
-    private financialService: FinancialService
+    private financialService: FinancialService,
+    private router: Router
   ) {}
 
   async openAddTransaction() {
@@ -33,6 +35,10 @@ export class TabsPage {
         console.log('Transaction added and notified');
       });
     }
+  }
+
+  navigateToAdvisor() {
+    this.router.navigate(['/tabs/advisor']);
   }
 
 }
