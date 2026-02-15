@@ -58,7 +58,7 @@ export class HomePage implements OnInit {
         symbol: a.symbol,
         amount: `${a.amount} ${a.symbol}`,
         value: a.currentValue || a.purchasePrice,
-        change: 0, // In real app, calculate from history
+        change: 0, 
         icon: a.type === 'CRYPTO' ? 'logo-bitcoin' : 'briefcase',
         color: '#f7931a'
       }));

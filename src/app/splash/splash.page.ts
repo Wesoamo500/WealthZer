@@ -55,7 +55,16 @@ export class SplashPage implements OnInit {
       await this.delay(500);
 
       if (user) {
-        this.router.navigate(['/tabs/home'], { replaceUrl: true });
+        const data = await firstValueFrom(forkJoin({
+          transactions: this.financialService.getTransactions().pipe(catchError(() => of([]))),
+          portfolio: this.financialService.getPortfolio().pipe(catchError(() => of([])))
+        }));
+        
+        if (data.transactions.length === 0 && data.portfolio.length === 0) {
+          this.router.navigate(['/welcome'], { replaceUrl: true });
+        } else {
+          this.router.navigate(['/tabs/home'], { replaceUrl: true });
+        }
       } else {
         this.router.navigate(['/auth/login'], { replaceUrl: true });
       }

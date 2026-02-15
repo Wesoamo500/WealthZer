@@ -6,27 +6,70 @@ ion-toolbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 8px;
+    padding: 0 16px;
+    height: 100%;
 }
 
-.logo-container {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
+.logo-wrapper {
     display: flex;
-    justify-content: center;
     align-items: center;
+    gap: 10px;
+
+    .logo-box {
+        background: #FFD700;
+        color: black;
+        border-radius: 8px;
+        padding: 4px;
+        font-size: 20px;
+        border: 2px solid #FFD700;
+    }
+
+    .logo-text {
+        font-size: 20px;
+        font-weight: 700;
+        color: white;
+    }
 }
 
 .notification-btn {
-    --color: #8E8E93;
+    --color: white;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 50%;
     width: 40px;
     height: 40px;
+    margin-right: 8px;
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        width: 6px;
+        height: 6px;
+        background: #FFD700;
+        border-radius: 50%;
+        border: 1px solid #000;
+    }
 }
 
+.profile-avatar {
+    width: 40px;
+    height: 40px;
+    background: #3a3a3c;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #FFD700;
+
+    ion-icon {
+        color: #FFD700;
+        font-size: 20px;
+    }
+}
+
+/* Main Content Layout */
 .net-worth-section {
     margin-top: 10px;
     margin-bottom: 24px;
