@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -11,8 +11,11 @@ import { IonicModule } from '@ionic/angular';
   imports: [IonicModule, CommonModule, FormsModule]
 })
 export class BudgetsPage {
+  @ViewChild('amountInput') amountInput!: ElementRef<HTMLInputElement>;
+  
   targetAmount: number = 0;
-  displayAmount: string = '1,250.00';
+  displayAmount: string = '0.00';
+  isAmountFocused: boolean = false;
   selectedPeriod: 'monthly' | 'weekly' = 'monthly';
   selectedCategory = 'DINING';
 
@@ -25,6 +28,27 @@ export class BudgetsPage {
   ];
 
   constructor() {}
+
+  focusAmountInput() {
+    this.amountInput.nativeElement.focus();
+    this.isAmountFocused = true;
+  }
+
+  onAmountBlur() {
+    this.isAmountFocused = false;
+    this.updateDisplayAmount();
+  }
+
+  updateDisplayAmount() {
+    if (this.targetAmount === 0 || this.targetAmount === null) {
+      this.displayAmount = '0.00';
+    } else {
+      this.displayAmount = this.targetAmount.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+  }
 
   selectPeriod(period: 'monthly' | 'weekly') {
     this.selectedPeriod = period;

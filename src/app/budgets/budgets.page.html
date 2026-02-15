@@ -15,13 +15,21 @@
 <ion-content [fullscreen]="true">
   <div class="main-container">
     <!-- Target Amount -->
-    <div class="target-amount-section">
+    <div class="target-amount-section" (click)="focusAmountInput()">
       <p class="section-label">TARGET AMOUNT</p>
       <div class="amount-display">
         <span class="currency-symbol">$</span>
         <span class="amount-value">{{ displayAmount }}</span>
-        <span class="cursor">|</span>
+        <span class="cursor" *ngIf="isAmountFocused">|</span>
       </div>
+      <input 
+        #amountInput
+        type="number" 
+        [(ngModel)]="targetAmount" 
+        (input)="updateDisplayAmount()"
+        (blur)="onAmountBlur()"
+        class="hidden-input"
+      />
     </div>
 
     <!-- Period Toggle -->
