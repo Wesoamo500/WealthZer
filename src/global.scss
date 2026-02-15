@@ -48,3 +48,14 @@
     -webkit-backdrop-filter: blur(15px);
   }
 }
+
+/* Global Spacing Adjustments */
+ion-header ion-toolbar {
+  --padding-top: calc(8px + var(--ion-safe-area-top, 0px));
+  --padding-bottom: 8px;
+}
+
+/* For pages without headers */
+.ion-content-scroll-host {
+  padding-top: var(--ion-safe-area-top, 0px);
+}

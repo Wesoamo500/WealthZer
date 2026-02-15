@@ -12,8 +12,8 @@ ion-toolbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 16px;
-    height: var(--header-height);
+    padding: var(--ion-safe-area-top, 0px) 16px 0;
+    min-height: calc(var(--header-height) + var(--ion-safe-area-top, 0px));
 }
 
 .logo-wrapper {
