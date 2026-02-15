@@ -21,6 +21,9 @@ export class PortfolioPage implements OnInit {
 
   ngOnInit() {
     this.loadPortfolio();
+    this.financialService.transactionUpdate$.subscribe(() => {
+      this.loadPortfolio();
+    });
   }
 
   loadPortfolio() {

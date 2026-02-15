@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
 export interface Transaction {
@@ -26,6 +27,9 @@ export interface PortfolioAsset {
   providedIn: 'root'
 })
 export class FinancialService {
+  private transactionUpdateSubject = new Subject<void>();
+  public transactionUpdate$ = this.transactionUpdateSubject.asObservable();
+
   constructor(private apiService: ApiService) {}
 
   getTransactions(): Observable<Transaction[]> {
@@ -41,10 +45,14 @@ export class FinancialService {
   }
 
   addTransaction(transaction: any): Observable<Transaction> {
-    return this.apiService.post<Transaction>('financial/transactions', transaction);
+    return this.apiService.post<Transaction>('financial/transactions', transaction).pipe(
+      tap(() => this.transactionUpdateSubject.next())
+    );
   }
 
   addAsset(asset: any): Observable<PortfolioAsset> {
-    return this.apiService.post<PortfolioAsset>('financial/assets', asset);
+    return this.apiService.post<PortfolioAsset>('financial/assets', asset).pipe(
+      tap(() => this.transactionUpdateSubject.next())
+    );
   }
 }

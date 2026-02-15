@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, from } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
@@ -26,7 +27,8 @@ export class AuthService {
 
   constructor(
     private apiService: ApiService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private router: Router
   ) {
     this.checkSession();
   }
@@ -70,6 +72,7 @@ export class AuthService {
   async logout() {
     await this.storageService.clear();
     this.currentUserSubject.next(null);
+    this.router.navigate(['/auth/login'], { replaceUrl: true });
   }
 
   getAccessToken(): Promise<string | null> {

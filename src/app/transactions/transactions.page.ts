@@ -25,6 +25,9 @@ export class TransactionsPage implements OnInit {
 
   ngOnInit() {
     this.loadTransactions();
+    this.financialService.transactionUpdate$.subscribe(() => {
+      this.loadTransactions();
+    });
   }
 
   loadTransactions() {
@@ -61,8 +64,8 @@ export class TransactionsPage implements OnInit {
   async openAddTransaction() {
     const modal = await this.modalCtrl.create({
       component: AddTransactionModalComponent,
-      breakpoints: [0, 0.7, 0.9],
-      initialBreakpoint: 0.7
+      breakpoints: [0, 0.9, 1.0],
+      initialBreakpoint: 0.9
     });
     
     await modal.present();

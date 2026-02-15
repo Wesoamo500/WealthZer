@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { AddTransactionModalComponent } from '../transactions/add-transaction-modal.component';
+import { FinancialService } from '../core/services/financial.service';
 
 @Component({
   selector: 'app-tabs',
@@ -11,11 +12,16 @@ import { AddTransactionModalComponent } from '../transactions/add-transaction-mo
 })
 export class TabsPage {
 
-  constructor(private modalCtrl: ModalController) {}
+  constructor(
+    private modalCtrl: ModalController,
+    private financialService: FinancialService
+  ) {}
 
   async openAddTransaction() {
     const modal = await this.modalCtrl.create({
       component: AddTransactionModalComponent,
+      breakpoints: [0, 0.9, 1.0],
+      initialBreakpoint: 0.9,
       cssClass: 'add-transaction-modal'
     });
 
@@ -23,7 +29,9 @@ export class TabsPage {
 
     const { data, role } = await modal.onWillDismiss();
     if (role === 'confirm') {
-      console.log('Transaction added:', data);
+      this.financialService.addTransaction(data).subscribe(() => {
+        console.log('Transaction added and notified');
+      });
     }
   }
 
