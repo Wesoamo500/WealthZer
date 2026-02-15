@@ -1,0 +1,98 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="background">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" icon="arrow-back-outline" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Create Budget</ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="help-circle-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="main-container">
+    <!-- Target Amount -->
+    <div class="target-amount-section">
+      <p class="section-label">TARGET AMOUNT</p>
+      <div class="amount-display">
+        <span class="currency-symbol">$</span>
+        <span class="amount-value">{{ displayAmount }}</span>
+        <span class="cursor">|</span>
+      </div>
+    </div>
+
+    <!-- Period Toggle -->
+    <div class="period-toggle-container">
+      <div class="period-toggle">
+        <div class="toggle-option" [class.active]="selectedPeriod === 'monthly'" (click)="selectPeriod('monthly')">
+          Monthly
+        </div>
+        <div class="toggle-option" [class.active]="selectedPeriod === 'weekly'" (click)="selectPeriod('weekly')">
+          Weekly
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Selector -->
+    <div class="category-section">
+      <div class="section-header">
+        <h3>Select Category</h3>
+        <span class="view-all">View All</span>
+      </div>
+      
+      <div class="category-scroll">
+        <div 
+          *ngFor="let cat of categories" 
+          class="category-item" 
+          [class.active]="selectedCategory === cat.id"
+          (click)="selectCategory(cat.id)"
+        >
+          <div class="icon-wrapper">
+            <ion-icon [name]="cat.icon"></ion-icon>
+          </div>
+          <span class="category-label">{{ cat.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Budget Impact -->
+    <div class="impact-card">
+      <div class="impact-header">
+        <div class="impact-title">
+          <h4>Budget Impact</h4>
+          <p>Based on $4,500 monthly income</p>
+        </div>
+        <ion-badge class="calculated-badge">CALCULATED</ion-badge>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="28"></div>
+        </div>
+      </div>
+
+      <div class="impact-footer">
+        <div class="breakdown-item">
+          <span class="dot"></span>
+          <span class="label">Dining (28%)</span>
+        </div>
+        <div class="remaining">
+          Remaining: $3,250.00
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Button -->
+  <ion-footer class="ion-no-border">
+    <div class="footer-container">
+      <ion-button expand="block" class="create-budget-btn">
+        Create Budget
+        <ion-icon name="add-circle" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+  </ion-footer>
+</ion-content>
