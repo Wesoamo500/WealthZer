@@ -78,6 +78,23 @@ export class AuthService {
     return this.apiService.post('auth/reset-password', data);
   }
 
+  getProfile(): Observable<any> {
+    return this.apiService.get('auth/profile');
+  }
+
+  updateProfile(data: any): Observable<any> {
+    return this.apiService.patch('auth/profile', data).pipe(
+      tap(async (updatedUser: any) => {
+        const currentUser = this.currentUserSubject.value;
+        if (currentUser) {
+          const newUser = { ...currentUser, ...updatedUser };
+          await this.storageService.set('user', JSON.stringify(newUser));
+          this.currentUserSubject.next(newUser as User);
+        }
+      })
+    );
+  }
+
   private async handleAuth(res: AuthResponse) {
     await this.storageService.set('access_token', res.accessToken);
     await this.storageService.set('refresh_token', res.refreshToken);

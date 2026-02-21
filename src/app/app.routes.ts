@@ -33,4 +33,9 @@ export const routes: Routes = [
     path: 'welcome',
     loadComponent: () => import('./welcome/welcome.page').then(m => m.WelcomePage)
   },
+  {
+    path: 'profile',
+    redirectTo: 'tabs/profile',
+    pathMatch: 'full'
+  }
 ];

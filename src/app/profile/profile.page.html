@@ -1,62 +1,152 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar color="background">
-    <ion-title>Profile</ion-title>
-    <ion-buttons slot="end">
-      <ion-button>
-        <ion-icon name="ellipsis-horizontal" slot="icon-only"></ion-icon>
-      </ion-button>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" text="" color="light"></ion-back-button>
     </ion-buttons>
+    <ion-title>App Settings</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content class="ion-padding">
+  <div class="profile-container">
+    
+    <!-- Skeleton Loading State -->
+    <ng-container *ngIf="isLoading">
+      <div class="user-card skeleton-card">
+        <div class="avatar-box">
+          <ion-skeleton-text animated style="width: 100%; height: 100%; border-radius: 16px;"></ion-skeleton-text>
+        </div>
+        <div class="user-info">
+          <div class="name-row">
+            <ion-skeleton-text animated style="width: 120px; height: 24px;"></ion-skeleton-text>
+          </div>
+          <ion-skeleton-text animated style="width: 180px; height: 16px; margin-top: 8px;"></ion-skeleton-text>
+        </div>
+      </div>
 
-  <div class="profile-header">
-    <div class="avatar">
-      <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="Avatar"/>
-    </div>
-    <h2>Abdul Suleman</h2>
-    <p>abdul@wealthzer.com</p>
-    <ion-badge color="primary">Pro Member</ion-badge>
+      <div class="settings-section" *ngFor="let i of [1, 2, 3]">
+        <ion-skeleton-text animated style="width: 100px; height: 14px; margin-bottom: 12px; margin-left: 8px;"></ion-skeleton-text>
+        <div class="items-card">
+          <ion-item lines="none" class="settings-item" *ngFor="let j of [1, 2]">
+            <div class="icon-box" slot="start">
+              <ion-skeleton-text animated style="width: 100%; height: 100%; border-radius: 10px;"></ion-skeleton-text>
+            </div>
+            <ion-label>
+              <ion-skeleton-text animated style="width: 140px; height: 18px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 200px; height: 14px; margin-top: 6px;"></ion-skeleton-text>
+            </ion-label>
+          </ion-item>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Real Content -->
+    <ng-container *ngIf="!isLoading">
+      <!-- Profile Header Card -->
+      <div class="user-card">
+        <div class="avatar-section">
+          <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (user?.email || 'default')" class="avatar-img" alt="Profile Avatar">
+        </div>
+        <div class="user-info">
+          <div class="name-row">
+            <h2>{{ user?.fullName || 'User' }}</h2>
+            <span class="pro-badge">PRO</span>
+          </div>
+          <p>{{ user?.email }}</p>
+        </div>
+        <ion-icon name="shield-checkmark" class="verified-icon"></ion-icon>
+      </div>
+
+      <!-- Account Section -->
+      <div class="settings-section">
+        <span class="section-label">ACCOUNT</span>
+        <div class="items-card">
+          <ion-item button detail="false" class="settings-item">
+            <div class="icon-box" slot="start">
+              <ion-icon name="person"></ion-icon>
+            </div>
+            <ion-label>
+              <h3>Personal Details</h3>
+              <p>Manage your core identity info</p>
+            </ion-label>
+            <ion-icon name="chevron-forward" slot="end"></ion-icon>
+          </ion-item>
+
+          <ion-item button detail="false" class="settings-item">
+            <div class="icon-box" slot="start">
+              <ion-icon name="bulb"></ion-icon>
+            </div>
+            <ion-label>
+              <h3>AI Advisor Mode</h3>
+              <p>Personalize your AI companion</p>
+            </ion-label>
+            <ion-icon name="chevron-forward" slot="end"></ion-icon>
+          </ion-item>
+        </div>
+      </div>
+
+      <!-- Security Section -->
+      <div class="settings-section">
+        <span class="section-label">SECURITY</span>
+        <div class="items-card">
+          <ion-item button detail="false" class="settings-item">
+            <div class="icon-box" slot="start">
+              <ion-icon name="phone-portrait"></ion-icon>
+            </div>
+            <ion-label>
+              <h3>Two-Factor Auth</h3>
+              <p class="status">Enabled (Authenticator)</p>
+            </ion-label>
+            <ion-icon name="chevron-forward" slot="end"></ion-icon>
+          </ion-item>
+
+          <ion-item lines="none" class="settings-item">
+            <div class="icon-box" slot="start">
+              <ion-icon name="finger-print"></ion-icon>
+            </div>
+            <ion-label>
+              <h3>Biometrics (FaceID)</h3>
+              <p>Unlock app with FaceID</p>
+            </ion-label>
+            <ion-toggle slot="end" [(ngModel)]="settings.biometrics" (ionChange)="updateSetting('biometrics', settings.biometrics)"></ion-toggle>
+          </ion-item>
+        </div>
+      </div>
+
+      <!-- Notifications Section -->
+      <div class="settings-section">
+        <span class="section-label">NOTIFICATIONS</span>
+        <div class="items-card">
+          <ion-item lines="inset" class="settings-item">
+            <div class="icon-box" slot="start">
+              <ion-icon name="notifications"></ion-icon>
+            </div>
+            <ion-label>
+              <h3>Push Notifications</h3>
+            </ion-label>
+            <ion-toggle slot="end" [(ngModel)]="settings.pushNotifications" (ionChange)="updateSetting('pushNotifications', settings.pushNotifications)"></ion-toggle>
+          </ion-item>
+
+          <ion-item button detail="false" class="settings-item">
+            <div class="icon-box" slot="start">
+              <ion-icon name="analytics"></ion-icon>
+            </div>
+            <ion-label>
+              <h3>AI Insights Frequency</h3>
+              <p>Daily Summary</p>
+            </ion-label>
+            <ion-icon name="chevron-forward" slot="end"></ion-icon>
+          </ion-item>
+        </div>
+      </div>
+
+      <!-- Logout -->
+      <div class="logout-container">
+        <ion-button fill="clear" class="logout-btn" (click)="logout()">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          Log Out
+        </ion-button>
+      </div>
+    </ng-container>
   </div>
-
-  <ion-list lines="none" class="settings-list">
-    <ion-list-header>
-      <ion-label>Account</ion-label>
-    </ion-list-header>
-    
-    <ion-item button detail="true">
-      <ion-icon name="person-outline" slot="start"></ion-icon>
-      <ion-label>Personal Information</ion-label>
-    </ion-item>
-    
-    <ion-item button detail="true">
-      <ion-icon name="card-outline" slot="start"></ion-icon>
-      <ion-label>Payment Methods</ion-label>
-    </ion-item>
-
-    <ion-list-header>
-      <ion-label>Settings</ion-label>
-    </ion-list-header>
-
-    <ion-item button detail="true">
-      <ion-icon name="notifications-outline" slot="start"></ion-icon>
-      <ion-label>Notifications</ion-label>
-    </ion-item>
-
-    <ion-item button detail="true">
-      <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
-      <ion-label>Security</ion-label>
-    </ion-item>
-
-    <ion-item button detail="true">
-      <ion-icon name="help-circle-outline" slot="start"></ion-icon>
-      <ion-label>Help & Support</ion-label>
-    </ion-item>
-  </ion-list>
-
-  <ion-button expand="block" color="danger" fill="outline" class="logout-btn">
-    Log Out
-  </ion-button>
-
 </ion-content>
