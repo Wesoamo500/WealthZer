@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, OnDestroy, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -13,7 +13,7 @@ import { FinancialService } from '../core/services/financial.service';
   imports: [IonicModule, CommonModule, FormsModule, RouterModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
 
   netWorth = 0;
   dailyChange = 0;
@@ -34,6 +34,7 @@ export class HomePage implements OnInit {
   recentTransactions: any[] = [];
   financialCards: any[] = [];
   isLoading = true;
+  private refreshInterval: any;
 
   constructor(private financialService: FinancialService) {}
 
@@ -48,10 +49,25 @@ export class HomePage implements OnInit {
     this.financialService.budgetUpdate$.subscribe(() => {
       this.loadData();
     });
+
+    // Auto-refresh every 2 hours (7200000 ms)
+    this.refreshInterval = setInterval(() => {
+        this.loadData();
+    }, 7200000);
   }
 
-  loadData() {
-    this.isLoading = true;
+  ngOnDestroy() {
+      if (this.refreshInterval) {
+          clearInterval(this.refreshInterval);
+      }
+  }
+
+  doRefresh(event: any) {
+    this.loadData(event);
+  }
+
+  loadData(event?: any) {
+    if (!event) this.isLoading = true;
     this.financialService.getNetWorth().subscribe(res => {
       this.netWorth = res.totalNetWorth;
       this.dailyChange = res.dailyChange;
@@ -88,8 +104,10 @@ export class HomePage implements OnInit {
         color: a.type === 'CRYPTO' ? '#f7931a' : '#3dc2ff'
       }));
       this.isLoading = false;
+      if (event) event.target.complete();
     }, error => {
       this.isLoading = false;
+      if (event) event.target.complete();
     });
   }
 

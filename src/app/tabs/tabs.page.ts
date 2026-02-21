@@ -3,16 +3,17 @@ import { Router, NavigationEnd, Event } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { AddTransactionModalComponent } from '../transactions/add-transaction-modal.component';
 import { FinancialService } from '../core/services/financial.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
   standalone: true,
-  imports: [IonicModule],
+  imports: [IonicModule, CommonModule],
 })
 export class TabsPage implements OnInit, OnDestroy {
-  isAdvisorPage = false;
+  isHomePage = true;
   private routerSubscription: any;
 
   constructor(
@@ -37,7 +38,7 @@ export class TabsPage implements OnInit, OnDestroy {
   }
 
   private checkCurrentRoute() {
-    this.isAdvisorPage = this.router.url.includes('/advisor');
+    this.isHomePage = this.router.url.includes('/home') || this.router.url === '/tabs' || this.router.url === '/';
   }
 
   async openAddTransaction() {
