@@ -18,6 +18,14 @@ export const routes: Routes = [
     loadComponent: () => import('./auth/two-factor/two-factor.page').then(m => m.TwoFactorPage)
   },
   {
+    path: 'auth/forgot-password',
+    loadComponent: () => import('./auth/forgot-password/forgot-password.page').then(m => m.ForgotPasswordPage)
+  },
+  {
+    path: 'auth/reset-password',
+    loadComponent: () => import('./auth/reset-password/reset-password.page').then(m => m.ResetPasswordPage)
+  },
+  {
     path: 'tabs',
     loadChildren: () => import('./tabs/tabs.routes').then(m => m.routes)
   },

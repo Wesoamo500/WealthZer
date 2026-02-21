@@ -87,7 +87,6 @@ export class LoginPage implements OnInit {
   }
 
   forgotPassword() {
-    console.log('Forgot password clicked');
-    // Navigate to forgot password page or show modal
+    this.router.navigate(['/auth/forgot-password']);
   }
 }

@@ -66,6 +66,18 @@ export class AuthService {
     );
   }
 
+  forgotPassword(email: string): Observable<any> {
+    return this.apiService.post('auth/forgot-password', { email });
+  }
+
+  verifyResetOtp(email: string, code: string): Observable<any> {
+    return this.apiService.post('auth/verify-reset-otp', { email, code });
+  }
+
+  resetPassword(data: any): Observable<any> {
+    return this.apiService.post('auth/reset-password', data);
+  }
+
   private async handleAuth(res: AuthResponse) {
     await this.storageService.set('access_token', res.accessToken);
     await this.storageService.set('refresh_token', res.refreshToken);
