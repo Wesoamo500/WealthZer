@@ -61,7 +61,7 @@
       <div class="settings-section">
         <span class="section-label">ACCOUNT</span>
         <div class="items-card">
-          <ion-item button detail="false" class="settings-item">
+          <ion-item button detail="false" class="settings-item" (click)="openPersonalDetails()">
             <div class="icon-box" slot="start">
               <ion-icon name="person"></ion-icon>
             </div>
@@ -72,13 +72,13 @@
             <ion-icon name="chevron-forward" slot="end"></ion-icon>
           </ion-item>
 
-          <ion-item button detail="false" class="settings-item">
+          <ion-item button detail="false" class="settings-item" (click)="openAiAdvisor()">
             <div class="icon-box" slot="start">
               <ion-icon name="bulb"></ion-icon>
             </div>
             <ion-label>
               <h3>AI Advisor Mode</h3>
-              <p>Personalize your AI companion</p>
+              <p>{{ settings.aiAdvisorMode }} Mode</p>
             </ion-label>
             <ion-icon name="chevron-forward" slot="end"></ion-icon>
           </ion-item>
@@ -89,13 +89,13 @@
       <div class="settings-section">
         <span class="section-label">SECURITY</span>
         <div class="items-card">
-          <ion-item button detail="false" class="settings-item">
+          <ion-item button detail="false" class="settings-item" (click)="openTwoFactor()">
             <div class="icon-box" slot="start">
               <ion-icon name="phone-portrait"></ion-icon>
             </div>
             <ion-label>
               <h3>Two-Factor Auth</h3>
-              <p class="status">Enabled (Authenticator)</p>
+              <p class="status" [class.enabled]="settings.twoFactorEnabled">{{ settings.twoFactorEnabled ? 'Enabled' : 'Disabled' }}</p>
             </ion-label>
             <ion-icon name="chevron-forward" slot="end"></ion-icon>
           </ion-item>
@@ -127,13 +127,13 @@
             <ion-toggle slot="end" [(ngModel)]="settings.pushNotifications" (ionChange)="updateSetting('pushNotifications', settings.pushNotifications)"></ion-toggle>
           </ion-item>
 
-          <ion-item button detail="false" class="settings-item">
+          <ion-item button detail="false" class="settings-item" (click)="openInsights()">
             <div class="icon-box" slot="start">
               <ion-icon name="analytics"></ion-icon>
             </div>
             <ion-label>
               <h3>AI Insights Frequency</h3>
-              <p>Daily Summary</p>
+              <p>{{ settings.aiInsightsFrequency }}</p>
             </ion-label>
             <ion-icon name="chevron-forward" slot="end"></ion-icon>
           </ion-item>
@@ -147,6 +147,119 @@
           Log Out
         </ion-button>
       </div>
+
+      <!-- Modals -->
+      <!-- Personal Details Modal -->
+      <ion-modal [isOpen]="isPersonalDetailsOpen" (didDismiss)="isPersonalDetailsOpen = false" class="profile-modal form-modal">
+        <ng-template>
+          <ion-header class="ion-no-border">
+            <ion-toolbar>
+              <ion-title>Personal Details</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="isPersonalDetailsOpen = false">Close</ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding modal-content">
+            <div class="form-group">
+              <ion-label class="form-label">Full Name</ion-label>
+              <ion-input type="text" [(ngModel)]="editFullName" class="custom-input" placeholder="Enter your full name"></ion-input>
+            </div>
+            <ion-button expand="block" class="primary-btn ion-margin-top" (click)="savePersonalDetails()">Save Changes</ion-button>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+
+      <!-- AI Advisor Modal -->
+      <ion-modal [isOpen]="isAiAdvisorOpen" (didDismiss)="isAiAdvisorOpen = false" class="profile-modal bottom-sheet" initialBreakpoint="0.6" [breakpoints]="[0, 0.6]">
+        <ng-template>
+          <ion-header class="ion-no-border">
+            <ion-toolbar>
+              <ion-title>AI Advisor Mode</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="isAiAdvisorOpen = false" class="close-btn-round"><ion-icon name="close"></ion-icon></ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding modal-content">
+            <p class="modal-description">Select how your AI handles recommendations and insights.</p>
+            <ion-radio-group [(ngModel)]="editAiMode">
+              <ion-item class="radio-item" lines="none">
+                <ion-label>Conservative</ion-label>
+                <ion-radio slot="start" value="Conservative"></ion-radio>
+              </ion-item>
+              <ion-item class="radio-item" lines="none">
+                <ion-label>Balanced</ion-label>
+                <ion-radio slot="start" value="Balanced"></ion-radio>
+              </ion-item>
+              <ion-item class="radio-item" lines="none">
+                <ion-label>Aggressive</ion-label>
+                <ion-radio slot="start" value="Aggressive"></ion-radio>
+              </ion-item>
+            </ion-radio-group>
+            <ion-button expand="block" class="primary-btn ion-margin-top" (click)="saveAiAdvisor()">Save Mode</ion-button>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+
+      <!-- Two-Factor Modal -->
+      <ion-modal [isOpen]="isTwoFactorOpen" (didDismiss)="isTwoFactorOpen = false" class="profile-modal bottom-sheet" initialBreakpoint="0.5" [breakpoints]="[0, 0.5]">
+        <ng-template>
+          <ion-header class="ion-no-border">
+            <ion-toolbar>
+              <ion-title>Two-Factor Auth</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="isTwoFactorOpen = false" class="close-btn-round"><ion-icon name="close"></ion-icon></ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding modal-content">
+            <div class="illustration-box">
+               <ion-icon name="shield-checkmark" class="illustration-icon"></ion-icon>
+            </div>
+            <p class="modal-description">Enhance your account security with two-factor authentication.</p>
+            <ion-item lines="none" class="settings-item standalone-toggle">
+              <ion-label>
+                <h3>Enable 2FA</h3>
+              </ion-label>
+              <ion-toggle slot="end" [(ngModel)]="editTwoFactor"></ion-toggle>
+            </ion-item>
+            <ion-button expand="block" class="primary-btn ion-margin-top" (click)="saveTwoFactor()">Update Security</ion-button>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+
+      <!-- Insights Frequency Modal -->
+      <ion-modal [isOpen]="isInsightsOpen" (didDismiss)="isInsightsOpen = false" class="profile-modal bottom-sheet" initialBreakpoint="0.6" [breakpoints]="[0, 0.6]">
+        <ng-template>
+          <ion-header class="ion-no-border">
+            <ion-toolbar>
+              <ion-title>Insights Frequency</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="isInsightsOpen = false" class="close-btn-round"><ion-icon name="close"></ion-icon></ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding modal-content">
+            <p class="modal-description">How often do you want AI financial summaries?</p>
+            <ion-radio-group [(ngModel)]="editInsightsFreq">
+              <ion-item class="radio-item" lines="none">
+                <ion-label>Daily Summary</ion-label>
+                <ion-radio slot="start" value="Daily"></ion-radio>
+              </ion-item>
+              <ion-item class="radio-item" lines="none">
+                <ion-label>Weekly Digest</ion-label>
+                <ion-radio slot="start" value="Weekly"></ion-radio>
+              </ion-item>
+              <ion-item class="radio-item" lines="none">
+                <ion-label>Monthly Report</ion-label>
+                <ion-radio slot="start" value="Monthly"></ion-radio>
+              </ion-item>
+            </ion-radio-group>
+            <ion-button expand="block" class="primary-btn ion-margin-top" (click)="saveInsights()">Save Preference</ion-button>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
     </ng-container>
   </div>
 </ion-content>

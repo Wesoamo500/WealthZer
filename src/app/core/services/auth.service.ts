@@ -9,6 +9,11 @@ export interface User {
   id: string;
   email: string;
   fullName?: string;
+  isBiometricsEnabled?: boolean;
+  pushNotificationsEnabled?: boolean;
+  aiAdvisorMode?: string;
+  twoFactorEnabled?: boolean;
+  aiInsightsFrequency?: string;
 }
 
 export interface AuthResponse {
