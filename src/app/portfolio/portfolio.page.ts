@@ -17,6 +17,7 @@ export class PortfolioPage implements OnInit {
   assets: PortfolioAsset[] = [];
   totalBalance: number = 0;
   currency: string = 'USD';
+  isLoading: boolean = true;
 
   constructor(
     private financialService: FinancialService,
@@ -31,13 +32,26 @@ export class PortfolioPage implements OnInit {
   }
 
   loadPortfolio() {
-    this.financialService.getPortfolio().subscribe(res => {
-      this.assets = res;
-    });
+    this.isLoading = true;
+    const portfolio$ = this.financialService.getPortfolio();
+    const netWorth$ = this.financialService.getNetWorth();
 
-    this.financialService.getNetWorth().subscribe(res => {
-      this.totalBalance = res.totalNetWorth;
-      this.currency = res.currency;
+    import('rxjs').then(({ forkJoin }) => {
+      forkJoin({
+        portfolio: portfolio$,
+        netWorth: netWorth$
+      }).subscribe({
+        next: (res) => {
+          this.assets = res.portfolio;
+          this.totalBalance = res.netWorth.totalNetWorth;
+          this.currency = res.netWorth.currency;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading portfolio:', err);
+          this.isLoading = false;
+        }
+      });
     });
   }
 

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -10,8 +10,20 @@ import { IonicModule } from '@ionic/angular';
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule]
 })
-export class MarketsPage {
+export class MarketsPage implements OnInit {
+  isLoading: boolean = true;
 
   constructor() {}
 
+  ngOnInit() {
+    this.loadData();
+  }
+
+  loadData() {
+    this.isLoading = true;
+    // Simulate API delay
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 1500);
+  }
 }

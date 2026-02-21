@@ -17,6 +17,7 @@ export class TransactionsPage implements OnInit {
   allTransactions: any[] = [];
   filteredTransactions: any[] = [];
   selectedFilter: string = 'all';
+  isLoading: boolean = true;
 
   constructor(
     private financialService: FinancialService,
@@ -31,16 +32,24 @@ export class TransactionsPage implements OnInit {
   }
 
   loadTransactions() {
-    this.financialService.getTransactions().subscribe(res => {
-      this.allTransactions = res.map(t => ({
-        ...t,
-        subtitle: `${t.account} • ${new Date(t.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-        amount: Number(t.amount),
-        icon: this.getIconForCategory(t.category),
-        iconBg: this.getBgForCategory(t.category),
-        iconColor: this.getColorForCategory(t.category)
-      }));
-      this.applyFilter();
+    this.isLoading = true;
+    this.financialService.getTransactions().subscribe({
+      next: (res) => {
+        this.allTransactions = res.map(t => ({
+          ...t,
+          subtitle: `${t.account} • ${new Date(t.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+          amount: Number(t.amount),
+          icon: this.getIconForCategory(t.category),
+          iconBg: this.getBgForCategory(t.category),
+          iconColor: this.getColorForCategory(t.category)
+        }));
+        this.applyFilter();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading transactions:', err);
+        this.isLoading = false;
+      }
     });
   }
 

@@ -33,50 +33,73 @@
   </div>
 
   <ion-list lines="none">
-    <ion-item class="market-item">
-      <div class="rank" slot="start">1</div>
-      <div class="coin-icon" slot="start">
-        <ion-icon name="logo-bitcoin" style="color: #f7931a;"></ion-icon>
-      </div>
-      <ion-label>
-        <h3>Bitcoin</h3>
-        <p>BTC</p>
-      </ion-label>
-      <div class="price-info" slot="end">
-        <h3>$54,231.20</h3>
-        <p class="positive">+3.2%</p>
-      </div>
-    </ion-item>
+    <!-- Skeleton Items -->
+    <ng-container *ngIf="isLoading">
+      <ion-item *ngFor="let i of [1,2,3,4,5]" class="market-item skeleton">
+        <div class="rank" slot="start" style="width: 20px; height: 16px;">
+          <ion-skeleton-text animated></ion-skeleton-text>
+        </div>
+        <ion-avatar slot="start" style="width: 32px; height: 32px;">
+          <ion-skeleton-text animated></ion-skeleton-text>
+        </ion-avatar>
+        <ion-label>
+          <ion-skeleton-text animated style="width: 40%; height: 16px; margin-bottom: 8px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 20%; height: 12px;"></ion-skeleton-text>
+        </ion-label>
+        <div slot="end" style="width: 80px; text-align: right;">
+          <ion-skeleton-text animated style="width: 100%; height: 16px; margin-bottom: 8px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; float: right; height: 12px;"></ion-skeleton-text>
+        </div>
+      </ion-item>
+    </ng-container>
 
-    <ion-item class="market-item">
-      <div class="rank" slot="start">2</div>
-      <div class="coin-icon" slot="start">
-        <ion-icon name="logo-electron" style="color: #627eea;"></ion-icon>
-      </div>
-      <ion-label>
-        <h3>Ethereum</h3>
-        <p>ETH</p>
-      </ion-label>
-      <div class="price-info" slot="end">
-        <h3>$12,145.00</h3>
-        <p class="negative">-1.4%</p>
-      </div>
-    </ion-item>
+    <!-- Real Market Items -->
+    <ng-container *ngIf="!isLoading">
+      <ion-item class="market-item">
+        <div class="rank" slot="start">1</div>
+        <div class="coin-icon" slot="start">
+          <ion-icon name="logo-bitcoin" style="color: #f7931a;"></ion-icon>
+        </div>
+        <ion-label>
+          <h3>Bitcoin</h3>
+          <p>BTC</p>
+        </ion-label>
+        <div class="price-info" slot="end">
+          <h3>$54,231.20</h3>
+          <p class="positive">+3.2%</p>
+        </div>
+      </ion-item>
 
-    <ion-item class="market-item">
-      <div class="rank" slot="start">3</div>
-      <div class="coin-icon" slot="start">
-        <ion-icon name="logo-apple" style="color: #A2AAAD;"></ion-icon>
-      </div>
-      <ion-label>
-        <h3>Apple Inc.</h3>
-        <p>AAPL</p>
-      </ion-label>
-      <div class="price-info" slot="end">
-        <h3>$186.20</h3>
-        <p class="positive">+0.8%</p>
-      </div>
-    </ion-item>
+      <ion-item class="market-item">
+        <div class="rank" slot="start">2</div>
+        <div class="coin-icon" slot="start">
+          <ion-icon name="logo-electron" style="color: #627eea;"></ion-icon>
+        </div>
+        <ion-label>
+          <h3>Ethereum</h3>
+          <p>ETH</p>
+        </ion-label>
+        <div class="price-info" slot="end">
+          <h3>$12,145.00</h3>
+          <p class="negative">-1.4%</p>
+        </div>
+      </ion-item>
+
+      <ion-item class="market-item">
+        <div class="rank" slot="start">3</div>
+        <div class="coin-icon" slot="start">
+          <ion-icon name="logo-apple" style="color: #A2AAAD;"></ion-icon>
+        </div>
+        <ion-label>
+          <h3>Apple Inc.</h3>
+          <p>AAPL</p>
+        </ion-label>
+        <div class="price-info" slot="end">
+          <h3>$186.20</h3>
+          <p class="positive">+0.8%</p>
+        </div>
+      </ion-item>
+    </ng-container>
   </ion-list>
 
 </ion-content>

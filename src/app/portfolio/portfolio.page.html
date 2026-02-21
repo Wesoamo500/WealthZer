@@ -13,11 +13,34 @@
   <div class="main-container">
     <div class="balance-card">
       <p class="balance-label">Total Balance</p>
-      <h1 class="balance-amount">{{ totalBalance | currency:currency }}</h1>
+      <h1 *ngIf="!isLoading" class="balance-amount">{{ totalBalance | currency:currency }}</h1>
+      <ion-skeleton-text *ngIf="isLoading" animated style="width: 60%; height: 36px; margin: 8px 0;"></ion-skeleton-text>
+    </div>
+
+    <!-- Loading State for Assets -->
+    <div class="assets-section" *ngIf="isLoading">
+      <div class="section-header">
+        <ion-skeleton-text animated style="width: 30%; height: 24px;"></ion-skeleton-text>
+      </div>
+      <ion-list lines="none">
+        <ion-item *ngFor="let i of [1,2,3,4]" class="asset-item skeleton">
+          <ion-avatar slot="start">
+            <ion-skeleton-text animated></ion-skeleton-text>
+          </ion-avatar>
+          <ion-label>
+            <ion-skeleton-text animated style="width: 50%; height: 16px; margin-bottom: 8px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 30%; height: 12px;"></ion-skeleton-text>
+          </ion-label>
+          <div slot="end" style="width: 60px;">
+            <ion-skeleton-text animated style="width: 100%; height: 16px; margin-bottom: 8px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 60%; float: right; height: 12px;"></ion-skeleton-text>
+          </div>
+        </ion-item>
+      </ion-list>
     </div>
 
     <!-- Active Assets -->
-    <div class="assets-section" *ngIf="assets.length > 0">
+    <div class="assets-section" *ngIf="!isLoading && assets.length > 0">
       <div class="section-header">
         <h2>Your Assets</h2>
         <ion-button fill="clear" color="primary" (click)="openAddAsset()">
@@ -44,7 +67,7 @@
     </div>
 
     <!-- Empty State -->
-    <div class="empty-state-wrapper" *ngIf="assets.length === 0">
+    <div class="empty-state-wrapper" *ngIf="!isLoading && assets.length === 0">
       <div class="empty-state-content">
         <div class="asset-icon-container">
           <div class="cube-shape">

@@ -28,6 +28,7 @@ export class AdvisorPage implements OnInit {
 
   messages: Message[] = [];
   newMessage = '';
+  isLoading: boolean = true;
 
   constructor(private advisorService: AdvisorService) {}
 
@@ -36,14 +37,22 @@ export class AdvisorPage implements OnInit {
   }
 
   loadChatHistory() {
-    this.advisorService.getChatHistory().subscribe(res => {
-      this.messages = res.map(m => ({
-        sender: m.role === 'USER' ? 'user' : 'ai',
-        text: m.message,
-        time: new Date(m.createdAt || '').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        type: 'text'
-      }));
-      setTimeout(() => this.content.scrollToBottom(300), 100);
+    this.isLoading = true;
+    this.advisorService.getChatHistory().subscribe({
+      next: (res) => {
+        this.messages = res.map(m => ({
+          sender: m.role === 'USER' ? 'user' : 'ai',
+          text: m.message,
+          time: new Date(m.createdAt || '').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          type: 'text'
+        }));
+        this.isLoading = false;
+        setTimeout(() => this.content.scrollToBottom(300), 100);
+      },
+      error: (err) => {
+        console.error('Error loading chat history:', err);
+        this.isLoading = false;
+      }
     });
   }
 
