@@ -10,6 +10,7 @@ interface Message {
   time: string;
   type?: string;
   title?: string;
+  isLoading?: boolean;
   data?: {
     cap: number;
     current: number;
@@ -47,12 +48,30 @@ export class AdvisorPage implements OnInit {
           type: 'text'
         }));
         this.isLoading = false;
-        setTimeout(() => this.content.scrollToBottom(300), 100);
+        setTimeout(() => this.content?.scrollToBottom(300), 100);
       },
       error: (err) => {
         console.error('Error loading chat history:', err);
         this.isLoading = false;
       }
+    });
+  }
+
+  get isChatEmpty(): boolean {
+    return !this.isLoading && this.messages.length === 0;
+  }
+
+  selectSuggestedQuestion(question: string) {
+    this.newMessage = question;
+    this.sendMessage();
+  }
+
+  clearChat() {
+    this.advisorService.clearChatHistory().subscribe({
+        next: () => {
+            this.messages = [];
+        },
+        error: (err) => console.error('Error clearing chat:', err)
     });
   }
 
@@ -68,16 +87,36 @@ export class AdvisorPage implements OnInit {
     });
     
     this.newMessage = '';
-    setTimeout(() => this.content.scrollToBottom(300), 100);
+    setTimeout(() => this.content?.scrollToBottom(300), 100);
 
-    this.advisorService.sendMessage(userMsg).subscribe(res => {
-      this.messages.push({
-        sender: 'ai',
-        text: res.message,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        type: 'text'
-      });
-      setTimeout(() => this.content.scrollToBottom(300), 300);
+    // Show a loading bubble for the AI while waiting
+    const loadingIdx = this.messages.push({
+      sender: 'ai',
+      text: '<div class="typing-indicator"><span></span><span></span><span></span></div>',
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      type: 'text',
+      isLoading: true
+    }) - 1;
+    setTimeout(() => this.content?.scrollToBottom(300), 100);
+
+    this.advisorService.sendMessage(userMsg).subscribe({
+        next: (res) => {
+          this.messages[loadingIdx] = {
+            sender: 'ai',
+            text: res.message,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            type: 'text'
+          };
+          setTimeout(() => this.content?.scrollToBottom(300), 300);
+        },
+        error: (err) => {
+          this.messages[loadingIdx] = {
+            sender: 'ai',
+            text: "Network error occurred.",
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            type: 'text'
+          };
+        }
     });
   }
 }
