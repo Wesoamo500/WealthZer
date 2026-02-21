@@ -77,8 +77,8 @@ export class HomePage implements OnInit, OnDestroy {
       this.dailyChange = res.dailyChange;
       this.dailyChangePercent = Number(res.dailyChangePercent.toFixed(2));
       this.investments = res.totalInvestments;
-      this.totalExpenses = res.totalExpenses;
-      this.totalIncome = res.totalIncome;
+      this.totalExpenses = Math.abs(res.totalExpenses);
+      this.totalIncome = Math.abs(res.totalIncome);
       
       // Calculate total budget (sum of all budget limits)
       this.budget = res.budgets.reduce((sum: number, b: any) => sum + Number(b.amount), 0);
