@@ -20,7 +20,8 @@ export class TwoFactorPage implements OnInit, OnDestroy {
   
   codeInput: string = '';
   email: string = 'joh***@gmail.com';
-  timeLeft: number = 54; // seconds
+  timeLeft: number = 600; // 10 minutes for code expiration
+  resendCooldown: number = 50; // 50 seconds for resend button
   timerInterval: any;
   isFocused: boolean = false;
 
@@ -55,9 +56,10 @@ export class TwoFactorPage implements OnInit, OnDestroy {
 
   startTimer() {
     this.timerInterval = setInterval(() => {
-      if (this.timeLeft > 0) {
-        this.timeLeft--;
-      } else {
+      if (this.timeLeft > 0) this.timeLeft--;
+      if (this.resendCooldown > 0) this.resendCooldown--;
+      
+      if (this.timeLeft <= 0 && this.resendCooldown <= 0) {
         clearInterval(this.timerInterval);
       }
     }, 1000);
@@ -114,8 +116,9 @@ export class TwoFactorPage implements OnInit, OnDestroy {
       }
     });
 
-    // Reset timer and UI
-    this.timeLeft = 54;
+    // Reset timers and UI
+    this.timeLeft = 600;
+    this.resendCooldown = 50;
     this.codeInput = '';
     if (this.timerInterval) {
       clearInterval(this.timerInterval);

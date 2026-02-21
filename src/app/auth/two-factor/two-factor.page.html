@@ -64,8 +64,8 @@
       </div>
 
       <!-- Resend Code -->
-      <button class="resend-btn" (click)="resendCode()">
-        Resend Code
+      <button class="resend-btn" [disabled]="resendCooldown > 0" (click)="resendCode()">
+        Resend Code {{ resendCooldown > 0 ? '(' + resendCooldown + 's)' : '' }}
       </button>
     </div>
 
