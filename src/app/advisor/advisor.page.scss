@@ -130,49 +130,126 @@ ion-toolbar {
 .chat-list {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
     padding-bottom: 20px;
+}
+
+.date-divider {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0 16px;
+
+    .date-chip {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 6px 16px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--ion-color-medium);
+        letter-spacing: 0.5px;
+    }
+}
+
+@keyframes slideUpFade {
+    0% {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .message-wrapper {
     display: flex;
     gap: 12px;
     max-width: 85%;
+    animation: slideUpFade 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     
     &.user {
         align-self: flex-end;
         flex-direction: row-reverse;
         
+    .message-content {
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
+        
         .user-bubble {
-            background: #252420; 
-            color: #fff;
-            border-radius: 16px 16px 0 16px;
-            border: 1px solid rgba(255,255,255,0.05);
+            background: linear-gradient(135deg, #FFD700 0%, #D4AF37 100%); 
+            color: #111;
+            border-radius: 18px 0 18px 18px; /* WhatsApp style right-tail */
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.25);
+            padding: 10px 14px 8px 14px;
+            display: flex;
+            flex-direction: column;
+            min-width: 90px;
+            font-weight: 500;
+
+            .msg-text {
+                margin-bottom: 2px;
+            }
+
+            .msg-time {
+                font-size: 10px;
+                color: rgba(0, 0, 0, 0.55);
+                align-self: flex-end;
+                margin-top: 0px;
+                margin-left: 16px;
+                font-weight: 600;
+            }
         }
+    }
     }
     
     &.ai {
         align-self: flex-start;
         max-width: 90%;
         
-        .ai-bubble {
-            background: transparent;
-            color: white;
-            padding: 0;
-            font-size: 15px;
-            font-weight: 400;
-            
-            ::ng-deep {
-                b, strong {
-                    color: var(--ion-color-primary);
-                    font-weight: 600;
+        .message-content {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+
+            .ai-bubble {
+                background: #1e1e1e; /* darker gray for AI to contrast user */
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 0 18px 18px 18px; /* WhatsApp style left-tail */
+                color: white;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+                padding: 10px 14px 8px 14px;
+                font-size: 15px;
+                font-weight: 400;
+                display: flex;
+                flex-direction: column;
+                min-width: 90px;
+                
+                ::ng-deep {
+                    b, strong {
+                        color: #FFD700;
+                        font-weight: 600;
+                    }
+                    ul {
+                        padding-left: 20px;
+                        margin: 8px 0;
+                    }
+                    li {
+                        margin-bottom: 4px;
+                    }
                 }
-                ul {
-                    padding-left: 20px;
-                    margin: 8px 0;
+
+                .msg-text {
+                    margin-bottom: 2px;
                 }
-                li {
-                    margin-bottom: 4px;
+
+                .msg-time {
+                    font-size: 10px;
+                    color: rgba(255, 255, 255, 0.4);
+                    align-self: flex-end;
+                    margin-top: 0px;
+                    margin-left: 16px;
                 }
             }
         }
@@ -224,30 +301,30 @@ ion-toolbar {
 .input-area {
     display: flex;
     align-items: center;
-    background: #252420;
+    background: #1e1e1e; /* match AI bubble dark */
     border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 20px;
-    padding: 4px 8px;
+    border-radius: 28px; /* High radius like WhatsApp */
+    padding: 2px 6px;
     
     .mic-icon {
         font-size: 24px;
         color: var(--ion-color-medium);
-        margin: 0 12px;
+        margin: 0 12px 0 8px;
     }
     
     .chat-input {
         --padding-start: 0;
-        --placeholder-color: rgba(255,255,255,0.3);
+        --placeholder-color: rgba(255,255,255,0.4);
         font-size: 15px;
         color: white;
     }
     
     .send-btn {
-        --background: var(--ion-color-primary);
-        width: 48px;
-        height: 48px;
-        --border-radius: 16px;
         margin: 0;
-        box-shadow: 0 0 15px rgba(var(--ion-color-primary-rgb), 0.3);
+        height: 44px;
+        width: 44px;
+        --padding-start: 0;
+        --padding-end: 0;
+        /* The background rectangle is fully removed via fill="clear" in HTML */
     }
 }

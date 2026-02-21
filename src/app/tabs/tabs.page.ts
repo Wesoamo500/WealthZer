@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router, NavigationEnd, Event } from '@angular/router';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { AddTransactionModalComponent } from '../transactions/add-transaction-modal.component';
 import { FinancialService } from '../core/services/financial.service';
@@ -11,13 +11,34 @@ import { FinancialService } from '../core/services/financial.service';
   standalone: true,
   imports: [IonicModule],
 })
-export class TabsPage {
+export class TabsPage implements OnInit, OnDestroy {
+  isAdvisorPage = false;
+  private routerSubscription: any;
 
   constructor(
     private modalCtrl: ModalController,
     private financialService: FinancialService,
     private router: Router
   ) {}
+
+  ngOnInit() {
+    this.checkCurrentRoute();
+    this.routerSubscription = this.router.events.subscribe((event: Event) => {
+      if (event instanceof NavigationEnd) {
+        this.checkCurrentRoute();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+  }
+
+  private checkCurrentRoute() {
+    this.isAdvisorPage = this.router.url.includes('/advisor');
+  }
 
   async openAddTransaction() {
     const modal = await this.modalCtrl.create({

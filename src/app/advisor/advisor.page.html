@@ -5,7 +5,7 @@
     </ion-buttons>
     <ion-title>
       <div class="advisor-title">
-        <span>AI Advisor</span>
+        <span>WealthZer AI</span>
       </div>
       <span class="subtitle"><span class="status-dot"></span> ONLINE</span>
     </ion-title>
@@ -64,7 +64,7 @@
         <div class="robot-icon">
            <ion-icon name="logo-reddit" color="primary"></ion-icon>
         </div>
-        <h2>Hello! I'm your financial assistant.</h2>
+        <h2>Hello! I'm WealthZer AI.</h2>
         <p>Ask me anything about your budgets, investments, or how to save more.</p>
 
         <div class="suggestions-container">
@@ -106,12 +106,20 @@
 
     <!-- Real Messages -->
     <ng-container *ngIf="!isChatEmpty && !isLoading">
+      
+      <div class="date-divider">
+        <span class="date-chip">Today</span>
+      </div>
+
       <ng-container *ngFor="let msg of messages">
         
         <!-- User Message -->
         <div class="message-wrapper user" *ngIf="msg.sender === 'user'">
-          <div class="message-bubble user-bubble">
-            {{ msg.text }}
+          <div class="message-content">
+            <div class="message-bubble user-bubble">
+              <span class="msg-text">{{ msg.text }}</span>
+              <span class="msg-time">{{ msg.time }}</span>
+            </div>
           </div>
         </div>
 
@@ -119,7 +127,8 @@
         <div class="message-wrapper ai" *ngIf="msg.sender === 'ai'">
           <div class="message-content">
             <div class="message-bubble ai-bubble" [class.loading-bubble]="msg['isLoading']">
-              <span [innerHTML]="msg.text"></span>
+              <span class="msg-text" [innerHTML]="msg.text"></span>
+              <span class="msg-time" *ngIf="!msg['isLoading']">{{ msg.time }}</span>
             </div>
           </div>
         </div>
@@ -140,8 +149,8 @@
         (keyup.enter)="sendMessage()"
         class="chat-input"
       ></ion-input>
-      <ion-button fill="solid" class="send-btn" (click)="sendMessage()">
-        <ion-icon name="send" slot="icon-only" color="dark"></ion-icon>
+      <ion-button fill="clear" class="send-btn" (click)="sendMessage()">
+        <ion-icon name="send" slot="icon-only" color="primary"></ion-icon>
       </ion-button>
     </div>
   </div>

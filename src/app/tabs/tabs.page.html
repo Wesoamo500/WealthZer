@@ -27,7 +27,7 @@
   </ion-tab-bar>
 
   <!-- Floating Action Button -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="main-fab">
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="main-fab" *ngIf="!isAdvisorPage">
     <ion-fab-button color="primary">
       <ion-icon name="grid-outline" class="main-icon"></ion-icon>
     </ion-fab-button>
