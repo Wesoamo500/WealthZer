@@ -45,9 +45,13 @@ export class AuthService {
     }
   }
 
-  login(credentials: { email: string; password: string; deviceId?: string }): Observable<AuthResponse> {
-    return this.apiService.post<AuthResponse>('auth/login', credentials).pipe(
-      tap(async (res) => await this.handleAuth(res))
+  login(credentials: { email: string; password: string; deviceId?: string }): Observable<AuthResponse | { requires2fa: true; tempToken: string }> {
+    return this.apiService.post<any>('auth/login', credentials).pipe(
+      tap(async (res: any) => {
+        if (!res.requires2fa) {
+          await this.handleAuth(res);
+        }
+      })
     );
   }
 

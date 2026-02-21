@@ -26,4 +26,8 @@ export class AdvisorService {
   clearChatHistory(): Observable<any> {
     return this.apiService.post('advisor/clear-history', {});
   }
+
+  getInsight(): Observable<any> {
+    return this.apiService.get<any>('advisor/insight');
+  }
 }

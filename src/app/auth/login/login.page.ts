@@ -46,14 +46,27 @@ export class LoginPage implements OnInit {
       password: this.password,
       deviceId: device.identifier
     }).subscribe({
-      next: (res) => {
-        // If the backend returns a user but requires 2FA, 
-        // we might still navigate to 2FA if that's the flow.
-        // Assuming the current login returns tokens and user.
-        console.log('Login successful', res);
-        this.router.navigate(['/auth/two-factor'], { 
-          queryParams: { email: this.email } 
-        });
+      next: (res: any) => {
+        console.log('Login response received', res);
+        
+        if (res.requires2fa) {
+          // 2FA Enabled: Navigate to 2FA Page which automatically gets the OTP from the backend
+          this.router.navigate(['/auth/two-factor'], { 
+            queryParams: { email: this.email } 
+          });
+        } else {
+          // 2FA Disabled: Log them directly into the app
+          forkJoin({
+            transactions: this.financialService.getTransactions().pipe(catchError(() => of([]))),
+            portfolio: this.financialService.getPortfolio().pipe(catchError(() => of([])))
+          }).subscribe(data => {
+            if (data.transactions.length === 0 && data.portfolio.length === 0) {
+              this.router.navigate(['/welcome']);
+            } else {
+              this.router.navigate(['/tabs']);
+            }
+          });
+        }
       },
       error: (err) => {
         console.error('Login failed', err);

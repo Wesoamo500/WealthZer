@@ -196,6 +196,81 @@ ion-toolbar {
     }
 }
 
+.budget-card {
+    background: #111;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+
+    .budget-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            margin: 0;
+        }
+
+        .usage-text {
+            color: #FFD700;
+            font-weight: 600;
+            font-size: 14px;
+        }
+    }
+
+    .progress-container {
+        margin-bottom: 20px;
+
+        .progress-track {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+
+            .progress-fill {
+                height: 100%;
+                background: #FFD700;
+                border-radius: 10px;
+                transition: width 0.8s ease-in-out;
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            }
+        }
+    }
+
+    .budget-footer {
+        display: flex;
+        justify-content: space-between;
+
+        .budget-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            &.text-right {
+                align-items: flex-end;
+            }
+
+            .label {
+                font-size: 10px;
+                color: rgba(255, 255, 255, 0.5);
+                letter-spacing: 0.1em;
+                font-weight: 600;
+            }
+
+            .value {
+                font-size: 18px;
+                font-weight: 700;
+                color: #A0AEC0;
+            }
+        }
+    }
+}
+
 .ai-card {
     background: linear-gradient(135deg, #1C1C1E 0%, #252527 100%);
     border: 1px solid rgba(244, 211, 94, 0.3);
@@ -268,6 +343,26 @@ ion-toolbar {
             font-size: 13px;
         }
     }
+}
+
+@keyframes gold-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+}
+
+.ai-loading-card {
+  border: 1px solid #FFD700 !important;
+  animation: gold-pulse 2s infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
 }
 
 .assets-list {

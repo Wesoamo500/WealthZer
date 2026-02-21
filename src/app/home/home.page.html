@@ -6,9 +6,6 @@
         <span class="logo-text">wealthZer</span>
       </div>
       <ion-buttons slot="end">
-        <ion-button class="notification-btn" (click)="loadData()">
-          <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
-        </ion-button>
         <ion-button class="notification-btn">
           <ion-icon name="notifications" slot="icon-only"></ion-icon>
         </ion-button>
@@ -88,37 +85,76 @@
   </div>
 
   <div class="ion-padding">
-    <!-- AI Insight Card -->
+    <!-- Monthly Budget Card -->
+    <div *ngIf="!isLoading && budget > 0" class="budget-card">
+      <div class="budget-header">
+        <h3>Monthly Budget</h3>
+        <span class="usage-text">{{ budgetUsedPercentage }}% Used</span>
+      </div>
+      
+      <div class="progress-container">
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="budgetUsedPercentage"></div>
+        </div>
+      </div>
+      
+      <div class="budget-footer">
+        <div class="budget-info">
+          <span class="label">SPENT</span>
+          <span class="value">{{ totalExpenses | currency }}</span>
+        </div>
+        <div class="budget-info text-right">
+          <span class="label">LIMIT</span>
+          <span class="value">{{ budget | currency }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Insight Card Header -->
     <div class="section-header">
       <h2>AI Financial Insights</h2>
       <ion-icon name="sparkles" color="primary"></ion-icon>
     </div>
 
-    <div *ngIf="isLoading" class="ai-card">
-      <ion-skeleton-text animated style="width: 100px; height: 18px; margin-bottom: 16px; border-radius: 4px;"></ion-skeleton-text>
-      <ion-skeleton-text animated style="width: 70%; height: 20px; margin-bottom: 8px;"></ion-skeleton-text>
-      <ion-skeleton-text animated style="width: 90%; height: 14px; margin-bottom: 4px;"></ion-skeleton-text>
-      <ion-skeleton-text animated style="width: 80%; height: 14px; margin-bottom: 24px;"></ion-skeleton-text>
-      <ion-skeleton-text animated style="width: 100%; height: 40px; border-radius: 12px;"></ion-skeleton-text>
-    </div>
+    <!-- AI Insight Card - Independent Loading -->
 
-    <div *ngIf="!isLoading" class="ai-card">
-      <div class="ai-header">
-        <ion-badge color="primary">SMART SUGGESTION</ion-badge>
-        <span class="timestamp">Just now</span>
-      </div>
-      
-      <h3>{{ aiInsight.title }}</h3>
-      <p class="insight-text">"{{ aiInsight.description }}"</p>
-      
-      <div class="ai-actions">
-        <ion-button color="primary" expand="block" class="action-btn">
-          {{ aiInsight.action }}
+    <!-- AI Insight Card - Independent Loading -->
+    <div class="ai-card" [ngClass]="{'ai-loading-card': isInsightLoading}">
+      <!-- Header is always shown (with skeleton if loading) -->
+      <div class="ai-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <ng-container *ngIf="isInsightLoading">
+            <ion-skeleton-text animated style="width: 120px; height: 20px; border-radius: 4px;"></ion-skeleton-text>
+          </ng-container>
+          <ng-container *ngIf="!isInsightLoading">
+            <ion-badge color="primary">SMART SUGGESTION</ion-badge>
+            <span class="timestamp">{{ getFormattedTimestamp() }}</span>
+          </ng-container>
+        </div>
+        <ion-button fill="clear" size="small" (click)="refreshInsight()" [disabled]="isInsightLoading" style="--padding-end: 0; --padding-start: 0; margin: 0; height: 24px;">
+          <ion-icon name="refresh" slot="icon-only" [class.spin]="isInsightLoading"></ion-icon>
         </ion-button>
-        <ion-button fill="clear" color="medium" class="dismiss-btn">
-          Dismiss
-        </ion-button>
       </div>
+
+      <!-- Skeleton Body -->
+      <div *ngIf="isInsightLoading" style="margin-top: 16px;">
+        <ion-skeleton-text animated style="width: 70%; height: 20px; margin-bottom: 8px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 90%; height: 14px; margin-bottom: 4px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 80%; height: 14px; margin-bottom: 24px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 100%; height: 40px; border-radius: 12px;"></ion-skeleton-text>
+      </div>
+
+      <!-- Real Content -->
+      <ng-container *ngIf="!isInsightLoading && aiInsight">
+        <h3 style="margin-top: 16px;">{{ aiInsight.title }}</h3>
+        <p class="insight-text">"{{ aiInsight.description }}"</p>
+        
+        <div class="ai-actions">
+          <ion-button color="primary" expand="block" class="action-btn" (click)="handleAiAction(aiInsight.action)">
+            {{ aiInsight.action }}
+          </ion-button>
+        </div>
+      </ng-container>
     </div>
 
     <!-- Top Assets -->

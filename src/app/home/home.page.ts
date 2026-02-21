@@ -2,8 +2,9 @@ import { Component, OnInit, OnDestroy, CUSTOM_ELEMENTS_SCHEMA } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FinancialService } from '../core/services/financial.service';
+import { AdvisorService } from '../core/services/advisor.service';
 
 @Component({
   selector: 'app-home',
@@ -23,12 +24,11 @@ export class HomePage implements OnInit, OnDestroy {
   budget = 0;
   totalExpenses = 0;
   totalIncome = 0;
+  budgetUsedPercentage = 0;
 
-  aiInsight = {
-    title: 'Subscription Optimization',
-    description: 'I noticed 3 recurring streaming services you haven\'t used in 30 days. Canceling these could save you $42.99/month.',
-    action: 'Analyze Subscriptions'
-  };
+  aiInsight: any = null;
+  insightTimestamp: Date | null = null;
+  isInsightLoading = true;
 
   assets: any[] = [];
   recentTransactions: any[] = [];
@@ -36,7 +36,11 @@ export class HomePage implements OnInit, OnDestroy {
   isLoading = true;
   private refreshInterval: any;
 
-  constructor(private financialService: FinancialService) {}
+  constructor(
+    private router: Router,
+    private financialService: FinancialService,
+    private advisorService: AdvisorService
+  ) {}
 
   ngOnInit() {
     this.loadData();
@@ -78,9 +82,12 @@ export class HomePage implements OnInit, OnDestroy {
       
       // Calculate total budget (sum of all budget limits)
       this.budget = res.budgets.reduce((sum: number, b: any) => sum + Number(b.amount), 0);
+      this.budgetUsedPercentage = this.budget > 0 ? Math.min(Math.round((this.totalExpenses / this.budget) * 100), 100) : 0;
       
       this.updateFinancialCards();
     });
+
+    this.refreshInsight();
 
     this.financialService.getTransactions().subscribe(res => {
       this.recentTransactions = res.slice(0, 3).map(t => ({
@@ -109,6 +116,26 @@ export class HomePage implements OnInit, OnDestroy {
       this.isLoading = false;
       if (event) event.target.complete();
     });
+  }
+
+  refreshInsight() {
+    this.isInsightLoading = true;
+    this.advisorService.getInsight().subscribe(
+      (res) => {
+        this.aiInsight = res;
+        this.insightTimestamp = new Date();
+        this.isInsightLoading = false;
+      },
+      (err) => {
+        this.isInsightLoading = false;
+        // Fallback for demo purposes if backend failed
+        this.aiInsight = {
+          title: "System Offline",
+          description: "Could not connect to WealthZer AI to fetch a fresh insight.",
+          action: "Retry"
+        };
+      }
+    );
   }
 
   updateFinancialCards() {
@@ -142,6 +169,31 @@ export class HomePage implements OnInit, OnDestroy {
         type: 'currency'
       }
     ];
+  }
+
+  getFormattedTimestamp(): string {
+    if (!this.insightTimestamp) return 'Just now';
+    return this.insightTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  handleAiAction(action: string) {
+    if (!action) return;
+    const loweredAction = action.toLowerCase();
+    
+    if (loweredAction.includes('configure') || loweredAction.includes('api')) {
+      this.router.navigate(['/tabs/profile']);
+    } else if (loweredAction.includes('budget') || loweredAction.includes('limit')) {
+      this.router.navigate(['/tabs/budgets']);
+    } else if (loweredAction.includes('transaction') || loweredAction.includes('add') || loweredAction.includes('spend')) {
+      this.router.navigate(['/tabs/transactions']);
+    } else if (loweredAction.includes('asset') || loweredAction.includes('invest') || loweredAction.includes('portfolio')) {
+      this.router.navigate(['/tabs/portfolio']);
+    } else if (loweredAction.includes('chat') || loweredAction.includes('advisor') || loweredAction.includes('ask')) {
+      this.router.navigate(['/tabs/advisor']);
+    } else {
+      // General fallback to transactions list
+      this.router.navigate(['/tabs/transactions']);
+    }
   }
 
   private getIconForCategory(cat: string): string {
