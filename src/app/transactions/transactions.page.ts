@@ -52,11 +52,17 @@ export class TransactionsPage implements OnInit {
   applyFilter() {
     if (this.selectedFilter === 'all') {
       this.filteredTransactions = this.allTransactions;
+    } else if (this.selectedFilter === 'income') {
+      this.filteredTransactions = this.allTransactions.filter(t => t.amount > 0);
+    } else if (this.selectedFilter === 'expenses') {
+      this.filteredTransactions = this.allTransactions.filter(t => t.amount < 0);
+    } else if (this.selectedFilter === 'transfers') {
+      this.filteredTransactions = this.allTransactions.filter(t => 
+        t.category.toLowerCase() === 'transfer' || t.category.toLowerCase() === 'transfers'
+      );
     } else {
       this.filteredTransactions = this.allTransactions.filter(t => 
-        t.category.toLowerCase() === this.selectedFilter.toLowerCase() ||
-        (this.selectedFilter === 'income' && t.amount > 0) ||
-        (this.selectedFilter === 'expenses' && t.amount < 0)
+        t.category.toLowerCase() === this.selectedFilter.toLowerCase()
       );
     }
   }

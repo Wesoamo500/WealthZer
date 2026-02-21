@@ -1,8 +1,9 @@
-import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule, ToastController, ModalController } from '@ionic/angular';
 import { FinancialService, Budget, Transaction } from '../core/services/financial.service';
+import { AddBudgetModalComponent } from './add-budget-modal.component';
 
 @Component({
   selector: 'app-budgets',
@@ -12,17 +13,12 @@ import { FinancialService, Budget, Transaction } from '../core/services/financia
   imports: [IonicModule, CommonModule, FormsModule]
 })
 export class BudgetsPage implements OnInit {
-  @ViewChild('amountInput') amountInput!: ElementRef<HTMLInputElement>;
-  
-  targetAmount: number = 0;
-  displayAmount: string = '0.00';
-  isAmountFocused: boolean = false;
-  selectedPeriod: 'monthly' | 'weekly' = 'monthly';
-  selectedCategory = 'DINING';
-  
   budgets: Budget[] = [];
   allTransactions: Transaction[] = [];
-  totalMonthlyIncome: number = 4500; // Mock current income
+  totalMonthlyIncome: number = 0;
+  totalBudgetLimit: number = 0;
+  totalSpent: number = 0;
+  isLoading: boolean = true;
 
   categories = [
     { id: 'DINING', label: 'Dining', icon: 'restaurant' },
@@ -34,7 +30,8 @@ export class BudgetsPage implements OnInit {
 
   constructor(
     private financialService: FinancialService,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private modalCtrl: ModalController
   ) {}
 
   ngOnInit() {
@@ -44,41 +41,49 @@ export class BudgetsPage implements OnInit {
   }
 
   loadData() {
+    this.isLoading = true;
     this.financialService.getBudgets().subscribe(res => {
       this.budgets = res;
+      this.calculateTotals();
     });
     this.financialService.getTransactions().subscribe(res => {
       this.allTransactions = res;
+      this.calculateTotals();
     });
+    this.financialService.getNetWorth().subscribe(res => {
+      this.totalMonthlyIncome = res.totalIncome;
+      this.isLoading = false;
+    }, () => this.isLoading = false);
   }
 
-  focusAmountInput() {
-    this.amountInput.nativeElement.focus();
-    this.isAmountFocused = true;
+  calculateTotals() {
+    this.totalBudgetLimit = this.budgets.reduce((sum, b) => sum + Number(b.amount), 0);
+    this.totalSpent = this.budgets.reduce((sum, b) => sum + this.calculateSpentForCategory(b.category), 0);
   }
 
-  onAmountBlur() {
-    this.isAmountFocused = false;
-    this.updateDisplayAmount();
-  }
+  async openAddBudget() {
+    const modal = await this.modalCtrl.create({
+      component: AddBudgetModalComponent,
+      cssClass: 'custom-modal-class'
+    });
 
-  updateDisplayAmount() {
-    if (this.targetAmount === 0 || this.targetAmount === null) {
-      this.displayAmount = '0.00';
-    } else {
-      this.displayAmount = this.targetAmount.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+    await modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'confirm' && data) {
+      this.financialService.addBudget(data).subscribe({
+        next: () => {
+          this.showToast('Budget updated successfully!');
+          // Subscription will refresh data
+        },
+        error: () => this.showToast('Error saving budget.')
       });
     }
   }
 
-  selectPeriod(period: 'monthly' | 'weekly') {
-    this.selectedPeriod = period;
-  }
-
-  selectCategory(categoryId: string) {
-    this.selectedCategory = categoryId;
+  getCategoryIcon(categoryId: string): string {
+    return this.categories.find(c => c.id === categoryId)?.icon || 'help-outline';
   }
 
   getBudgetForCategory(categoryId: string): Budget | undefined {
@@ -105,33 +110,8 @@ export class BudgetsPage implements OnInit {
     return Math.max(budget.amount - spent, 0);
   }
 
-  async createBudget() {
-    if (this.targetAmount <= 0) {
-      this.showToast('Please enter a valid amount');
-      return;
-    }
-
-    const existingBudget = this.getBudgetForCategory(this.selectedCategory);
-    if (existingBudget) {
-      this.showToast(`A budget for ${this.selectedCategory} already exists.`);
-      return;
-    }
-
-    const newBudget: Budget = {
-      category: this.selectedCategory,
-      amount: this.targetAmount,
-      period: this.selectedPeriod,
-      spent: 0
-    };
-
-    this.financialService.addBudget(newBudget).subscribe({
-      next: () => {
-        this.showToast('Budget created successfully!');
-        this.targetAmount = 0;
-        this.updateDisplayAmount();
-      },
-      error: () => this.showToast('Error creating budget. Please try again.')
-    });
+  async deleteBudget(id: string) {
+    // Optional: Add delete functionality if service supports it
   }
 
   private async showToast(message: string) {

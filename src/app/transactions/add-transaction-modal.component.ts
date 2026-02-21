@@ -72,7 +72,7 @@ export class AddTransactionModalComponent implements OnInit {
 
     const transaction = {
       title: this.title,
-      amount: -Math.abs(this.amount), // Most transactions are expenses
+      amount: this.selectedCategory === 'INCOME' ? Math.abs(this.amount) : -Math.abs(this.amount),
       category: this.selectedCategory,
       date: this.selectedDate,
       account: this.selectedAccount,

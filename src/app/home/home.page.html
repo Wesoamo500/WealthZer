@@ -24,41 +24,56 @@
     <ion-text color="medium">
       <p class="label">TOTAL NET WORTH</p>
     </ion-text>
-    <ion-text color="light">
-      <h1 class="amount">{{ netWorth | currency }}</h1>
-    </ion-text>
     
-    <div class="change-badge up">
-      <ion-icon name="trending-up"></ion-icon>
-      <span>+{{ dailyChange | currency }} ({{ dailyChangePercent }}%) Today</span>
+    <div *ngIf="isLoading">
+      <ion-skeleton-text animated style="width: 60%; height: 36px; margin-bottom: 8px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 40%; height: 20px; border-radius: 20px;"></ion-skeleton-text>
+    </div>
+
+    <div *ngIf="!isLoading">
+      <ion-text color="light">
+        <h1 class="amount">{{ netWorth | currency }}</h1>
+      </ion-text>
+      
+      <div class="change-badge" [ngClass]="dailyChange > 0 ? 'up' : (dailyChange < 0 ? 'down' : 'stale')">
+        <ion-icon [name]="dailyChange > 0 ? 'trending-up' : (dailyChange < 0 ? 'trending-down' : 'remove')"></ion-icon>
+        <span>{{ dailyChange > 0 ? '+' : '' }}{{ dailyChange | currency }} ({{ dailyChangePercent }}%) Today</span>
+      </div>
     </div>
   </div>
 
-  <!-- Quick Stats Grid -->
-  <ion-grid class="stats-grid ion-padding-horizontal">
-    <ion-row>
-      <ion-col size="6">
-        <div class="stat-card">
-          <div class="icon-box blue">
-            <ion-icon name="trending-up"></ion-icon>
+  <!-- Swippable Financial Cards -->
+  <div class="carousel-container">
+    <swiper-container 
+      *ngIf="!isLoading"
+      [slidesPerView]="2.2" 
+      [spaceBetween]="12" 
+      [freeMode]="true"
+      class="financial-swiper">
+      <swiper-slide *ngFor="let card of financialCards">
+        <div class="stat-card" [ngClass]="card.color">
+          <div class="icon-box" [ngClass]="card.color">
+            <ion-icon [name]="card.icon"></ion-icon>
           </div>
-          <p class="stat-label">Investments</p>
-          <h3 class="stat-value">{{ investments | currency:'USD':'symbol':'1.0-0' }}</h3>
-          <div class="progress-bar blue"></div>
+          <p class="stat-label">{{ card.title }}</p>
+          <h3 class="stat-value">{{ card.value | currency:'USD':'symbol':'1.0-0' }}</h3>
+          <div class="progress-bar" [ngClass]="card.color"></div>
         </div>
-      </ion-col>
-      <ion-col size="6">
+      </swiper-slide>
+    </swiper-container>
+
+    <!-- Skeleton Carousel -->
+    <div *ngIf="isLoading" style="display: flex; gap: 12px; overflow: hidden;">
+      <div *ngFor="let i of [1,2,3]" style="flex: 0 0 42%; width: 42%;">
         <div class="stat-card">
-          <div class="icon-box orange">
-            <ion-icon name="pie-chart"></ion-icon>
-          </div>
-          <p class="stat-label">Budgets</p>
-          <h3 class="stat-value">{{ budget | currency:'USD':'symbol':'1.0-0' }}</h3>
-          <div class="progress-bar orange"></div>
+          <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 10px; margin-bottom: 12px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 60%; margin-bottom: 4px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 20px; margin-bottom: 8px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 4px;"></ion-skeleton-text>
         </div>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+      </div>
+    </div>
+  </div>
 
   <div class="ion-padding">
     <!-- AI Insight Card -->
@@ -67,7 +82,15 @@
       <ion-icon name="sparkles" color="primary"></ion-icon>
     </div>
 
-    <div class="ai-card">
+    <div *ngIf="isLoading" class="ai-card">
+      <ion-skeleton-text animated style="width: 100px; height: 18px; margin-bottom: 16px; border-radius: 4px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 70%; height: 20px; margin-bottom: 8px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 90%; height: 14px; margin-bottom: 4px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 80%; height: 14px; margin-bottom: 24px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 100%; height: 40px; border-radius: 12px;"></ion-skeleton-text>
+    </div>
+
+    <div *ngIf="!isLoading" class="ai-card">
       <div class="ai-header">
         <ion-badge color="primary">SMART SUGGESTION</ion-badge>
         <span class="timestamp">Just now</span>
@@ -92,7 +115,25 @@
       <ion-button fill="clear" size="small" color="primary" routerLink="/tabs/portfolio">See All</ion-button>
     </div>
 
-    <ion-list lines="none" class="assets-list">
+    <div *ngIf="isLoading">
+      <ion-list lines="none" class="assets-list">
+        <ion-item *ngFor="let i of [1,2,3]" class="asset-item">
+          <ion-avatar slot="start">
+            <ion-skeleton-text animated></ion-skeleton-text>
+          </ion-avatar>
+          <ion-label>
+            <ion-skeleton-text animated style="width: 50%;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 30%;"></ion-skeleton-text>
+          </ion-label>
+          <div slot="end" style="width: 60px;">
+            <ion-skeleton-text animated style="width: 100%;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%; float: right;"></ion-skeleton-text>
+          </div>
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <ion-list *ngIf="!isLoading" lines="none" class="assets-list">
       <ion-item *ngFor="let asset of assets" class="asset-item">
         <div class="asset-icon" slot="start">
           <ion-icon [name]="asset.icon" [style.color]="asset.color"></ion-icon>
@@ -116,7 +157,22 @@
       <ion-button fill="clear" size="small" color="primary" routerLink="/tabs/transactions">See All</ion-button>
     </div>
 
-    <ion-list lines="none" class="transactions-list">
+    <div *ngIf="isLoading">
+      <ion-list lines="none" class="transactions-list">
+        <ion-item *ngFor="let i of [1,2,3]" class="transaction-item">
+          <ion-avatar slot="start" style="width: 44px; height: 44px; border-radius: 12px;">
+            <ion-skeleton-text animated></ion-skeleton-text>
+          </ion-avatar>
+          <ion-label>
+            <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+          </ion-label>
+          <ion-skeleton-text slot="end" animated style="width: 50px;"></ion-skeleton-text>
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <ion-list *ngIf="!isLoading" lines="none" class="transactions-list">
       <ion-item *ngFor="let transaction of recentTransactions" class="transaction-item">
         <div class="transaction-icon" [style.background]="transaction.iconBg" slot="start">
           <ion-icon [name]="transaction.icon" [style.color]="transaction.iconColor"></ion-icon>

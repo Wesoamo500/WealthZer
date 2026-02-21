@@ -56,6 +56,10 @@ export class AuthService {
     );
   }
 
+  resendOtp(email: string): Observable<any> {
+    return this.apiService.post('auth/resend-otp', { email });
+  }
+
   socialLogin(provider: 'GOOGLE' | 'APPLE', idToken: string, fullName?: string): Observable<AuthResponse> {
     return this.apiService.post<AuthResponse>('auth/social-login', { provider, idToken, fullName }).pipe(
       tap(async (res) => await this.handleAuth(res))

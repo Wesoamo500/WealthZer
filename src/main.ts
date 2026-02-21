@@ -1,4 +1,7 @@
 import { enableProdMode, importProvidersFrom } from '@angular/core';
+import { register } from 'swiper/element/bundle';
+register();
+
 import { bootstrapApplication } from '@angular/platform-browser';
 import { RouteReuseStrategy, provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';

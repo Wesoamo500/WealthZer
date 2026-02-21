@@ -92,6 +92,16 @@ body {
     --ion-tab-bar-color-selected: var(--ion-color-primary);
 }
 
+// Global Header Glassmorphism
+ion-header {
+    ion-toolbar {
+        --background: rgba(16, 16, 16, 0.8) !important;
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        --border-style: none;
+    }
+}
+
 // Custom Utilities
 .gold-text {
     color: var(--ion-color-primary);

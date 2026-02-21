@@ -51,8 +51,17 @@ export class FinancialService {
     return this.apiService.get<PortfolioAsset[]>('financial/portfolio');
   }
 
-  getNetWorth(): Observable<{ totalNetWorth: number; currency: string }> {
-    return this.apiService.get<{ totalNetWorth: number; currency: string }>('financial/net-worth');
+  getNetWorth(): Observable<{ 
+    totalNetWorth: number; 
+    totalInvestments: number;
+    totalIncome: number;
+    totalExpenses: number;
+    dailyChange: number;
+    dailyChangePercent: number;
+    budgets: any[];
+    currency: string; 
+  }> {
+    return this.apiService.get<any>('financial/net-worth');
   }
 
   getBudgets(): Observable<Budget[]> {

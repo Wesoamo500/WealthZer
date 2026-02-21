@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ModalController } from '@ionic/angular';
 import { FinancialService, PortfolioAsset } from '../core/services/financial.service';
+import { AddAssetModalComponent } from './add-asset-modal.component';
 
 @Component({
   selector: 'app-portfolio',
@@ -17,7 +18,10 @@ export class PortfolioPage implements OnInit {
   totalBalance: number = 0;
   currency: string = 'USD';
 
-  constructor(private financialService: FinancialService) {}
+  constructor(
+    private financialService: FinancialService,
+    private modalCtrl: ModalController
+  ) {}
 
   ngOnInit() {
     this.loadPortfolio();
@@ -37,9 +41,24 @@ export class PortfolioPage implements OnInit {
     });
   }
 
-  openAddAsset() {
-    // Logic for adding asset (placeholder for now as no modal exists yet)
-    console.log('Open Add Asset');
+  async openAddAsset() {
+    const modal = await this.modalCtrl.create({
+      component: AddAssetModalComponent,
+      cssClass: 'custom-modal-class'
+    });
+
+    await modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'confirm' && data) {
+      this.financialService.addAsset(data).subscribe({
+        next: () => {
+          // Home and Portfolio will auto-refresh due to transactionUpdate$ subscription
+        },
+        error: (err) => console.error('Error adding asset:', err)
+      });
+    }
   }
 
   getIconForAsset(type: string): string {

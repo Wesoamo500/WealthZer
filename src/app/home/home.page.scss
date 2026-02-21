@@ -101,9 +101,30 @@ ion-toolbar {
         margin-top: 8px;
         
         &.up {
+            background: rgba(45, 211, 111, 0.1);
             color: var(--ion-color-success);
         }
+        &.down {
+            background: rgba(235, 68, 68, 0.1);
+            color: var(--ion-color-danger);
+        }
+        &.stale {
+            background: rgba(146, 148, 156, 0.1);
+            color: var(--ion-color-medium);
+        }
     }
+}
+
+.carousel-container {
+    padding: 0 16px;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.financial-swiper {
+    width: 100%;
+    height: auto;
+    padding-bottom: 20px; // Space for pagination if added
 }
 
 .stats-grid {
@@ -132,6 +153,8 @@ ion-toolbar {
         
         &.blue { background: rgba(61, 194, 255, 0.2); color: #3dc2ff; }
         &.orange { background: rgba(255, 196, 9, 0.2); color: #ffc409; }
+        &.danger { background: rgba(var(--ion-color-danger-rgb), 0.2); color: var(--ion-color-danger); }
+        &.success { background: rgba(var(--ion-color-success-rgb), 0.2); color: var(--ion-color-success); }
     }
     
     .stat-label {
@@ -155,6 +178,8 @@ ion-toolbar {
         
         &.blue { background: #3dc2ff; }
         &.orange { background: #ffc409; }
+        &.danger { background: var(--ion-color-danger); }
+        &.success { background: var(--ion-color-success); }
     }
 }
 

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { FinancialService } from '../../core/services/financial.service';
@@ -28,7 +28,8 @@ export class TwoFactorPage implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private authService: AuthService,
-    private financialService: FinancialService
+    private financialService: FinancialService,
+    private toastCtrl: ToastController
   ) {}
 
   ngOnInit() {
@@ -92,8 +93,28 @@ export class TwoFactorPage implements OnInit, OnDestroy {
   }
 
   resendCode() {
-    console.log('Resending code...');
-    // Reset timer
+    this.authService.resendOtp(this.email).subscribe({
+      next: async () => {
+        const toast = await this.toastCtrl.create({
+          message: 'Verification code resent!',
+          duration: 2000,
+          position: 'top',
+          color: 'success'
+        });
+        await toast.present();
+      },
+      error: async () => {
+        const toast = await this.toastCtrl.create({
+          message: 'Error resending code. Please try again.',
+          duration: 2000,
+          position: 'top',
+          color: 'danger'
+        });
+        await toast.present();
+      }
+    });
+
+    // Reset timer and UI
     this.timeLeft = 54;
     this.codeInput = '';
     if (this.timerInterval) {
