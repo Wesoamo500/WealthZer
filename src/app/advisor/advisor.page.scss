@@ -297,33 +297,67 @@ ion-toolbar {
     }
 }
 
-.footer-container {
-    padding: 10px 16px 20px 16px;
-    background: transparent;
-}
+.perfect-pill-footer {
+    padding: 12px 16px 24px 16px;
+    background: var(--ion-background-color);
 
-.input-area {
-    display: flex;
-    align-items: center;
-    background: #1e1e1e; /* match AI bubble dark */
-    border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 28px; /* High radius like WhatsApp */
-    padding: 2px 6px;
-    
-    
-    
-    .chat-input {
-        --padding-start: 4px;
-        --placeholder-color: rgba(255,255,255,0.4);
-        font-size: 15px;
-        color: white;
-    }
-    
-    .send-btn {
-        margin: 0;
-        height: 44px;
-        width: 44px;
-        --padding-start: 0;
-        --padding-end: 0;
+    .input-pill {
+        display: flex;
+        align-items: center;
+        background: #141414; /* Deep dark background like image */
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 40px; /* Perfect pill shape */
+        padding: 6px 6px 6px 18px;
+        min-height: 56px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+        .mic-prefix {
+            font-size: 22px;
+            color: #8E8E93; /* Muted gray like image */
+            margin-right: 12px;
+        }
+
+        .chat-input {
+            --padding-start: 0;
+            --padding-end: 8px;
+            --highlight-height: 0;
+            --placeholder-color: #55585d; /* Darker gray placeholder like image */
+            --placeholder-opacity: 1;
+            font-size: 16px;
+            color: #aeaeae; /* Light gray text like image */
+            font-weight: 400;
+
+            &::part(native) {
+                caret-color: #FFD700;
+            }
+        }
+
+        .send-action {
+            padding: 2px;
+            cursor: pointer;
+
+            .send-circle {
+                width: 44px;
+                height: 44px;
+                background: rgba(255, 255, 255, 0.03); /* Subtle dark circle */
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transition: background 0.2s ease;
+
+                &:active {
+                    background: rgba(255, 215, 0, 0.1);
+                    transform: scale(0.95);
+                }
+
+                .send-icon-gold {
+                    color: #FFD700; /* Gold icon */
+                    font-size: 22px;
+                    /* Slight adjustment to look like the slanted arrow in the image */
+                    transform: rotate(0deg); 
+                }
+            }
+        }
     }
 }

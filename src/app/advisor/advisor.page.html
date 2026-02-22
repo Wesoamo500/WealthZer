@@ -141,17 +141,23 @@
 </ion-content>
 
 <ion-footer class="ion-no-border">
-  <div class="footer-container">
-    <div class="input-area">
+  <div class="perfect-pill-footer">
+    <div class="input-pill">
+      <ion-icon name="mic-outline" class="mic-prefix"></ion-icon>
+      
       <ion-input 
-        placeholder="Type your financial question..." 
+        placeholder="Ask WealthZer anything..." 
         [(ngModel)]="newMessage"
         (keyup.enter)="sendMessage()"
         class="chat-input"
+        mode="md"
       ></ion-input>
-      <ion-button fill="clear" class="send-btn" (click)="sendMessage()">
-        <ion-icon name="send" slot="icon-only" color="primary"></ion-icon>
-      </ion-button>
+
+      <div class="send-action" (click)="sendMessage()">
+        <div class="send-circle">
+          <ion-icon name="send" class="send-icon-gold"></ion-icon>
+        </div>
+      </div>
     </div>
   </div>
 </ion-footer>
