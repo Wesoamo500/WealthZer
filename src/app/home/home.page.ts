@@ -208,4 +208,5 @@ export class HomePage implements OnInit, OnDestroy {
   private getColorForCategory(cat: string): string {
     return '#FF9500';
   }
+
 }

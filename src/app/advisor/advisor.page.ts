@@ -119,4 +119,5 @@ export class AdvisorPage implements OnInit {
         }
     });
   }
+
 }

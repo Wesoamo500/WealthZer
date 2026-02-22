@@ -310,14 +310,10 @@ ion-toolbar {
     border-radius: 28px; /* High radius like WhatsApp */
     padding: 2px 6px;
     
-    .mic-icon {
-        font-size: 24px;
-        color: var(--ion-color-medium);
-        margin: 0 12px 0 8px;
-    }
+    
     
     .chat-input {
-        --padding-start: 0;
+        --padding-start: 4px;
         --placeholder-color: rgba(255,255,255,0.4);
         font-size: 15px;
         color: white;
@@ -329,6 +325,5 @@ ion-toolbar {
         width: 44px;
         --padding-start: 0;
         --padding-end: 0;
-        /* The background rectangle is fully removed via fill="clear" in HTML */
     }
 }

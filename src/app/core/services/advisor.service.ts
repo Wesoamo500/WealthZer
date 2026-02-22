@@ -19,15 +19,18 @@ export class AdvisorService {
     return this.apiService.get<ChatMessage[]>('advisor/chat-history');
   }
 
-  sendMessage(message: string): Observable<ChatMessage> {
-    return this.apiService.post<ChatMessage>('advisor/ask', { question: message });
+  sendMessage(message: string, provider?: string): Observable<ChatMessage> {
+    return this.apiService.post<ChatMessage>('advisor/ask', { 
+      question: message,
+      provider: provider 
+    });
   }
 
   clearChatHistory(): Observable<any> {
     return this.apiService.post('advisor/clear-history', {});
   }
 
-  getInsight(): Observable<any> {
-    return this.apiService.get<any>('advisor/insight');
+  getInsight(provider?: string): Observable<any> {
+    return this.apiService.get<any>(`advisor/insight${provider ? '?provider=' + provider : ''}`);
   }
 }
