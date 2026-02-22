@@ -20,9 +20,6 @@
 
 <ion-content [fullscreen]="true" class="ion-padding" #content>
   
-  <div class="date-divider">
-    <span>Today, 10:24 AM</span>
-  </div>
 
   <div class="chat-list">
     <!-- Skeleton Loading State -->
@@ -108,11 +105,12 @@
     <!-- Real Messages -->
     <ng-container *ngIf="!isChatEmpty && !isLoading">
       
-      <div class="date-divider">
-        <span class="date-chip">Today</span>
-      </div>
-
-      <ng-container *ngFor="let msg of messages">
+      <ng-container *ngFor="let msg of messages; let i = index">
+        
+        <!-- Dynamic Date Divider -->
+        <div class="date-divider" *ngIf="showDateDivider(msg, i)">
+          <span class="date-chip">{{ getDateLabel(msg.createdAt) }}</span>
+        </div>
         
         <!-- User Message -->
         <div class="message-wrapper user" *ngIf="msg.sender === 'user'">
