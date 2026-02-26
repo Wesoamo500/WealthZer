@@ -16,7 +16,7 @@ import { CurrencyService } from '../core/services/currency.service';
 export class TransactionsPage implements OnInit {
 
   allTransactions: any[] = [];
-  filteredTransactions: any[] = [];
+  groupedTransactions: { label: string; transactions: any[] }[] = [];
   selectedFilter: string = 'all';
   isLoading: boolean = true;
 
@@ -51,6 +51,7 @@ export class TransactionsPage implements OnInit {
           ...t,
           subtitle: `${t.account} • ${new Date(t.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
           amount: Number(t.amount),
+          date: new Date(t.date),
           icon: this.getIconForCategory(t.category),
           iconBg: this.getBgForCategory(t.category),
           iconColor: this.getColorForCategory(t.category)
@@ -71,21 +72,51 @@ export class TransactionsPage implements OnInit {
   }
 
   applyFilter() {
-    if (this.selectedFilter === 'all') {
-      this.filteredTransactions = this.allTransactions;
-    } else if (this.selectedFilter === 'income') {
-      this.filteredTransactions = this.allTransactions.filter(t => t.amount > 0);
+    let filtered = this.allTransactions;
+    
+    if (this.selectedFilter === 'income') {
+      filtered = this.allTransactions.filter(t => t.amount > 0);
     } else if (this.selectedFilter === 'expenses') {
-      this.filteredTransactions = this.allTransactions.filter(t => t.amount < 0);
+      filtered = this.allTransactions.filter(t => t.amount < 0);
     } else if (this.selectedFilter === 'transfers') {
-      this.filteredTransactions = this.allTransactions.filter(t => 
+      filtered = this.allTransactions.filter(t => 
         t.category.toLowerCase() === 'transfer' || t.category.toLowerCase() === 'transfers'
       );
-    } else {
-      this.filteredTransactions = this.allTransactions.filter(t => 
+    } else if (this.selectedFilter !== 'all') {
+      filtered = this.allTransactions.filter(t => 
         t.category.toLowerCase() === this.selectedFilter.toLowerCase()
       );
     }
+
+    this.groupedTransactions = this.groupByTimeline(filtered);
+  }
+
+  groupByTimeline(transactions: any[]): { label: string; transactions: any[] }[] {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const groups: { [key: string]: any[] } = {};
+
+    transactions.forEach(t => {
+      const txDate = new Date(t.date);
+      const txDay = new Date(txDate.getFullYear(), txDate.getMonth(), txDate.getDate());
+      
+      let label: string;
+      if (txDay.getTime() === today.getTime()) {
+        label = 'Today';
+      } else if (txDay.getTime() === yesterday.getTime()) {
+        label = 'Yesterday';
+      } else {
+        label = txDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+
+      if (!groups[label]) groups[label] = [];
+      groups[label].push(t);
+    });
+
+    return Object.keys(groups).map(label => ({ label, transactions: groups[label] }));
   }
 
   async openAddTransaction() {
