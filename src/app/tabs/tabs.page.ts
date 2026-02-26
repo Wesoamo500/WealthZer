@@ -38,7 +38,7 @@ export class TabsPage implements OnInit, OnDestroy {
   }
 
   private checkCurrentRoute() {
-    this.isHomePage = this.router.url.includes('/home') || this.router.url === '/tabs' || this.router.url === '/';
+    this.isHomePage = this.router.url.includes('/home') || this.router.url.includes('/transactions') || this.router.url === '/tabs' || this.router.url === '/';
   }
 
   async openAddTransaction() {
