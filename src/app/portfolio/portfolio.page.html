@@ -60,7 +60,9 @@
           </ion-label>
           <div class="value" slot="end">
             <h3>{{ ((asset.currentValue || asset.purchasePrice || 0) * exchangeRate) | currency:displayCurrency }}</h3>
-            <p class="positive">+0.00%</p>
+            <p [class.positive]="asset.gainLossPercent && asset.gainLossPercent > 0" [class.negative]="asset.gainLossPercent && asset.gainLossPercent < 0">
+              {{ asset.gainLossPercent ? (asset.gainLossPercent > 0 ? '+' : '') + asset.gainLossPercent.toFixed(2) + '%' : '+0.00%' }}
+            </p>
           </div>
         </ion-item>
       </ion-list>

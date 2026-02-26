@@ -127,7 +127,7 @@ export class HomePage implements OnInit, OnDestroy {
         symbol: a.symbol,
         amount: `${a.amount} ${a.symbol}`,
         value: a.currentValue || a.purchasePrice,
-        change: 0, 
+        change: a.gainLossPercent || 0, 
         icon: a.type === 'CRYPTO' ? 'logo-bitcoin' : 'briefcase',
         color: a.type === 'CRYPTO' ? '#f7931a' : '#3dc2ff'
       }));

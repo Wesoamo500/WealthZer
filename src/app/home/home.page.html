@@ -255,7 +255,7 @@
         <div class="asset-value" slot="end">
           <h3>{{ (asset.value * exchangeRate) | currency:displayCurrency }}</h3>
           <p [class.positive]="asset.change > 0" [class.negative]="asset.change < 0">
-            {{ asset.change > 0 ? '+' : ''}}{{ asset.change }}%
+            {{ asset.change > 0 ? '+' : ''}}{{ asset.change.toFixed(2) }}%
           </p>
         </div>
       </ion-item>

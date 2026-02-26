@@ -21,6 +21,10 @@ export interface PortfolioAsset {
   type: string;
   purchasePrice: number;
   currentValue?: number;
+  currentPrice?: number;
+  purchaseValue?: number;
+  gainLoss?: number;
+  gainLossPercent?: number;
 }
 
 export interface Budget {
