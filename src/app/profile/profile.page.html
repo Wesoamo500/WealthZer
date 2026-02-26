@@ -273,7 +273,7 @@
       </ion-modal>
 
       <!-- Currency Selector Modal -->
-      <ion-modal [isOpen]="isCurrencyOpen" (didDismiss)="isCurrencyOpen = false" class="profile-modal bottom-sheet" initialBreakpoint="0.7" [breakpoints]="[0, 0.7]">
+      <ion-modal [isOpen]="isCurrencyOpen" (didDismiss)="isCurrencyOpen = false" class="profile-modal bottom-sheet" initialBreakpoint="0.75" [breakpoints]="[0, 0.75]">
         <ng-template>
           <ion-header class="ion-no-border">
             <ion-toolbar>
@@ -284,16 +284,31 @@
             </ion-toolbar>
           </ion-header>
           <ion-content class="ion-padding modal-content">
-            <p class="modal-description">Choose your preferred display currency. All values will be converted in real-time.</p>
-            <ion-radio-group [(ngModel)]="editCurrency">
-              <ion-item *ngFor="let cur of currencies" class="radio-item" lines="none">
+            <div class="search-box">
+              <ion-searchbar 
+                [(ngModel)]="searchTerm" 
+                (ionInput)="filterCurrencies()" 
+                placeholder="Search currency..."
+                class="currency-search">
+              </ion-searchbar>
+            </div>
+            <div class="currency-list">
+              <ion-item 
+                *ngFor="let cur of filteredCurrencies" 
+                button 
+                detail="false"
+                class="currency-item" 
+                [class.selected]="cur.code === editCurrency"
+                (click)="selectCurrency(cur.code)"
+                lines="none">
+                <div class="currency-flag" slot="start">{{ cur.flag }}</div>
                 <ion-label>
-                  <span style="margin-right: 8px;">{{ cur.flag }}</span> {{ cur.name }} ({{ cur.symbol }})
+                  <h3>{{ cur.name }}</h3>
+                  <p>{{ cur.code }} • {{ cur.symbol }}</p>
                 </ion-label>
-                <ion-radio slot="start" [value]="cur.code"></ion-radio>
+                <ion-icon *ngIf="cur.code === editCurrency" name="checkmark-circle" slot="end" class="check-icon"></ion-icon>
               </ion-item>
-            </ion-radio-group>
-            <ion-button expand="block" class="primary-btn ion-margin-top" (click)="saveCurrency()">Save Currency</ion-button>
+            </div>
           </ion-content>
         </ng-template>
       </ion-modal>

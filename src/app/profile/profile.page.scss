@@ -232,6 +232,60 @@ ion-content {
 
   .modal-content {
     --background: #101010;
+    --padding-bottom: 20px;
+
+    .search-box {
+      margin-bottom: 16px;
+      
+      .currency-search {
+        --background: #1c1c1e;
+        --border-radius: 12px;
+        --box-shadow: none;
+        --placeholder-color: rgba(255, 255, 255, 0.4);
+        --color: white;
+        --icon-color: rgba(255, 255, 255, 0.4);
+        padding: 0;
+      }
+    }
+
+    .currency-list {
+      .currency-item {
+        --background: #1c1c1e;
+        --border-radius: 12px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.2s;
+
+        &.selected {
+          border-color: var(--ion-color-primary);
+          background: rgba(var(--ion-color-primary-rgb), 0.1);
+        }
+
+        .currency-flag {
+          font-size: 28px;
+          margin-right: 12px;
+        }
+
+        ion-label {
+          h3 {
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 4px;
+          }
+          p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            margin: 0;
+          }
+        }
+
+        .check-icon {
+          color: var(--ion-color-primary);
+          font-size: 24px;
+        }
+      }
+    }
 
     .modal-description {
       color: rgba(255, 255, 255, 0.6);
@@ -331,6 +385,7 @@ ion-content {
       --border-radius: 12px;
       font-weight: 700;
       margin-top: 32px;
+      margin-bottom: 32px;
       height: 52px;
       text-transform: none;
       font-size: 16px;

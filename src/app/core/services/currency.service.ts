@@ -2,6 +2,7 @@ import { Injectable, NgZone } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ApiService } from './api.service';
 import { AuthService } from './auth.service';
+import { StorageService } from './storage.service';
 
 export interface CurrencyInfo {
   code: string;
@@ -41,7 +42,8 @@ export class CurrencyService {
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private storageService: StorageService
   ) {
     // Default fallback rates
     this._rates = {
@@ -50,10 +52,9 @@ export class CurrencyService {
       BRL: 4.97, ZAR: 18.5, AED: 3.67, SAR: 3.75, KES: 153,
     };
 
-    // Load user's preferred currency on init
+    // Load user's preferred currency from profile
     this.authService.currentUser.subscribe(user => {
-      console.log('CurrencyService: Current user updated', user?.preferredCurrency);
-      if (user?.preferredCurrency) {
+      if (user?.preferredCurrency && user.preferredCurrency !== this._currencyCode.getValue()) {
         this.setCurrency(user.preferredCurrency, false);
       }
     });
@@ -87,6 +88,7 @@ export class CurrencyService {
     this.updateRate();
 
     if (persist) {
+      this.storageService.set('preferredCurrency', code);
       this.authService.updateProfile({ preferredCurrency: code }).subscribe({
         next: (res) => console.log('CurrencyService: Profile updated with currency', code),
         error: (err) => console.error('CurrencyService: Error updating profile with currency', err)

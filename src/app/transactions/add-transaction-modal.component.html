@@ -15,7 +15,7 @@
   <div class="amount-section" (click)="focusAmountInput()">
     <p class="enter-amount-label">ENTER AMOUNT</p>
     <div class="amount-display">
-      <span class="currency-symbol">$</span>
+      <span class="currency-symbol">{{ currencyService.getCurrencyInfo().symbol }}</span>
       <span class="amount-value">{{ displayAmount }}</span>
       <span class="cursor" *ngIf="isAmountFocused">|</span>
     </div>

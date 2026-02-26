@@ -41,6 +41,8 @@ export class ProfilePage implements OnInit {
   editInsightsFreq = '';
   editCurrency = 'USD';
   currencies = SUPPORTED_CURRENCIES;
+  filteredCurrencies = SUPPORTED_CURRENCIES;
+  searchTerm = '';
 
   constructor(
     private authService: AuthService,
@@ -139,15 +141,27 @@ export class ProfilePage implements OnInit {
 
   openCurrency() {
     this.editCurrency = this.settings.preferredCurrency;
+    this.searchTerm = '';
+    this.filteredCurrencies = SUPPORTED_CURRENCIES;
     this.isCurrencyOpen = true;
   }
 
-  saveCurrency() {
-    console.log('ProfilePage: Saving currency', this.editCurrency);
-    this.settings.preferredCurrency = this.editCurrency;
-    this.currencyService.setCurrency(this.editCurrency);
+  filterCurrencies() {
+    const term = this.searchTerm.toLowerCase();
+    this.filteredCurrencies = SUPPORTED_CURRENCIES.filter(c => 
+      c.name.toLowerCase().includes(term) || 
+      c.code.toLowerCase().includes(term)
+    );
+  }
+
+  selectCurrency(code: string) {
+    this.editCurrency = code;
+    this.settings.preferredCurrency = code;
+    this.currencyService.setCurrency(code, true);
     this.isCurrencyOpen = false;
   }
+
+
 
   logout() {
     this.authService.logout();

@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
+import { CurrencyService } from '../core/services/currency.service';
 
 @Component({
   selector: 'app-add-transaction',
@@ -36,7 +37,10 @@ export class AddTransactionModalComponent implements OnInit {
     { id: 'CREDIT', label: 'Credit Card', icon: 'card' }
   ];
 
-  constructor(private modalCtrl: ModalController) {}
+  constructor(
+    private modalCtrl: ModalController,
+    public currencyService: CurrencyService
+  ) {}
 
   ngOnInit() {
     this.updateDisplayAmount();
