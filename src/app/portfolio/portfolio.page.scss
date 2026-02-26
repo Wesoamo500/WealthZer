@@ -55,6 +55,11 @@ ion-header {
       font-weight: 600;
     }
   }
+
+  ion-list {
+    background: transparent;
+    padding: 0;
+  }
 }
 
 .asset-item {
@@ -63,7 +68,7 @@ ion-header {
   --padding-end: 16px;
   --inner-padding-end: 0;
   --border-radius: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   height: 80px;
 
   .icon-box {

@@ -58,10 +58,12 @@ export class HomePage implements OnInit, OnDestroy {
     // Subscribe to reactive updates
     this.financialService.transactionUpdate$.subscribe(() => {
       this.loadData();
+      this.loadHealthScore();
     });
     
     this.financialService.budgetUpdate$.subscribe(() => {
       this.loadData();
+      this.loadHealthScore();
     });
 
     // Subscribe to currency changes

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
+import { CurrencyService } from '../core/services/currency.service';
 
 @Component({
   selector: 'app-add-asset-modal',
@@ -38,7 +39,7 @@ import { IonicModule, ModalController } from '@ionic/angular';
           </ion-col>
           <ion-col size="6">
             <ion-item class="custom-input">
-              <ion-label position="stacked">Buy Price</ion-label>
+              <ion-label position="stacked">Buy Price ({{ currencySymbol }})</ion-label>
               <ion-input type="number" [(ngModel)]="purchasePrice" placeholder="0.00"></ion-input>
             </ion-item>
           </ion-col>
@@ -109,12 +110,14 @@ import { IonicModule, ModalController } from '@ionic/angular';
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule]
 })
-export class AddAssetModalComponent {
+export class AddAssetModalComponent implements OnInit {
   name: string = '';
   symbol: string = '';
   amount: number | null = null;
   purchasePrice: number | null = null;
   selectedType: string = 'STOCK';
+  displayCurrency: string = 'USD';
+  currencySymbol: string = '$';
 
   assetTypes = [
     { id: 'STOCK', label: 'Stock', icon: 'trending-up' },
@@ -122,7 +125,17 @@ export class AddAssetModalComponent {
     { id: 'CASH', label: 'Cash', icon: 'wallet' }
   ];
 
-  constructor(private modalCtrl: ModalController) {}
+  constructor(
+    private modalCtrl: ModalController,
+    private currencyService: CurrencyService
+  ) {}
+
+  ngOnInit() {
+    this.currencyService.currencyCode$.subscribe(code => {
+      this.displayCurrency = code;
+      this.currencySymbol = this.currencyService.getCurrencyInfo(code).symbol;
+    });
+  }
 
   dismiss() {
     this.modalCtrl.dismiss();

@@ -56,7 +56,7 @@
           </div>
           <ion-label>
             <h3>{{ asset.name }}</h3>
-            <p>{{ asset.amount }} {{ asset.symbol }}</p>
+            <p>{{ asset.amount }} {{ asset.symbol }} • Buy: {{ (asset.purchasePrice * exchangeRate) | currency:displayCurrency }}</p>
           </ion-label>
           <div class="value" slot="end">
             <h3>{{ ((asset.currentValue || asset.purchasePrice || 0) * exchangeRate) | currency:displayCurrency }}</h3>
