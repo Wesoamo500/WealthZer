@@ -85,4 +85,15 @@ export class FinancialService {
       tap(() => this.budgetUpdateSubject.next())
     );
   }
+
+  getHealthScore(): Observable<{
+    score: number;
+    grade: string;
+    pillars: { name: string; score: number; max: number }[];
+    tip: string;
+    comparisonText: string;
+    savingsRate: number;
+  }> {
+    return this.apiService.get<any>('financial/health-score');
+  }
 }

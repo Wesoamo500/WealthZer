@@ -36,6 +36,10 @@ export class HomePage implements OnInit, OnDestroy {
   isLoading = true;
   private refreshInterval: any;
 
+  // Health Score
+  healthScore: any = null;
+  isHealthScoreLoading = true;
+
   constructor(
     private router: Router,
     private financialService: FinancialService,
@@ -88,6 +92,7 @@ export class HomePage implements OnInit, OnDestroy {
     });
 
     this.refreshInsight();
+    this.loadHealthScore();
 
     this.financialService.getTransactions().subscribe(res => {
       this.recentTransactions = res.slice(0, 3).map(t => ({
@@ -207,6 +212,21 @@ export class HomePage implements OnInit, OnDestroy {
 
   private getColorForCategory(cat: string): string {
     return '#FF9500';
+  }
+
+  loadHealthScore() {
+    this.isHealthScoreLoading = true;
+    this.financialService.getHealthScore().subscribe(
+      (res) => {
+        this.healthScore = res;
+        this.isHealthScoreLoading = false;
+      },
+      (err) => {
+        console.error('Error loading health score:', err);
+        this.isHealthScoreLoading = false;
+        this.healthScore = { score: 0, grade: 'N/A', pillars: [], tip: 'Unable to calculate your score right now.', comparisonText: '', savingsRate: 0 };
+      }
+    );
   }
 
 }

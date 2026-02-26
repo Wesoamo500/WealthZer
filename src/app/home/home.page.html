@@ -51,6 +51,65 @@
     </div>
   </div>
 
+  <!-- Financial Health Score Card -->
+  <div class="health-score-section ion-padding-horizontal" style="margin-bottom: 16px;">
+    <!-- Skeleton -->
+    <div *ngIf="isHealthScoreLoading" class="health-score-card">
+      <div class="health-score-left">
+        <ion-skeleton-text animated style="width: 90px; height: 90px; border-radius: 50%;"></ion-skeleton-text>
+      </div>
+      <div class="health-score-right">
+        <ion-skeleton-text animated style="width: 60%; height: 18px; margin-bottom: 6px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 80%; height: 14px; margin-bottom: 4px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 12px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 50%; height: 14px;"></ion-skeleton-text>
+      </div>
+    </div>
+
+    <!-- Real Content -->
+    <div *ngIf="!isHealthScoreLoading && healthScore" class="health-score-card">
+      <div class="health-score-left">
+        <div class="gauge-container">
+          <svg viewBox="0 0 120 120" class="gauge-svg">
+            <!-- Background circle -->
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#2a2a2a" stroke-width="8" />
+            <!-- Score arc -->
+            <circle cx="60" cy="60" r="50" fill="none"
+              stroke="url(#scoreGradient)" stroke-width="8"
+              stroke-linecap="round"
+              [attr.stroke-dasharray]="healthScore.score * 3.14 + ' ' + (314 - healthScore.score * 3.14)"
+              stroke-dashoffset="78.5"
+              transform="rotate(-90 60 60)"
+              class="gauge-arc" />
+            <defs>
+              <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#FFD700" />
+                <stop offset="100%" style="stop-color:#FF9500" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="gauge-text">
+            <span class="score-number">{{ healthScore.score }}</span>
+            <span class="score-max">/ 100</span>
+          </div>
+        </div>
+      </div>
+      <div class="health-score-right">
+        <div class="score-header">
+          <h3>Financial Health</h3>
+          <span class="grade-badge" [ngClass]="{
+            'excellent': healthScore.grade === 'Excellent',
+            'good': healthScore.grade === 'Good',
+            'fair': healthScore.grade === 'Fair',
+            'poor': healthScore.grade === 'Poor'
+          }">{{ healthScore.grade }}</span>
+        </div>
+        <p class="comparison-text">{{ healthScore.comparisonText }}</p>
+        <p class="tip-link" routerLink="/tabs/advisor">Improve Score ›</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Swippable Financial Cards -->
   <div class="carousel-container">
     <swiper-container 
