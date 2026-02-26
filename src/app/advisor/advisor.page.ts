@@ -1,8 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { IonContent, IonicModule } from '@ionic/angular';
 import { AdvisorService } from '../core/services/advisor.service';
+import { VoiceService } from '../core/services/voice.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 interface Message {
   sender: string;
@@ -25,17 +27,46 @@ interface Message {
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule]
 })
-export class AdvisorPage implements OnInit {
+export class AdvisorPage implements OnInit, OnDestroy {
   @ViewChild(IonContent) content!: IonContent;
 
   messages: Message[] = [];
   newMessage = '';
   isLoading: boolean = true;
+  isListening: boolean = false;
+  isVoiceAvailable: boolean = false;
 
-  constructor(private advisorService: AdvisorService) {}
+  private transcriptSub!: Subscription;
+  private listeningSub!: Subscription;
+  private availableSub!: Subscription;
+
+  constructor(
+    private advisorService: AdvisorService,
+    public voiceService: VoiceService
+  ) {}
 
   ngOnInit() {
     this.loadChatHistory();
+
+    this.listeningSub = this.voiceService.isListening$.subscribe(
+      listening => this.isListening = listening
+    );
+
+    this.transcriptSub = this.voiceService.transcript$.subscribe(
+      text => {
+        if (text) this.newMessage = text;
+      }
+    );
+
+    this.availableSub = this.voiceService.isAvailable$.subscribe(
+      available => this.isVoiceAvailable = available
+    );
+  }
+
+  ngOnDestroy() {
+    this.transcriptSub?.unsubscribe();
+    this.listeningSub?.unsubscribe();
+    this.availableSub?.unsubscribe();
   }
 
   loadChatHistory() {
@@ -156,6 +187,18 @@ export class AdvisorPage implements OnInit {
       return messageDate.toLocaleDateString([], { weekday: 'long' });
     }
     return messageDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  async toggleVoice() {
+    if (this.isListening) {
+      const transcript = await this.voiceService.stopListening();
+      if (transcript) {
+        this.newMessage = transcript;
+      }
+    } else {
+      this.newMessage = '';
+      await this.voiceService.startListening();
+    }
   }
 
 }

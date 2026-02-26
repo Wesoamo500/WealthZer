@@ -140,20 +140,33 @@
 
 <ion-footer class="ion-no-border">
   <div class="perfect-pill-footer">
-    <div class="input-pill">
-      <ion-icon name="mic-outline" class="mic-prefix"></ion-icon>
+    <!-- Listening indicator bar -->
+    <div class="listening-bar" *ngIf="isListening">
+      <div class="pulse-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <span class="listening-text">Listening...</span>
+    </div>
+
+    <div class="input-pill" [class.is-recording]="isListening">
+      <ion-icon 
+        [name]="isListening ? 'mic' : 'mic-outline'" 
+        class="mic-prefix" 
+        [class.mic-active]="isListening"
+        (click)="toggleVoice()"
+      ></ion-icon>
       
       <ion-input 
-        placeholder="Ask WealthZer anything..." 
+        placeholder="{{ isListening ? 'Speak now...' : 'Ask WealthZer anything...' }}" 
         [(ngModel)]="newMessage"
         (keyup.enter)="sendMessage()"
         class="chat-input"
         mode="md"
       ></ion-input>
 
-      <div class="send-action" (click)="sendMessage()">
-        <div class="send-circle">
-          <ion-icon name="send" class="send-icon-gold"></ion-icon>
+      <div class="send-action" (click)="isListening ? toggleVoice() : sendMessage()">
+        <div class="send-circle" [class.stop-circle]="isListening">
+          <ion-icon [name]="isListening ? 'stop' : 'send'" class="send-icon-gold"></ion-icon>
         </div>
       </div>
     </div>
