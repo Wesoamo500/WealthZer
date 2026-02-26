@@ -43,6 +43,14 @@ export class AuthService {
     const userJson = await this.storageService.get('user');
     if (userJson) {
       this.currentUserSubject.next(JSON.parse(userJson));
+      // Refresh profile from backend to get latest data
+      this.getProfile().subscribe({
+        next: (profile) => {
+          this.storageService.set('user', JSON.stringify(profile));
+          this.currentUserSubject.next(profile);
+        },
+        error: (err) => console.error('Error refreshing profile:', err)
+      });
     }
   }
 

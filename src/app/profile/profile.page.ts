@@ -52,6 +52,14 @@ export class ProfilePage implements OnInit {
 
   ngOnInit() {
     this.loadProfile();
+    
+    // Subscribe to user changes to keep currency in sync
+    this.authService.currentUser.subscribe(user => {
+      if (user?.preferredCurrency) {
+        this.settings.preferredCurrency = user.preferredCurrency;
+        this.editCurrency = user.preferredCurrency;
+      }
+    });
   }
 
   loadProfile() {
@@ -67,6 +75,12 @@ export class ProfilePage implements OnInit {
           aiInsightsFrequency: profile.aiInsightsFrequency || 'Daily',
           preferredCurrency: profile.preferredCurrency || 'USD'
         };
+        
+        // Update currency service with fresh profile data
+        if (profile.preferredCurrency) {
+          this.currencyService.setCurrency(profile.preferredCurrency, false);
+        }
+        
         this.isLoading = false;
       },
       error: (err) => {
@@ -159,12 +173,6 @@ export class ProfilePage implements OnInit {
     this.editCurrency = code;
     this.settings.preferredCurrency = code;
     this.currencyService.setCurrency(code, true);
-    
-    // Update user object to trigger currency service subscription
-    if (this.user) {
-      this.user.preferredCurrency = code;
-    }
-    
     this.isCurrencyOpen = false;
   }
 

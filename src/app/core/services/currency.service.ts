@@ -52,17 +52,33 @@ export class CurrencyService {
       BRL: 4.97, ZAR: 18.5, AED: 3.67, SAR: 3.75, KES: 153,
     };
 
-    // Load user's preferred currency from profile
+    // Initialize from stored user immediately
+    this.initializeCurrency();
+
+    // Listen for user profile changes
     this.authService.currentUser.subscribe(user => {
       console.log('CurrencyService: User loaded', user);
-      if (user?.preferredCurrency) {
+      if (user?.preferredCurrency && this._currencyCode.getValue() !== user.preferredCurrency) {
         console.log('CurrencyService: Setting currency from profile', user.preferredCurrency);
-        this.setCurrency(user.preferredCurrency, false);
+        this._currencyCode.next(user.preferredCurrency);
+        this.updateRate();
       }
     });
 
     // Fetch rates on init
     this.fetchRates();
+  }
+
+  private async initializeCurrency() {
+    const userJson = await this.storageService.get('user');
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      if (user?.preferredCurrency) {
+        console.log('CurrencyService: Initializing with stored currency', user.preferredCurrency);
+        this._currencyCode.next(user.preferredCurrency);
+        this.updateRate();
+      }
+    }
   }
 
   get currencyCode(): string {
@@ -90,7 +106,6 @@ export class CurrencyService {
     this.updateRate();
 
     if (persist) {
-      this.storageService.set('preferredCurrency', code);
       this.authService.updateProfile({ preferredCurrency: code }).subscribe({
         next: (res) => console.log('CurrencyService: Profile updated with currency', code),
         error: (err) => console.error('CurrencyService: Error updating profile with currency', err)
