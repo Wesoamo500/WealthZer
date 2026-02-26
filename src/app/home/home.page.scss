@@ -472,7 +472,11 @@ ion-toolbar {
             text-align: right;
 
             &.positive {
-                color: var(--ion-color-success);
+                color: #34C759;
+            }
+            
+            &.negative {
+                color: #ff3b30;
             }
         }
     }

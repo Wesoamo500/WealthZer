@@ -155,9 +155,16 @@ export class ProfilePage implements OnInit {
   }
 
   selectCurrency(code: string) {
+    console.log('ProfilePage: Selecting currency', code);
     this.editCurrency = code;
     this.settings.preferredCurrency = code;
     this.currencyService.setCurrency(code, true);
+    
+    // Update user object to trigger currency service subscription
+    if (this.user) {
+      this.user.preferredCurrency = code;
+    }
+    
     this.isCurrencyOpen = false;
   }
 

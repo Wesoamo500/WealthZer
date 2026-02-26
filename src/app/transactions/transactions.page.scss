@@ -103,6 +103,7 @@ ion-list {
     font-size: 16px;
     font-weight: 700;
     color: white;
+    &.positive { color: #34C759; }
     &.negative { color: #ff3b30; }
   }
 }

@@ -54,7 +54,9 @@ export class CurrencyService {
 
     // Load user's preferred currency from profile
     this.authService.currentUser.subscribe(user => {
-      if (user?.preferredCurrency && user.preferredCurrency !== this._currencyCode.getValue()) {
+      console.log('CurrencyService: User loaded', user);
+      if (user?.preferredCurrency) {
+        console.log('CurrencyService: Setting currency from profile', user.preferredCurrency);
         this.setCurrency(user.preferredCurrency, false);
       }
     });

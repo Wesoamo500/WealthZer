@@ -93,11 +93,14 @@ export class AuthService {
   }
 
   updateProfile(data: any): Observable<any> {
+    console.log('AuthService: Updating profile with', data);
     return this.apiService.patch('auth/profile', data).pipe(
       tap(async (updatedUser: any) => {
+        console.log('AuthService: Profile updated, response:', updatedUser);
         const currentUser = this.currentUserSubject.value;
         if (currentUser) {
           const newUser = { ...currentUser, ...updatedUser };
+          console.log('AuthService: New user object:', newUser);
           await this.storageService.set('user', JSON.stringify(newUser));
           this.currentUserSubject.next(newUser as User);
         }

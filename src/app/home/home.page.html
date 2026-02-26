@@ -291,7 +291,7 @@
           <h3>{{ transaction.title }}</h3>
           <p>{{ transaction.date }}</p>
         </ion-label>
-        <div class="transaction-amount" slot="end" [class.positive]="transaction.amount > 0">
+        <div class="transaction-amount" slot="end" [class.positive]="transaction.amount > 0" [class.negative]="transaction.amount < 0">
           {{ transaction.amount > 0 ? '+' : '' }}{{ (transaction.amount * exchangeRate) | currency:displayCurrency }}
         </div>
       </ion-item>

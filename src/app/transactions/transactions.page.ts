@@ -138,6 +138,8 @@ export class TransactionsPage implements OnInit {
 
   private getIconForCategory(cat: string): string {
     const map: any = { 
+      'income': 'trending-up',
+      'transfer': 'swap-horizontal',
       'dining': 'restaurant', 
       'groceries': 'cart', 
       'transport': 'car', 
@@ -149,6 +151,8 @@ export class TransactionsPage implements OnInit {
 
   private getBgForCategory(cat: string): string {
     const map: any = { 
+      'income': 'rgba(52, 199, 89, 0.2)',
+      'transfer': 'rgba(0, 122, 255, 0.2)',
       'dining': 'rgba(255, 149, 0, 0.2)', 
       'groceries': 'rgba(52, 199, 89, 0.2)', 
       'transport': 'rgba(0, 122, 255, 0.2)', 
@@ -159,6 +163,8 @@ export class TransactionsPage implements OnInit {
 
   private getColorForCategory(cat: string): string {
     const map: any = { 
+      'income': '#34C759',
+      'transfer': '#007AFF',
       'dining': '#FF9500', 
       'groceries': '#34C759', 
       'transport': '#007AFF', 

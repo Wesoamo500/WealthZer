@@ -24,6 +24,8 @@ export class AddTransactionModalComponent implements OnInit {
   note = '';
 
   categories = [
+    { id: 'INCOME', label: 'Income', icon: 'trending-up' },
+    { id: 'TRANSFER', label: 'Transfer', icon: 'swap-horizontal' },
     { id: 'DINING', label: 'Dining', icon: 'restaurant' },
     { id: 'GROCERIES', label: 'Groceries', icon: 'cart' },
     { id: 'TRANSPORT', label: 'Transport', icon: 'car' },
@@ -70,7 +72,6 @@ export class AddTransactionModalComponent implements OnInit {
 
   confirmTransaction() {
     if (!this.title) {
-        // Basic validation before sending
         return;
     }
 

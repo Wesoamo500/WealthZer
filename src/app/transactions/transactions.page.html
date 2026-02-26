@@ -59,7 +59,7 @@
               <h3>{{ item.title }}</h3>
               <p>{{ item.subtitle }}</p>
             </ion-label>
-            <div class="amount" slot="end" [class.negative]="item.amount < 0">
+            <div class="amount" slot="end" [class.positive]="item.amount > 0" [class.negative]="item.amount < 0">
               {{ item.amount > 0 ? '+' : '' }}{{ (item.amount * exchangeRate) | currency:displayCurrency }}
             </div>
           </ion-item>

@@ -89,11 +89,11 @@ ion-content {
   }
   
   .category-grid {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
     
     .category-item {
-      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
