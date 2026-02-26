@@ -41,12 +41,12 @@
 
     <div *ngIf="!isLoading">
       <ion-text color="light">
-        <h1 class="amount">{{ netWorth | currency }}</h1>
+        <h1 class="amount">{{ (netWorth * exchangeRate) | currency:displayCurrency:'symbol':'1.0-0' }}</h1>
       </ion-text>
       
       <div class="change-badge" [ngClass]="dailyChange > 0 ? 'up' : (dailyChange < 0 ? 'down' : 'stale')">
         <ion-icon [name]="dailyChange > 0 ? 'trending-up' : (dailyChange < 0 ? 'trending-down' : 'remove')"></ion-icon>
-        <span>{{ dailyChange > 0 ? '+' : '' }}{{ dailyChange | currency }} ({{ dailyChangePercent }}%) Today</span>
+        <span>{{ dailyChange > 0 ? '+' : '' }}{{ (dailyChange * exchangeRate) | currency:displayCurrency }} ({{ dailyChangePercent }}%) Today</span>
       </div>
     </div>
   </div>
@@ -124,7 +124,7 @@
             <ion-icon [name]="card.icon"></ion-icon>
           </div>
           <p class="stat-label">{{ card.title }}</p>
-          <h3 class="stat-value">{{ card.value | currency:'USD':'symbol':'1.0-0' }}</h3>
+          <h3 class="stat-value">{{ (card.value * exchangeRate) | currency:displayCurrency:'symbol':'1.0-0' }}</h3>
           <div class="progress-bar" [ngClass]="card.color"></div>
         </div>
       </swiper-slide>
@@ -160,11 +160,11 @@
       <div class="budget-footer">
         <div class="budget-info">
           <span class="label">SPENT</span>
-          <span class="value">{{ totalExpenses | currency }}</span>
+          <span class="value">{{ (totalExpenses * exchangeRate) | currency:displayCurrency }}</span>
         </div>
         <div class="budget-info text-right">
           <span class="label">LIMIT</span>
-          <span class="value">{{ budget | currency }}</span>
+          <span class="value">{{ (budget * exchangeRate) | currency:displayCurrency }}</span>
         </div>
       </div>
     </div>
@@ -253,7 +253,7 @@
           <p>{{ asset.amount }}</p>
         </ion-label>
         <div class="asset-value" slot="end">
-          <h3>{{ asset.value | currency }}</h3>
+          <h3>{{ (asset.value * exchangeRate) | currency:displayCurrency }}</h3>
           <p [class.positive]="asset.change > 0" [class.negative]="asset.change < 0">
             {{ asset.change > 0 ? '+' : ''}}{{ asset.change }}%
           </p>
@@ -292,7 +292,7 @@
           <p>{{ transaction.date }}</p>
         </ion-label>
         <div class="transaction-amount" slot="end" [class.positive]="transaction.amount > 0">
-          {{ transaction.amount > 0 ? '+' : '' }}{{ transaction.amount | currency }}
+          {{ transaction.amount > 0 ? '+' : '' }}{{ (transaction.amount * exchangeRate) | currency:displayCurrency }}
         </div>
       </ion-item>
     </ion-list>

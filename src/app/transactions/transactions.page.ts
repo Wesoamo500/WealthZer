@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { FinancialService } from '../core/services/financial.service';
 import { AddTransactionModalComponent } from './add-transaction-modal.component';
+import { CurrencyService } from '../core/services/currency.service';
 
 @Component({
   selector: 'app-transactions',
@@ -19,15 +20,26 @@ export class TransactionsPage implements OnInit {
   selectedFilter: string = 'all';
   isLoading: boolean = true;
 
+  displayCurrency: string = 'USD';
+  exchangeRate: number = 1;
+
   constructor(
     private financialService: FinancialService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    public currencyService: CurrencyService
   ) {}
 
   ngOnInit() {
     this.loadTransactions();
     this.financialService.transactionUpdate$.subscribe(() => {
       this.loadTransactions();
+    });
+
+    this.currencyService.currencyCode$.subscribe(code => {
+      this.displayCurrency = code;
+    });
+    this.currencyService.exchangeRate$.subscribe(rate => {
+      this.exchangeRate = rate;
     });
   }
 

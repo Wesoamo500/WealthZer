@@ -5,6 +5,7 @@ import { IonicModule } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
 import { FinancialService } from '../core/services/financial.service';
 import { AdvisorService } from '../core/services/advisor.service';
+import { CurrencyService } from '../core/services/currency.service';
 
 @Component({
   selector: 'app-home',
@@ -40,10 +41,15 @@ export class HomePage implements OnInit, OnDestroy {
   healthScore: any = null;
   isHealthScoreLoading = true;
 
+  // Currency
+  displayCurrency = 'USD';
+  exchangeRate = 1;
+
   constructor(
     private router: Router,
     private financialService: FinancialService,
-    private advisorService: AdvisorService
+    private advisorService: AdvisorService,
+    public currencyService: CurrencyService
   ) {}
 
   ngOnInit() {
@@ -56,6 +62,14 @@ export class HomePage implements OnInit, OnDestroy {
     
     this.financialService.budgetUpdate$.subscribe(() => {
       this.loadData();
+    });
+
+    // Subscribe to currency changes
+    this.currencyService.currencyCode$.subscribe(code => {
+      this.displayCurrency = code;
+    });
+    this.currencyService.exchangeRate$.subscribe(rate => {
+      this.exchangeRate = rate;
     });
 
     // Auto-refresh every 2 hours (7200000 ms)

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { FinancialService, PortfolioAsset } from '../core/services/financial.service';
 import { AddAssetModalComponent } from './add-asset-modal.component';
+import { CurrencyService } from '../core/services/currency.service';
 
 @Component({
   selector: 'app-portfolio',
@@ -16,18 +17,27 @@ export class PortfolioPage implements OnInit {
 
   assets: PortfolioAsset[] = [];
   totalBalance: number = 0;
-  currency: string = 'USD';
   isLoading: boolean = true;
+  displayCurrency: string = 'USD';
+  exchangeRate: number = 1;
 
   constructor(
     private financialService: FinancialService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    public currencyService: CurrencyService
   ) {}
 
   ngOnInit() {
     this.loadPortfolio();
     this.financialService.transactionUpdate$.subscribe(() => {
       this.loadPortfolio();
+    });
+
+    this.currencyService.currencyCode$.subscribe(code => {
+      this.displayCurrency = code;
+    });
+    this.currencyService.exchangeRate$.subscribe(rate => {
+      this.exchangeRate = rate;
     });
   }
 
@@ -44,7 +54,6 @@ export class PortfolioPage implements OnInit {
         next: (res) => {
           this.assets = res.portfolio;
           this.totalBalance = res.netWorth.totalNetWorth;
-          this.currency = res.netWorth.currency;
           this.isLoading = false;
         },
         error: (err) => {

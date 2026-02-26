@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { AuthService, User } from '../core/services/auth.service';
 import { StorageService } from '../core/services/storage.service';
+import { CurrencyService, SUPPORTED_CURRENCIES, CurrencyInfo } from '../core/services/currency.service';
 
 @Component({
   selector: 'app-profile',
@@ -22,7 +23,8 @@ export class ProfilePage implements OnInit {
     pushNotifications: false,
     aiAdvisorMode: 'Balanced',
     twoFactorEnabled: false,
-    aiInsightsFrequency: 'Daily'
+    aiInsightsFrequency: 'Daily',
+    preferredCurrency: 'USD'
   };
 
   // Modals Open State
@@ -30,16 +32,20 @@ export class ProfilePage implements OnInit {
   isAiAdvisorOpen = false;
   isTwoFactorOpen = false;
   isInsightsOpen = false;
+  isCurrencyOpen = false;
 
   // Temp Form Models (to hold data while modal is open before saving)
   editFullName = '';
   editAiMode = '';
   editTwoFactor = false;
   editInsightsFreq = '';
+  editCurrency = 'USD';
+  currencies = SUPPORTED_CURRENCIES;
 
   constructor(
     private authService: AuthService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    public currencyService: CurrencyService
   ) {}
 
   ngOnInit() {
@@ -54,9 +60,10 @@ export class ProfilePage implements OnInit {
         this.settings = {
           biometrics: profile.isBiometricsEnabled || false,
           pushNotifications: profile.pushNotificationsEnabled || false,
-          aiAdvisorMode: profile.aiAdvisorMode || 'Balanced',
+          aiAdvisorMode: profile.advisorMode || 'Balanced',
           twoFactorEnabled: profile.twoFactorEnabled || false,
-          aiInsightsFrequency: profile.aiInsightsFrequency || 'Daily'
+          aiInsightsFrequency: profile.aiInsightsFrequency || 'Daily',
+          preferredCurrency: profile.preferredCurrency || 'USD'
         };
         this.isLoading = false;
       },
@@ -72,9 +79,10 @@ export class ProfilePage implements OnInit {
     if (key === 'biometrics') updateData.isBiometricsEnabled = value;
     if (key === 'pushNotifications') updateData.pushNotificationsEnabled = value;
     if (key === 'fullName') updateData.fullName = value;
-    if (key === 'aiAdvisorMode') updateData.aiAdvisorMode = value;
+    if (key === 'aiAdvisorMode') updateData.advisorMode = value;
     if (key === 'twoFactorEnabled') updateData.twoFactorEnabled = value;
     if (key === 'aiInsightsFrequency') updateData.aiInsightsFrequency = value;
+    if (key === 'preferredCurrency') updateData.preferredCurrency = value;
     
     this.authService.updateProfile(updateData).subscribe({
       next: (updated) => {
@@ -128,6 +136,19 @@ export class ProfilePage implements OnInit {
     this.updateSetting('aiInsightsFrequency', this.editInsightsFreq);
     this.isInsightsOpen = false;
   }
+
+  openCurrency() {
+    this.editCurrency = this.settings.preferredCurrency;
+    this.isCurrencyOpen = true;
+  }
+
+  saveCurrency() {
+    console.log('ProfilePage: Saving currency', this.editCurrency);
+    this.settings.preferredCurrency = this.editCurrency;
+    this.currencyService.setCurrency(this.editCurrency);
+    this.isCurrencyOpen = false;
+  }
+
   logout() {
     this.authService.logout();
   }

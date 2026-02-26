@@ -19,12 +19,12 @@
       <div class="summary-grid">
         <div class="summary-item">
           <p class="label">TOTAL BUDGET</p>
-          <h2 *ngIf="!isLoading">{{ totalBudgetLimit | currency }}</h2>
+          <h2 *ngIf="!isLoading">{{ (totalBudgetLimit * exchangeRate) | currency:displayCurrency }}</h2>
           <ion-skeleton-text *ngIf="isLoading" animated style="width: 80%; height: 24px;"></ion-skeleton-text>
         </div>
         <div class="summary-item">
           <p class="label">TOTAL SPENT</p>
-          <h2 *ngIf="!isLoading" [class.danger]="totalSpent > totalBudgetLimit">{{ totalSpent | currency }}</h2>
+          <h2 *ngIf="!isLoading" [class.danger]="totalSpent > totalBudgetLimit">{{ (totalSpent * exchangeRate) | currency:displayCurrency }}</h2>
           <ion-skeleton-text *ngIf="isLoading" animated style="width: 80%; height: 24px;"></ion-skeleton-text>
         </div>
       </div>
@@ -32,7 +32,7 @@
       <div class="overall-progress" *ngIf="!isLoading && totalBudgetLimit > 0">
         <div class="progress-info">
           <span>{{ (totalSpent / totalBudgetLimit) * 100 | number:'1.0-0' }}% spent</span>
-          <span>{{ (totalBudgetLimit - totalSpent) | currency }} left</span>
+          <span>{{ ((totalBudgetLimit - totalSpent) * exchangeRate) | currency:displayCurrency }} left</span>
         </div>
         <div class="progress-track">
           <div class="progress-fill" [style.width.%]="(totalSpent / totalBudgetLimit) * 100" [class.danger]="totalSpent > totalBudgetLimit"></div>
@@ -85,7 +85,7 @@
           <ion-label>
             <div class="item-header">
               <h3>{{ budget.category | titlecase }}</h3>
-              <span class="limit">{{ calculateSpentForCategory(budget.category) | currency }} / {{ budget.amount | currency }}</span>
+              <span class="limit">{{ (calculateSpentForCategory(budget.category) * exchangeRate) | currency:displayCurrency }} / {{ (budget.amount * exchangeRate) | currency:displayCurrency }}</span>
             </div>
             <div class="item-progress">
               <div class="progress-track">
@@ -97,7 +97,7 @@
               </div>
             </div>
             <p class="remaining" [class.danger]="getImpactPercentage(budget.category) >= 100">
-              {{ getImpactPercentage(budget.category) >= 100 ? 'Over Budget' : (getRemainingAmount(budget.category) | currency) + ' remaining' }}
+              {{ getImpactPercentage(budget.category) >= 100 ? 'Over Budget' : ((getRemainingAmount(budget.category) * exchangeRate) | currency:displayCurrency) + ' remaining' }}
             </p>
           </ion-label>
         </ion-item>

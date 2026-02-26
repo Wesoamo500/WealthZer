@@ -82,6 +82,17 @@
             </ion-label>
             <ion-icon name="chevron-forward" slot="end"></ion-icon>
           </ion-item>
+
+          <ion-item button detail="false" class="settings-item" (click)="openCurrency()">
+            <div class="icon-box" slot="start">
+              <ion-icon name="cash"></ion-icon>
+            </div>
+            <ion-label>
+              <h3>Currency</h3>
+              <p>{{ currencyService.getCurrencyInfo(settings.preferredCurrency).flag }} {{ settings.preferredCurrency }}</p>
+            </ion-label>
+            <ion-icon name="chevron-forward" slot="end"></ion-icon>
+          </ion-item>
         </div>
       </div>
 
@@ -257,6 +268,32 @@
               </ion-item>
             </ion-radio-group>
             <ion-button expand="block" class="primary-btn ion-margin-top" (click)="saveInsights()">Save Preference</ion-button>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+
+      <!-- Currency Selector Modal -->
+      <ion-modal [isOpen]="isCurrencyOpen" (didDismiss)="isCurrencyOpen = false" class="profile-modal bottom-sheet" initialBreakpoint="0.7" [breakpoints]="[0, 0.7]">
+        <ng-template>
+          <ion-header class="ion-no-border">
+            <ion-toolbar>
+              <ion-title>Select Currency</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="isCurrencyOpen = false" class="close-btn-round"><ion-icon name="close"></ion-icon></ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding modal-content">
+            <p class="modal-description">Choose your preferred display currency. All values will be converted in real-time.</p>
+            <ion-radio-group [(ngModel)]="editCurrency">
+              <ion-item *ngFor="let cur of currencies" class="radio-item" lines="none">
+                <ion-label>
+                  <span style="margin-right: 8px;">{{ cur.flag }}</span> {{ cur.name }} ({{ cur.symbol }})
+                </ion-label>
+                <ion-radio slot="start" [value]="cur.code"></ion-radio>
+              </ion-item>
+            </ion-radio-group>
+            <ion-button expand="block" class="primary-btn ion-margin-top" (click)="saveCurrency()">Save Currency</ion-button>
           </ion-content>
         </ng-template>
       </ion-modal>

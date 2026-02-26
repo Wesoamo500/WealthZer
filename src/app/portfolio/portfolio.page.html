@@ -13,7 +13,7 @@
   <div class="main-container">
     <div class="balance-card">
       <p class="balance-label">Total Balance</p>
-      <h1 *ngIf="!isLoading" class="balance-amount">{{ totalBalance | currency:currency }}</h1>
+      <h1 *ngIf="!isLoading" class="balance-amount">{{ (totalBalance * exchangeRate) | currency:displayCurrency }}</h1>
       <ion-skeleton-text *ngIf="isLoading" animated style="width: 60%; height: 36px; margin: 8px 0;"></ion-skeleton-text>
     </div>
 
@@ -59,7 +59,7 @@
             <p>{{ asset.amount }} {{ asset.symbol }}</p>
           </ion-label>
           <div class="value" slot="end">
-            <h3>{{ (asset.currentValue || 0) | currency:currency }}</h3>
+            <h3>{{ ((asset.currentValue || asset.purchasePrice || 0) * exchangeRate) | currency:displayCurrency }}</h3>
             <p class="positive">+0.00%</p>
           </div>
         </ion-item>

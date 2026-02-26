@@ -14,6 +14,7 @@ export interface User {
   aiAdvisorMode?: string;
   twoFactorEnabled?: boolean;
   aiInsightsFrequency?: string;
+  preferredCurrency?: string;
 }
 
 export interface AuthResponse {

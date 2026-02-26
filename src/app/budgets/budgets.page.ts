@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, ModalController } from '@ionic/angular';
 import { FinancialService, Budget, Transaction } from '../core/services/financial.service';
 import { AddBudgetModalComponent } from './add-budget-modal.component';
+import { CurrencyService } from '../core/services/currency.service';
 
 @Component({
   selector: 'app-budgets',
@@ -19,6 +20,8 @@ export class BudgetsPage implements OnInit {
   totalBudgetLimit: number = 0;
   totalSpent: number = 0;
   isLoading: boolean = true;
+  displayCurrency: string = 'USD';
+  exchangeRate: number = 1;
 
   categories = [
     { id: 'DINING', label: 'Dining', icon: 'restaurant' },
@@ -31,13 +34,21 @@ export class BudgetsPage implements OnInit {
   constructor(
     private financialService: FinancialService,
     private toastCtrl: ToastController,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    public currencyService: CurrencyService
   ) {}
 
   ngOnInit() {
     this.loadData();
     this.financialService.budgetUpdate$.subscribe(() => this.loadData());
     this.financialService.transactionUpdate$.subscribe(() => this.loadData());
+
+    this.currencyService.currencyCode$.subscribe(code => {
+      this.displayCurrency = code;
+    });
+    this.currencyService.exchangeRate$.subscribe(rate => {
+      this.exchangeRate = rate;
+    });
   }
 
   loadData() {
