@@ -59,8 +59,10 @@
         color="primary" 
         class="login-btn"
         (click)="login()"
+        [disabled]="isLoading"
       >
-        Log In
+        <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+        <span *ngIf="!isLoading">Log In</span>
       </ion-button>
 
     </form>

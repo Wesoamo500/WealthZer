@@ -19,6 +19,7 @@ export class LoginPage implements OnInit {
   email: string = '';
   password: string = '';
   showPassword: boolean = false;
+  isLoading: boolean = false;
 
   constructor(
     private router: Router,
@@ -34,11 +35,11 @@ export class LoginPage implements OnInit {
 
   async login() {
     if (!this.email || !this.password) {
-      // In a real app, use a toast or alert
       console.log('Please fill in all fields');
       return;
     }
 
+    this.isLoading = true;
     const device = await Device.getId();
     
     this.authService.login({
@@ -50,16 +51,16 @@ export class LoginPage implements OnInit {
         console.log('Login response received', res);
         
         if (res.requires2fa) {
-          // 2FA Enabled: Navigate to 2FA Page which automatically gets the OTP from the backend
+          this.isLoading = false;
           this.router.navigate(['/auth/two-factor'], { 
             queryParams: { email: this.email } 
           });
         } else {
-          // 2FA Disabled: Log them directly into the app
           forkJoin({
             transactions: this.financialService.getTransactions().pipe(catchError(() => of([]))),
             portfolio: this.financialService.getPortfolio().pipe(catchError(() => of([])))
           }).subscribe(data => {
+            this.isLoading = false;
             if (data.transactions.length === 0 && data.portfolio.length === 0) {
               this.router.navigate(['/welcome']);
             } else {
@@ -69,6 +70,7 @@ export class LoginPage implements OnInit {
         }
       },
       error: (err) => {
+        this.isLoading = false;
         console.error('Login failed', err);
       }
     });

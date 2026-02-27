@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly apiUrl = 'http://localhost:3000'; // Default API Gateway URL
+  private readonly apiUrl = environment.apiUrl || 'http://localhost:3000';
 
   constructor(private http: HttpClient) {}
 
