@@ -36,44 +36,55 @@ export class LoginPage implements OnInit {
   async login() {
     if (!this.email || !this.password) {
       console.log('Please fill in all fields');
+      alert('Please fill in all fields');
       return;
     }
 
     this.isLoading = true;
-    const device = await Device.getId();
+    console.log('Starting login process...');
     
-    this.authService.login({
-      email: this.email,
-      password: this.password,
-      deviceId: device.identifier
-    }).subscribe({
-      next: (res: any) => {
-        console.log('Login response received', res);
-        
-        if (res.requires2fa) {
-          this.isLoading = false;
-          this.router.navigate(['/auth/two-factor'], { 
-            queryParams: { email: this.email } 
-          });
-        } else {
-          forkJoin({
-            transactions: this.financialService.getTransactions().pipe(catchError(() => of([]))),
-            portfolio: this.financialService.getPortfolio().pipe(catchError(() => of([])))
-          }).subscribe(data => {
+    try {
+      const device = await Device.getId();
+      console.log('Device ID:', device.identifier);
+      
+      this.authService.login({
+        email: this.email,
+        password: this.password,
+        deviceId: device.identifier
+      }).subscribe({
+        next: (res: any) => {
+          console.log('Login response received', res);
+          
+          if (res.requires2fa) {
             this.isLoading = false;
-            if (data.transactions.length === 0 && data.portfolio.length === 0) {
-              this.router.navigate(['/welcome']);
-            } else {
-              this.router.navigate(['/tabs']);
-            }
-          });
+            this.router.navigate(['/auth/two-factor'], { 
+              queryParams: { email: this.email } 
+            });
+          } else {
+            forkJoin({
+              transactions: this.financialService.getTransactions().pipe(catchError(() => of([]))),
+              portfolio: this.financialService.getPortfolio().pipe(catchError(() => of([])))
+            }).subscribe(data => {
+              this.isLoading = false;
+              if (data.transactions.length === 0 && data.portfolio.length === 0) {
+                this.router.navigate(['/welcome']);
+              } else {
+                this.router.navigate(['/tabs']);
+              }
+            });
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          console.error('Login failed', err);
+          alert(`Login failed: ${err?.message || 'Unable to connect to server. Please check your connection.'}`);
         }
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.error('Login failed', err);
-      }
-    });
+      });
+    } catch (error) {
+      this.isLoading = false;
+      console.error('Device ID error:', error);
+      alert('Failed to get device information');
+    }
   }
 
   async socialLogin(provider: 'GOOGLE' | 'APPLE') {
