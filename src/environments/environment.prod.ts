@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.yourdomain.com' // Replace with your production URL when ready
+  apiUrl: 'http://10.0.2.2:3000'
 };
