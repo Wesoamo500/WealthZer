@@ -22,6 +22,7 @@ export class AddTransactionModalComponent implements OnInit {
   selectedDate = new Date().toISOString();
   selectedAccount = 'BANK';
   note = '';
+  exchangeRate: number = 1;
 
   categories = [
     { id: 'INCOME', label: 'Income', icon: 'trending-up' },
@@ -46,6 +47,9 @@ export class AddTransactionModalComponent implements OnInit {
 
   ngOnInit() {
     this.updateDisplayAmount();
+    this.currencyService.exchangeRate$.subscribe(rate => {
+      this.exchangeRate = rate;
+    });
   }
 
   focusAmountInput() {
@@ -75,9 +79,12 @@ export class AddTransactionModalComponent implements OnInit {
         return;
     }
 
+    // Convert to USD before saving
+    const amountInUSD = this.amount / this.exchangeRate;
+
     const transaction = {
       title: this.title,
-      amount: this.selectedCategory === 'INCOME' ? Math.abs(this.amount) : -Math.abs(this.amount),
+      amount: this.selectedCategory === 'INCOME' ? Math.abs(amountInUSD) : -Math.abs(amountInUSD),
       category: this.selectedCategory,
       date: this.selectedDate,
       account: this.selectedAccount,

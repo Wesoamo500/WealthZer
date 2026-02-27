@@ -118,6 +118,7 @@ export class AddAssetModalComponent implements OnInit {
   selectedType: string = 'STOCK';
   displayCurrency: string = 'USD';
   currencySymbol: string = '$';
+  exchangeRate: number = 1;
 
   assetTypes = [
     { id: 'STOCK', label: 'Stock', icon: 'trending-up' },
@@ -135,6 +136,9 @@ export class AddAssetModalComponent implements OnInit {
       this.displayCurrency = code;
       this.currencySymbol = this.currencyService.getCurrencyInfo(code).symbol;
     });
+    this.currencyService.exchangeRate$.subscribe(rate => {
+      this.exchangeRate = rate;
+    });
   }
 
   dismiss() {
@@ -144,12 +148,15 @@ export class AddAssetModalComponent implements OnInit {
   confirm() {
     if (!this.name || !this.symbol || !this.amount || !this.purchasePrice) return;
     
+    // Convert to USD before saving
+    const purchasePriceInUSD = this.purchasePrice / this.exchangeRate;
+    
     this.modalCtrl.dismiss({
       name: this.name,
       symbol: this.symbol,
       amount: this.amount,
       type: this.selectedType,
-      purchasePrice: this.purchasePrice
+      purchasePrice: purchasePriceInUSD
     }, 'confirm');
   }
 }
