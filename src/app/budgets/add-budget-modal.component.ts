@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
+import { CurrencyService } from '../core/services/currency.service';
 
 @Component({
   selector: 'app-add-budget-modal',
@@ -22,7 +23,7 @@ import { IonicModule, ModalController } from '@ionic/angular';
         <div class="amount-input-section">
           <p class="label">MONTHLY LIMIT</p>
           <div class="amount-row">
-            <span class="currency">$</span>
+            <span class="currency">{{ currencySymbol }}</span>
             <ion-input type="number" [(ngModel)]="amount" placeholder="0.00" class="main-amount"></ion-input>
           </div>
         </div>
@@ -124,10 +125,12 @@ import { IonicModule, ModalController } from '@ionic/angular';
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule]
 })
-export class AddBudgetModalComponent {
+export class AddBudgetModalComponent implements OnInit {
   amount: number | null = null;
   selectedCategory: string = 'DINING';
   period: string = 'MONTHLY';
+  currencySymbol: string = '$';
+  exchangeRate: number = 1;
 
   categories = [
     { id: 'DINING', label: 'Dining', icon: 'restaurant' },
@@ -137,7 +140,20 @@ export class AddBudgetModalComponent {
     { id: 'OTHERS', label: 'Others', icon: 'ellipsis-horizontal' }
   ];
 
-  constructor(private modalCtrl: ModalController) {}
+  constructor(
+    private modalCtrl: ModalController,
+    private currencyService: CurrencyService
+  ) {}
+
+  ngOnInit() {
+    this.currencyService.currencyCode$.subscribe(code => {
+      const currencyInfo = this.currencyService.getCurrencyInfo(code);
+      this.currencySymbol = currencyInfo.symbol;
+    });
+    this.currencyService.exchangeRate$.subscribe(rate => {
+      this.exchangeRate = rate;
+    });
+  }
 
   dismiss() {
     this.modalCtrl.dismiss();
@@ -146,9 +162,12 @@ export class AddBudgetModalComponent {
   confirm() {
     if (!this.amount || this.amount <= 0) return;
     
+    // Convert to USD before saving
+    const amountInUSD = this.amount / this.exchangeRate;
+    
     this.modalCtrl.dismiss({
       category: this.selectedCategory,
-      amount: this.amount,
+      amount: amountInUSD,
       period: this.period
     }, 'confirm');
   }
