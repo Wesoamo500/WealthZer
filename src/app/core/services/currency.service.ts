@@ -12,6 +12,7 @@ export interface CurrencyInfo {
 }
 
 export const SUPPORTED_CURRENCIES: CurrencyInfo[] = [
+  { code: 'GHS', name: 'Ghana Cedi', symbol: 'GH₵', flag: '🇬🇭' },
   { code: 'USD', name: 'US Dollar', symbol: '$', flag: '🇺🇸' },
   { code: 'EUR', name: 'Euro', symbol: '€', flag: '🇪🇺' },
   { code: 'GBP', name: 'British Pound', symbol: '£', flag: '🇬🇧' },
@@ -33,7 +34,7 @@ export const SUPPORTED_CURRENCIES: CurrencyInfo[] = [
   providedIn: 'root'
 })
 export class CurrencyService {
-  private _currencyCode = new BehaviorSubject<string>('USD');
+  private _currencyCode = new BehaviorSubject<string>('GHS');
   private _exchangeRate = new BehaviorSubject<number>(1);
   private _rates: Record<string, number> = {};
 
@@ -47,7 +48,7 @@ export class CurrencyService {
   ) {
     // Default fallback rates
     this._rates = {
-      USD: 1, EUR: 0.92, GBP: 0.79, NGN: 1550, JPY: 149.5,
+      GHS: 15.0, USD: 1, EUR: 0.92, GBP: 0.79, NGN: 1550, JPY: 149.5,
       CAD: 1.36, AUD: 1.53, CHF: 0.88, CNY: 7.24, INR: 83.1,
       BRL: 4.97, ZAR: 18.5, AED: 3.67, SAR: 3.75, KES: 153,
     };
@@ -122,8 +123,8 @@ export class CurrencyService {
     console.log('CurrencyService: Updating rate for', code, 'Available rates:', !!this._rates[code]);
     if (this._rates[code]) {
       this._exchangeRate.next(this._rates[code]);
-    } else if (code === 'USD') {
-      this._exchangeRate.next(1);
+    } else if (code === 'GHS') {
+      this._exchangeRate.next(15.0); // Safe fallback before real rates load
     }
   }
 

@@ -24,7 +24,7 @@ export class ProfilePage implements OnInit {
     aiAdvisorMode: 'Balanced',
     twoFactorEnabled: false,
     aiInsightsFrequency: 'Daily',
-    preferredCurrency: 'USD'
+    preferredCurrency: 'GHS'
   };
 
   // Modals Open State
@@ -39,7 +39,7 @@ export class ProfilePage implements OnInit {
   editAiMode = '';
   editTwoFactor = false;
   editInsightsFreq = '';
-  editCurrency = 'USD';
+  editCurrency = 'GHS';
   currencies = SUPPORTED_CURRENCIES;
   filteredCurrencies = SUPPORTED_CURRENCIES;
   searchTerm = '';
@@ -73,7 +73,7 @@ export class ProfilePage implements OnInit {
           aiAdvisorMode: profile.advisorMode || 'Balanced',
           twoFactorEnabled: profile.twoFactorEnabled || false,
           aiInsightsFrequency: profile.aiInsightsFrequency || 'Daily',
-          preferredCurrency: profile.preferredCurrency || 'USD'
+          preferredCurrency: profile.preferredCurrency || 'GHS'
         };
         
         // Update currency service with fresh profile data

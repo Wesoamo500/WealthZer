@@ -18,7 +18,7 @@ export class PortfolioPage implements OnInit {
   assets: PortfolioAsset[] = [];
   totalBalance: number = 0;
   isLoading: boolean = true;
-  displayCurrency: string = 'USD';
+  displayCurrency: string = 'GHS';
   exchangeRate: number = 1;
 
   constructor(
