@@ -1,0 +1,378 @@
+<ion-content [fullscreen]="true" [scrollY]="true" class="auth-content">
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- VIEW: LOGIN                                          -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="auth-screen" *ngIf="view === 'login'" @fadeSlide>
+
+    <!-- Header -->
+    <div class="auth-screen__header">
+      <div class="auth-screen__logo" aria-hidden="true">
+        <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+          <path d="M6 20L13 9L19 17L25 7L34 20"
+                stroke="url(#auth-grad)" stroke-width="2.8"
+                stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="auth-grad" x1="6" y1="7" x2="34" y2="20" gradientUnits="userSpaceOnUse">
+              <stop stop-color="var(--wz-color-primary)"/>
+              <stop offset="1" stop-color="#3DD6BC"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h1 class="auth-screen__title">Welcome<br>back</h1>
+      <p class="auth-screen__subtitle">Sign in to your WealthZer account</p>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-screen__form">
+
+      <!-- Email -->
+      <div class="wz-field">
+        <label class="wz-field__label">Email</label>
+        <div class="wz-field__input-wrap"
+             [class.wz-field__input-wrap--error]="fieldError(loginForm, 'email')">
+          <ion-icon name="mail-outline" class="wz-field__icon" aria-hidden="true"></ion-icon>
+          <ion-input type="email"
+                     formControlName="email"
+                     placeholder="your@email.com"
+                     autocomplete="email"
+                     inputmode="email"
+                     class="wz-field__input">
+          </ion-input>
+        </div>
+        <ion-note *ngIf="fieldError(loginForm, 'email', 'email')" class="wz-field__error">
+          Enter a valid email address
+        </ion-note>
+      </div>
+
+      <!-- Password -->
+      <div class="wz-field">
+        <label class="wz-field__label">Password</label>
+        <div class="wz-field__input-wrap"
+             [class.wz-field__input-wrap--error]="fieldError(loginForm, 'password')">
+          <ion-icon name="lock-closed-outline" class="wz-field__icon" aria-hidden="true"></ion-icon>
+          <ion-input [type]="showPassword ? 'text' : 'password'"
+                     formControlName="password"
+                     placeholder="Your password"
+                     autocomplete="current-password"
+                     class="wz-field__input">
+          </ion-input>
+          <button type="button" class="wz-field__eye" (click)="showPassword = !showPassword"
+                  [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+            <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </button>
+        </div>
+        <div class="wz-field__row-end">
+          <button type="button" class="wz-link wz-link--small" (click)="goTo('twofa')">
+            Forgot password?
+          </button>
+        </div>
+      </div>
+
+      <!-- Biometric prompt -->
+      <button *ngIf="biometricAvailable"
+              type="button"
+              class="bio-prompt"
+              (click)="onBiometricLogin()"
+              aria-label="Sign in with biometrics">
+        <ion-icon name="finger-print-outline" class="bio-prompt__icon"></ion-icon>
+        <span class="bio-prompt__text">Use Face ID / Touch ID</span>
+      </button>
+
+      <!-- Primary CTA -->
+      <ion-button expand="block"
+                  type="submit"
+                  class="wz-btn-primary"
+                  [disabled]="isLoading">
+        <ion-spinner *ngIf="isLoading" name="crescent" class="btn-spinner"></ion-spinner>
+        <span *ngIf="!isLoading">Sign In</span>
+        <ion-icon *ngIf="!isLoading" name="arrow-forward-outline" slot="end"></ion-icon>
+      </ion-button>
+
+      <!-- Divider -->
+      <div class="auth-divider">
+        <span class="auth-divider__line"></span>
+        <span class="auth-divider__text">or continue with</span>
+        <span class="auth-divider__line"></span>
+      </div>
+
+      <!-- Google SSO -->
+      <button type="button" class="social-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+    </form>
+
+    <!-- Footer -->
+    <div class="auth-screen__footer">
+      <p class="auth-footer-link">
+        Don't have an account?
+        <button type="button" class="wz-link" (click)="goTo('register')">Create one</button>
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- VIEW: REGISTER (MULTI-STEP)                          -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="auth-screen" *ngIf="view === 'register'" @fadeSlide>
+
+    <!-- Header -->
+    <div class="auth-screen__header">
+      <button type="button" class="wz-back-btn" (click)="onRegisterBack()" aria-label="Go back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+
+      <div class="step-header">
+        <h1 class="auth-screen__title" style="font-size: 22px;">Create account</h1>
+        <div class="step-dots" role="progressbar"
+             [attr.aria-valuenow]="registerStep"
+             [attr.aria-valuemax]="totalSteps">
+          <span *ngFor="let s of [1,2,3]"
+                class="step-dot"
+                [class.step-dot--done]="s < registerStep"
+                [class.step-dot--active]="s === registerStep">
+          </span>
+        </div>
+      </div>
+
+      <p class="auth-screen__subtitle">
+        <ng-container [ngSwitch]="registerStep">
+          <ng-container *ngSwitchCase="1">Tell us a bit about yourself</ng-container>
+          <ng-container *ngSwitchCase="2">Secure your account</ng-container>
+          <ng-container *ngSwitchCase="3">Set your preferred currency</ng-container>
+        </ng-container>
+      </p>
+
+      <!-- Step progress bar -->
+      <div class="step-progress-track">
+        <div class="step-progress-fill" [style.width.%]="progressPercent"></div>
+      </div>
+    </div>
+
+    <!-- Step forms -->
+    <form [formGroup]="registerForm" (ngSubmit)="onRegisterNext()" class="auth-screen__form">
+
+      <!-- ── STEP 1: Name + Email ── -->
+      <ng-container *ngIf="registerStep === 1">
+        <div class="field-row">
+          <div class="wz-field">
+            <label class="wz-field__label">First Name</label>
+            <div class="wz-field__input-wrap">
+              <ion-input formControlName="firstName" placeholder="Kwame" class="wz-field__input"></ion-input>
+            </div>
+            <ion-note *ngIf="fieldError(registerForm,'firstName')" class="wz-field__error">Required</ion-note>
+          </div>
+          <div class="wz-field">
+            <label class="wz-field__label">Last Name</label>
+            <div class="wz-field__input-wrap">
+              <ion-input formControlName="lastName" placeholder="Asante" class="wz-field__input"></ion-input>
+            </div>
+          </div>
+        </div>
+        <div class="wz-field">
+          <label class="wz-field__label">Email</label>
+          <div class="wz-field__input-wrap">
+            <ion-icon name="mail-outline" class="wz-field__icon"></ion-icon>
+            <ion-input type="email" formControlName="email"
+                       placeholder="your@email.com" inputmode="email"
+                       class="wz-field__input">
+            </ion-input>
+          </div>
+          <ion-note *ngIf="fieldError(registerForm,'email','email')" class="wz-field__error">
+            Enter a valid email
+          </ion-note>
+        </div>
+      </ng-container>
+
+      <!-- ── STEP 2: Password ── -->
+      <ng-container *ngIf="registerStep === 2">
+        <div class="wz-field">
+          <label class="wz-field__label">New Password</label>
+          <div class="wz-field__input-wrap">
+            <ion-icon name="lock-closed-outline" class="wz-field__icon"></ion-icon>
+            <ion-input [type]="showPassword ? 'text' : 'password'"
+                       formControlName="password"
+                       placeholder="Min. 8 characters"
+                       autocomplete="new-password"
+                       class="wz-field__input">
+            </ion-input>
+            <button type="button" class="wz-field__eye" (click)="showPassword = !showPassword">
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </button>
+          </div>
+          <!-- Strength bars -->
+          <div class="strength-meter">
+            <div class="strength-bars">
+              <span *ngFor="let bar of strengthBars"
+                    class="strength-bar"
+                    [class.strength-bar--active]="bar.active"
+                    [class.strength-bar--weak]="bar.active && bar.level === 'weak'"
+                    [class.strength-bar--medium]="bar.active && bar.level === 'medium'"
+                    [class.strength-bar--strong]="bar.active && bar.level === 'strong'">
+              </span>
+            </div>
+            <span class="strength-hint">{{ passwordHint }}</span>
+          </div>
+        </div>
+
+        <div class="wz-field">
+          <label class="wz-field__label">Confirm Password</label>
+          <div class="wz-field__input-wrap"
+               [class.wz-field__input-wrap--error]="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched">
+            <ion-icon name="lock-closed-outline" class="wz-field__icon"></ion-icon>
+            <ion-input [type]="showConfirmPassword ? 'text' : 'password'"
+                       formControlName="confirmPassword"
+                       placeholder="Repeat password"
+                       autocomplete="new-password"
+                       class="wz-field__input">
+            </ion-input>
+          </div>
+          <ion-note *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched"
+                    class="wz-field__error">
+            Passwords don't match
+          </ion-note>
+        </div>
+
+        <!-- Terms checkbox -->
+        <div class="terms-row">
+          <div class="wz-checkbox"
+               [class.wz-checkbox--checked]="registerForm.get('acceptTerms')?.value"
+               (click)="registerForm.get('acceptTerms')?.setValue(!registerForm.get('acceptTerms')?.value)"
+               role="checkbox"
+               [attr.aria-checked]="registerForm.get('acceptTerms')?.value"
+               tabindex="0">
+            <svg *ngIf="registerForm.get('acceptTerms')?.value"
+                 width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="terms-text">
+            I agree to WealthZer's
+            <a class="wz-link" href="/terms">Terms of Service</a> and
+            <a class="wz-link" href="/privacy">Privacy Policy</a>
+          </p>
+        </div>
+      </ng-container>
+
+      <!-- ── STEP 3: Currency ── -->
+      <ng-container *ngIf="registerStep === 3">
+        <p class="step3-intro">
+          WealthZer will display all amounts in your preferred currency.
+          You can change this anytime in Settings.
+        </p>
+        <div class="currency-options">
+          <div *ngFor="let c of ['USD','GHS','EUR','GBP','NGN','KES']"
+               class="currency-chip"
+               [class.currency-chip--selected]="registerForm.get('currency')?.value === c"
+               (click)="registerForm.get('currency')?.setValue(c)"
+               [attr.aria-pressed]="registerForm.get('currency')?.value === c"
+               role="button" tabindex="0">
+            {{ c }}
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- CTA -->
+      <ion-button expand="block" type="submit" class="wz-btn-primary" [disabled]="isLoading">
+        <ion-spinner *ngIf="isLoading" name="crescent" class="btn-spinner"></ion-spinner>
+        <span *ngIf="!isLoading">
+          {{ registerStep < totalSteps ? 'Continue' : 'Create Account' }}
+        </span>
+        <ion-icon *ngIf="!isLoading" name="arrow-forward-outline" slot="end"></ion-icon>
+      </ion-button>
+
+    </form>
+
+    <div class="auth-screen__footer">
+      <p class="auth-footer-link">
+        Already have an account?
+        <button type="button" class="wz-link" (click)="goTo('login')">Sign in</button>
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- VIEW: TWO-FACTOR AUTH                               -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="auth-screen" *ngIf="view === 'twofa'" @fadeSlide>
+
+    <div class="auth-screen__header">
+      <button type="button" class="wz-back-btn" (click)="goTo('login')" aria-label="Go back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <h1 class="auth-screen__title">Verify it's<br>you</h1>
+      <p class="auth-screen__subtitle">
+        Enter the 6-digit code sent to your registered device
+      </p>
+    </div>
+
+    <div class="twofa-body">
+
+      <!-- Phone icon -->
+      <div class="twofa-icon" aria-hidden="true">
+        <ion-icon name="phone-portrait-outline" style="font-size: 32px; color: var(--wz-color-primary);"></ion-icon>
+      </div>
+
+      <!-- OTP input row -->
+      <div class="otp-row"
+           role="group"
+           aria-label="6-digit verification code"
+           (paste)="onOtpPaste($event)">
+        <input
+          *ngFor="let val of otpValues; let i = index"
+          #otpInput
+          class="otp-box"
+          [class.otp-box--filled]="val !== ''"
+          [class.otp-box--active]="val === '' && (i === 0 || otpValues[i-1] !== '')"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          pattern="[0-9]"
+          [value]="val"
+          [attr.aria-label]="'Digit ' + (i + 1)"
+          (input)="onOtpInput(i, $event)"
+          (keydown)="onOtpKeydown(i, $event)">
+      </div>
+
+      <!-- Resend -->
+      <div class="resend-row">
+        <p class="resend-text">
+          Didn't receive the code?
+          <button type="button"
+                  class="wz-link"
+                  [class.wz-link--disabled]="!canResend"
+                  (click)="resendCode()">
+            {{ canResend ? 'Resend now' : 'Resend (0:' + (resendSeconds | number:'2.0-0') + ')' }}
+          </button>
+        </p>
+        <p class="resend-alt">Or use an authenticator app instead</p>
+      </div>
+
+    </div>
+
+    <div class="auth-screen__footer">
+      <ion-button expand="block" class="wz-btn-primary" [disabled]="isLoading || otpValues.join('').length < 6">
+        <ion-spinner *ngIf="isLoading" name="crescent" class="btn-spinner"></ion-spinner>
+        <span *ngIf="!isLoading">Verify Code</span>
+      </ion-button>
+      <p class="auth-footer-link" style="margin-top: 12px;">
+        Having trouble?
+        <button type="button" class="wz-link">Contact support</button>
+      </p>
+    </div>
+
+  </div>
+
+</ion-content>

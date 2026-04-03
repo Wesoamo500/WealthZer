@@ -1,114 +1,429 @@
-// Ionic Variables and Theming. For more info, please see:
-// http://ionicframework.com/docs/theming/
+// ============================================================
+// WealthZer — Design System Tokens
+// theme/variables.scss
+// Midnight Teal + Copper · Light-first · Glassmorphism
+// ============================================================
 
-/** Ionic CSS Variables **/
+// ── FONTS ─────────────────────────────────────────────────
+// Add to index.html:
+// <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+$font-display : 'Outfit', sans-serif;
+$font-body    : 'Inter', sans-serif;
+
+// ── BRAND RAMPS ───────────────────────────────────────────
+// Teal (Primary)
+$teal-50  : #E6F4F2;
+$teal-100 : #C4E4DF;
+$teal-200 : #A8D9D1;
+$teal-400 : #3DD6BC;
+$teal-600 : #1A8C7E;
+$teal-700 : #0D5C52;   // Light mode primary
+$teal-900 : #063D36;   // Light mode deep
+
+// Copper (Accent)
+$copper-50  : #FAF0E6;
+$copper-100 : #F5D9BC;
+$copper-200 : #F0C898;
+$copper-400 : #E8A064;
+$copper-600 : #D4852A;
+$copper-700 : #C8712A;  // Light mode accent
+$copper-900 : #8A4010;  // Light mode deep
+
+// Semantic
+$color-success-light : #0D5C52;
+$color-success-dark  : #3DD6BC;
+$color-error-light   : #B93535;
+$color-error-dark    : #FF7070;
+$color-warning-light : #C8712A;
+$color-warning-dark  : #FFC83C;
+$color-info-light    : #1E5AA0;
+$color-info-dark     : #5096FF;
+$color-gold          : #7B6A3C;
+$color-gold-dark     : #D4AF60;
+
+// ── IONIC CSS VARIABLES ───────────────────────────────────
+// Applied via :root in global.scss
+
 :root {
-  /** primary **/
-  --ion-color-primary: #F4D35E;
-  --ion-color-primary-rgb: 244, 211, 94;
-  --ion-color-primary-contrast: #000000;
-  --ion-color-primary-contrast-rgb: 0, 0, 0;
-  --ion-color-primary-shade: #d7ba53;
-  --ion-color-primary-tint: #f5d76e;
+  // ── Primary palette
+  --ion-color-primary         : #{$teal-700};
+  --ion-color-primary-rgb     : 13, 92, 82;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-shade   : #{$teal-900};
+  --ion-color-primary-tint    : #{$teal-400};
 
-  /** secondary **/
-  --ion-color-secondary: #3dc2ff;
-  --ion-color-secondary-rgb: 61, 194, 255;
+  // ── Accent (copper)
+  --ion-color-secondary         : #{$copper-700};
+  --ion-color-secondary-rgb     : 200, 113, 42;
   --ion-color-secondary-contrast: #ffffff;
-  --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #36abe0;
-  --ion-color-secondary-tint: #50c8ff;
+  --ion-color-secondary-shade   : #{$copper-900};
+  --ion-color-secondary-tint    : #{$copper-400};
 
-  /** tertiary **/
-  --ion-color-tertiary: #5260ff;
-  --ion-color-tertiary-rgb: 82, 96, 255;
-  --ion-color-tertiary-contrast: #ffffff;
-  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-  --ion-color-tertiary-shade: #4854e0;
-  --ion-color-tertiary-tint: #6370ff;
+  // ── Semantic
+  --ion-color-success : #{$color-success-light};
+  --ion-color-warning : #{$color-warning-light};
+  --ion-color-danger  : #{$color-error-light};
 
-  /** success **/
-  --ion-color-success: #2dd36f;
-  --ion-color-success-rgb: 45, 211, 111;
-  --ion-color-success-contrast: #ffffff;
-  --ion-color-success-contrast-rgb: 255, 255, 255;
-  --ion-color-success-shade: #28ba62;
-  --ion-color-success-tint: #42d77d;
+  // ── WealthZer Custom Tokens
+  --wz-color-primary          : #{$teal-700};
+  --wz-color-primary-subtle   : rgba(13, 92, 82, 0.08);
+  --wz-color-primary-border   : rgba(13, 92, 82, 0.14);
+  --wz-color-accent           : #{$copper-700};
+  --wz-color-accent-subtle    : rgba(200, 113, 42, 0.08);
+  --wz-color-accent-border    : rgba(200, 113, 42, 0.16);
+  --wz-color-success          : #{$color-success-light};
+  --wz-color-error            : #{$color-error-light};
+  --wz-color-warning          : #{$color-warning-light};
+  --wz-color-info             : #{$color-info-light};
+  --wz-color-gold             : #{$color-gold};
 
-  /** warning **/
-  --ion-color-warning: #ffc409;
-  --ion-color-warning-rgb: 255, 196, 9;
-  --ion-color-warning-contrast: #000000;
-  --ion-color-warning-contrast-rgb: 0, 0, 0;
-  --ion-color-warning-shade: #e0ac08;
-  --ion-color-warning-tint: #ffca22;
+  // ── Surfaces (Light)
+  --wz-bg-base                : #F5F7F6;
+  --wz-bg-card                : #FFFFFF;
+  --wz-bg-elevated            : #EDF3F1;
+  --wz-bg-glass               : rgba(13, 92, 82, 0.06);
+  --wz-bg-glass-accent        : rgba(200, 113, 42, 0.07);
+  --wz-bg-input               : rgba(13, 92, 82, 0.04);
 
-  /** danger **/
-  --ion-color-danger: #eb445a;
-  --ion-color-danger-rgb: 235, 68, 90;
-  --ion-color-danger-contrast: #ffffff;
-  --ion-color-danger-contrast-rgb: 255, 255, 255;
-  --ion-color-danger-shade: #cf3c4f;
-  --ion-color-danger-tint: #ed576b;
+  // ── Borders (Light)
+  --wz-border-subtle          : rgba(13, 92, 82, 0.08);
+  --wz-border-default         : rgba(13, 92, 82, 0.14);
+  --wz-border-strong          : rgba(13, 92, 82, 0.25);
+  --wz-border-glass           : rgba(13, 92, 82, 0.14);
 
-  /** dark **/
-  --ion-color-dark: #222428;
-  --ion-color-dark-rgb: 34, 36, 40;
-  --ion-color-dark-contrast: #ffffff;
-  --ion-color-dark-contrast-rgb: 255, 255, 255;
-  --ion-color-dark-shade: #1e2023;
-  --ion-color-dark-tint: #383a3e;
+  // ── Text (Light)
+  --wz-text-primary           : #0D1F1C;
+  --wz-text-secondary         : #3D5550;
+  --wz-text-muted             : #7A9E99;
+  --wz-text-inverse           : #FFFFFF;
+  --wz-text-on-primary        : #FFFFFF;
+  --wz-text-on-accent         : #FFFFFF;
 
-  /** medium **/
-  --ion-color-medium: #92949c;
-  --ion-color-medium-rgb: 146, 148, 156;
-  --ion-color-medium-contrast: #ffffff;
-  --ion-color-medium-contrast-rgb: 255, 255, 255;
-  --ion-color-medium-shade: #808289;
-  --ion-color-medium-tint: #9d9fa6;
+  // ── Glassmorphism
+  --wz-glass-blur             : blur(20px);
+  --wz-glass-blur-sm          : blur(12px);
 
-  /** light **/
-  --ion-color-light: #f4f5f8;
-  --ion-color-light-rgb: 244, 245, 248;
-  --ion-color-light-contrast: #000000;
-  --ion-color-light-contrast-rgb: 0, 0, 0;
-  --ion-color-light-shade: #d7d8da;
-  --ion-color-light-tint: #f5f6f9;
+  // ── Radius
+  --wz-radius-xs              : 6px;
+  --wz-radius-sm              : 10px;
+  --wz-radius-md              : 14px;   // buttons, inputs
+  --wz-radius-lg              : 20px;   // cards
+  --wz-radius-xl              : 28px;   // modals, bottom sheets
+  --wz-radius-full            : 99px;  // pills, badges, chips
+
+  // ── Shadows (Light)
+  --wz-shadow-sm    : 0 1px 6px rgba(13, 92, 82, 0.07);
+  --wz-shadow-md    : 0 4px 20px rgba(13, 92, 82, 0.10);
+  --wz-shadow-lg    : 0 8px 40px rgba(13, 92, 82, 0.14);
+  --wz-shadow-glass : 0 8px 32px rgba(13, 92, 82, 0.08);
+
+  // ── Spacing (8pt grid)
+  --wz-space-1  : 4px;
+  --wz-space-2  : 8px;
+  --wz-space-3  : 12px;
+  --wz-space-4  : 16px;
+  --wz-space-5  : 20px;
+  --wz-space-6  : 24px;
+  --wz-space-8  : 32px;
+  --wz-space-10 : 40px;
+  --wz-space-12 : 48px;
+  --wz-space-16 : 64px;
+
+  // ── Animation
+  --wz-ease-out   : cubic-bezier(0.16, 1, 0.3, 1);
+  --wz-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --wz-duration-fast   : 150ms;
+  --wz-duration-base   : 260ms;
+  --wz-duration-slow   : 400ms;
+
+  // ── Ionic overrides (Light)
+  --ion-background-color     : var(--wz-bg-base);
+  --ion-text-color           : var(--wz-text-primary);
+  --ion-toolbar-background   : var(--wz-bg-card);
+  --ion-tab-bar-background   : var(--wz-bg-card);
+  --ion-tab-bar-border-color : var(--wz-border-subtle);
+  --ion-item-background      : transparent;
+  --ion-card-background      : var(--wz-bg-card);
+  --ion-border-color         : var(--wz-border-subtle);
+  --ion-font-family          : #{$font-body};
 }
 
-body {
-    // Force Dark Mode
-    --ion-background-color: #101010;
-    --ion-background-color-rgb: 16,16,16;
+@mixin dark-theme {
+  // ── WealthZer tokens (Dark)
+  --wz-color-primary          : #{$teal-400};
+  --wz-color-primary-subtle   : rgba(61, 214, 188, 0.08);
+  --wz-color-primary-border   : rgba(61, 214, 188, 0.12);
+  --wz-color-accent           : #{$copper-400};
+  --wz-color-accent-subtle    : rgba(232, 160, 100, 0.08);
+  --wz-color-accent-border    : rgba(232, 160, 100, 0.14);
+  --wz-color-success          : #{$color-success-dark};
+  --wz-color-error            : #{$color-error-dark};
+  --wz-color-warning          : #{$color-warning-dark};
+  --wz-color-info             : #{$color-info-dark};
+  --wz-color-gold             : #{$color-gold-dark};
 
-    --ion-text-color: #ffffff;
-    --ion-text-color-rgb: 255,255,255;
+  // ── Surfaces (Dark)
+  --wz-bg-base                : #080E0D;
+  --wz-bg-card                : #111A18;
+  --wz-bg-elevated            : #162420;
+  --wz-bg-glass               : rgba(61, 214, 188, 0.05);
+  --wz-bg-glass-accent        : rgba(232, 160, 100, 0.06);
+  --wz-bg-input               : rgba(61, 214, 188, 0.04);
 
-    --ion-card-background: #1C1C1E;
-    --ion-item-background: #1C1C1E;
-    
-    --ion-tab-bar-background: #101010;
-    --ion-tab-bar-border-color: #2c2c2e;
-    --ion-tab-bar-color-selected: var(--ion-color-primary);
+  // ── Borders (Dark)
+  --wz-border-subtle          : rgba(61, 214, 188, 0.07);
+  --wz-border-default         : rgba(61, 214, 188, 0.12);
+  --wz-border-strong          : rgba(61, 214, 188, 0.22);
+  --wz-border-glass           : rgba(61, 214, 188, 0.10);
+
+  // ── Text (Dark)
+  --wz-text-primary           : #E8F0EE;
+  --wz-text-secondary         : #7ABFB5;
+  --wz-text-muted             : #3D6660;
+  --wz-text-inverse           : #0D1F1C;
+  --wz-text-on-primary        : #080E0D;
+  --wz-text-on-accent         : #1A0A00;
+
+  // ── Shadows (Dark)
+  --wz-shadow-sm    : 0 1px 6px rgba(0, 0, 0, 0.25);
+  --wz-shadow-md    : 0 4px 20px rgba(0, 0, 0, 0.35);
+  --wz-shadow-lg    : 0 8px 40px rgba(0, 0, 0, 0.5);
+  --wz-shadow-glass : 0 8px 32px rgba(0, 0, 0, 0.3);
+
+  // ── Ionic overrides (Dark)
+  --ion-color-primary         : #{$teal-400};
+  --ion-color-primary-rgb     : 61, 214, 188;
+  --ion-color-primary-contrast: #080E0D;
+  --ion-color-primary-shade   : #2EC4AB;
+  --ion-color-primary-tint    : #7AE8D8;
+  --ion-color-secondary       : #{$copper-400};
+  --ion-background-color      : var(--wz-bg-base);
+  --ion-text-color            : var(--wz-text-primary);
+  --ion-toolbar-background    : var(--wz-bg-card);
+  --ion-tab-bar-background    : var(--wz-bg-card);
+  --ion-tab-bar-border-color  : var(--wz-border-subtle);
+  --ion-card-background       : var(--wz-bg-card);
+  --ion-border-color          : var(--wz-border-subtle);
 }
 
-// Global Header Glassmorphism
-ion-header {
-    ion-toolbar {
-        --background: rgba(16, 16, 16, 0.8) !important;
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
-        --border-style: none;
-    }
+// ── DARK THEME ─────────────────────────────────────────────
+@media (prefers-color-scheme: dark) {
+  :root { @include dark-theme; }
 }
 
-// Custom Utilities
-.gold-text {
-    color: var(--ion-color-primary);
+body.dark { @include dark-theme; }
+
+// ── GLOBAL MIXINS ─────────────────────────────────────────
+
+@mixin glass-card {
+  background    : var(--wz-bg-glass);
+  border        : 1px solid var(--wz-border-glass);
+  border-radius : var(--wz-radius-lg);
+  backdrop-filter: var(--wz-glass-blur);
+  -webkit-backdrop-filter: var(--wz-glass-blur);
 }
 
-.card-dark {
-    --background: #1C1C1E;
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+@mixin glass-card-accent {
+  background    : var(--wz-bg-glass-accent);
+  border        : 1px solid var(--wz-color-accent-border);
+  border-radius : var(--wz-radius-lg);
+  backdrop-filter: var(--wz-glass-blur);
+  -webkit-backdrop-filter: var(--wz-glass-blur);
+}
+
+@mixin solid-card {
+  background    : var(--wz-bg-card);
+  border        : 1px solid var(--wz-border-subtle);
+  border-radius : var(--wz-radius-lg);
+  box-shadow    : var(--wz-shadow-sm);
+}
+
+// ── UTILITY MIXINS ────────────────────────────────────────
+
+@mixin flex-center($direction: column) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between($direction: row) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin glass-panel($bg: var(--wz-bg-glass), $border: var(--wz-border-glass)) {
+  background: $bg;
+  border: 1px solid $border;
+  backdrop-filter: var(--wz-glass-blur-sm);
+  -webkit-backdrop-filter: var(--wz-glass-blur-sm);
+}
+
+@mixin orb($bg-color, $size: 300px, $blur: 55px) {
+  position: absolute;
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur($blur);
+  background: radial-gradient(circle, $bg-color 0%, transparent 65%);
+}
+
+@mixin safe-area-padding($top: true, $bottom: true) {
+  @if $top {
+    padding-top: max(var(--wz-space-8), calc(env(safe-area-inset-top) + var(--wz-space-4)));
+  }
+  @if $bottom {
+    padding-bottom: max(var(--wz-space-8), calc(env(safe-area-inset-bottom) + var(--wz-space-4)));
+  }
+}
+
+@mixin font-display { font-family: $font-display; }
+@mixin font-body    { font-family: $font-body; }
+
+@mixin text-hero {
+  @include font-display;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--wz-text-primary);
+}
+
+@mixin text-title {
+  @include font-display;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--wz-text-primary);
+}
+
+@mixin text-section {
+  @include font-display;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--wz-text-primary);
+}
+
+@mixin text-card-title {
+  @include font-display;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--wz-text-primary);
+}
+
+@mixin text-body {
+  @include font-body;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--wz-text-secondary);
+}
+
+@mixin text-label {
+  @include font-body;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--wz-text-secondary);
+}
+
+@mixin text-caption {
+  @include font-body;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wz-text-muted);
+}
+
+@mixin btn-base {
+  @include font-display;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: var(--wz-radius-md);
+  border: none;
+  cursor: pointer;
+  transition: transform var(--wz-duration-fast) var(--wz-ease-out),
+              opacity var(--wz-duration-fast) ease;
+  &:active { transform: scale(0.97); }
+}
+
+@mixin btn-primary {
+  @include btn-base;
+  background: var(--wz-color-primary);
+  color: var(--wz-text-on-primary);
+  padding: 14px 28px;
+}
+
+@mixin btn-accent {
+  @include btn-base;
+  background: var(--wz-color-accent);
+  color: var(--wz-text-on-accent);
+  padding: 14px 28px;
+}
+
+@mixin input-base {
+  @include font-body;
+  font-size: 14px;
+  background: var(--wz-bg-input);
+  border: 1.5px solid var(--wz-border-default);
+  border-radius: var(--wz-radius-md);
+  color: var(--wz-text-primary);
+  padding: 14px 16px;
+  outline: none;
+  width: 100%;
+  transition: border-color var(--wz-duration-fast) ease,
+              background var(--wz-duration-fast) ease;
+
+  &::placeholder { color: var(--wz-text-muted); }
+
+  &:focus {
+    border-color: var(--wz-color-primary);
+    background: var(--wz-color-primary-subtle);
+  }
+}
+
+@mixin badge($bg, $color) {
+  @include font-body;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: var(--wz-radius-full);
+  background: $bg;
+  color: $color;
+}
+
+// ── ANIMATION UTILITIES ────────────────────────────────────
+
+@keyframes wz-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes wz-shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes wz-pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+@keyframes wz-spin {
+  to { transform: rotate(360deg); }
+}
+
+// Staggered entry helper (used in dashboard card list)
+@for $i from 1 through 8 {
+  .wz-stagger-#{$i} {
+    animation: wz-fade-up var(--wz-duration-slow) var(--wz-ease-out) #{$i * 60}ms both;
+  }
 }

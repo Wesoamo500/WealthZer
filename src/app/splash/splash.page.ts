@@ -1,21 +1,43 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { IonContent } from '@ionic/angular/standalone';
+import { CommonModule } from '@angular/common';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { Capacitor } from '@capacitor/core';
+import { forkJoin, catchError, of, firstValueFrom } from 'rxjs';
+
+// Services
 import { AuthService } from '../core/services/auth.service';
 import { FinancialService } from '../core/services/financial.service';
-import { forkJoin, catchError, of, firstValueFrom } from 'rxjs';
+
+// ─── Status messages cycling during load ──────────────────
+const LOAD_STATUSES = [
+  'Securing connection...',
+  'Verifying identity...',
+  'Fetching portfolio...',
+  'Loading AI insights...',
+  'Almost ready...',
+];
+
+// ─── Minimum splash display duration (ms) ─────────────────
+const MIN_DISPLAY_MS = 2800;
 
 @Component({
   selector: 'app-splash',
   templateUrl: './splash.page.html',
   styleUrls: ['./splash.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [IonContent, CommonModule],
 })
-export class SplashPage implements OnInit {
-  progress = 0;
-  statusText = 'INITIALIZING SYSTEM';
+export class SplashPage implements OnInit, OnDestroy {
+
+  // ── Template bindings ──────────────────────────────────
+  statusText  = LOAD_STATUSES[0];
+  statusVisible = true;
+
+  // ── Internal ───────────────────────────────────────────
+  private statusInterval?: ReturnType<typeof setInterval>;
+  private statusIndex = 0;
 
   constructor(
     private router: Router,
@@ -23,86 +45,105 @@ export class SplashPage implements OnInit {
     private financialService: FinancialService
   ) {}
 
-  ngOnInit() {
-    this.startSynchronization();
-  }
+  // ────────────────────────────────────────────────────────
+  async ngOnInit(): Promise<void> {
+    await this.configureStatusBar();
+    this.startStatusCycle();
 
-  private async startSynchronization() {
+    // Run parallel tasks: Auth Check, Data Sync, and Brand Timer
     try {
-      // Stage 1: Auth Verification (0-30%)
-      this.statusText = 'VERIFYING SESSION';
-      this.updateProgress(10);
-      
-      // Wait for AuthService to emit the first value from checkSession
-      const user = await firstValueFrom(this.authService.currentUser);
-      this.updateProgress(30);
+      const [user, _] = await Promise.all([
+        this.checkAuthState(),
+        this.minDisplayTimer(),
+      ]);
 
       if (user) {
-        // Stage 2: Data Fetching (30-90%)
-        this.statusText = 'SYNCHRONIZING DATA';
-        
-        await this.fetchRealData();
-        this.updateProgress(90);
+        this.statusText = 'Finalizing...';
+        const hasData = await this.checkUserContent();
+        this.navigateNext(true, hasData);
       } else {
-        // Give time for UI to breathe even if no auth
-        await this.delay(800);
-        this.updateProgress(90);
-      }
-
-      // Stage 3: Finalizing (90-100%)
-      this.statusText = 'READY';
-      this.updateProgress(100);
-      await this.delay(500);
-
-      if (user) {
-        // Fetch data to determine if we should show the welcome page
-        const data = await firstValueFrom(forkJoin({
-          transactions: this.financialService.getTransactions().pipe(catchError(() => of([]))),
-          portfolio: this.financialService.getPortfolio().pipe(catchError(() => of([])))
-        }));
-        
-        // If user has no information (0 assets and 0 transactions), show welcome page
-        if (data.transactions.length === 0 && data.portfolio.length === 0) {
-          this.router.navigate(['/welcome'], { replaceUrl: true });
-        } else {
-          this.router.navigate(['/tabs/home'], { replaceUrl: true });
-        }
-      } else {
-        this.router.navigate(['/auth/login'], { replaceUrl: true });
+        this.navigateNext(false);
       }
     } catch (error) {
-      console.error('Synchronization failed:', error);
-      this.statusText = 'OFFLINE MODE';
-      // Navigate anyway to allow user to try login or use cached data
-      this.router.navigate(['/auth/login'], { replaceUrl: true });
+      console.error('Splash Synchronization Error:', error);
+      this.navigateNext(false);
     }
   }
 
-  private async fetchRealData() {
-    // Fetch all required data in parallel
-    const sync$ = forkJoin({
-      transactions: this.financialService.getTransactions().pipe(catchError(() => of([]))),
-      portfolio: this.financialService.getPortfolio().pipe(catchError(() => of([]))),
-      netWorth: this.financialService.getNetWorth().pipe(catchError(() => of({ totalNetWorth: 0, currency: 'USD' })))
-    });
+  ngOnDestroy(): void {
+    this.stopStatusCycle();
+  }
 
-    // We use a small interval to smooth the progress bar while waiting for response
-    const interval = setInterval(() => {
-        if (this.progress < 85) this.progress += 2;
-    }, 100);
-
+  // ── Status bar ─────────────────────────────────────────
+  private async configureStatusBar(): Promise<void> {
+    if (!Capacitor.isNativePlatform()) return;
     try {
-        await firstValueFrom(sync$);
-    } finally {
-        clearInterval(interval);
+      await StatusBar.setOverlaysWebView({ overlay: true });
+      await StatusBar.setStyle({ style: Style.Dark });
+    } catch (error) {
+      console.warn('StatusBar config skipped:', error);
     }
   }
 
-  private updateProgress(val: number) {
-    this.progress = val;
+  // ── Status text cycle ──────────────────────────────────
+  private startStatusCycle(): void {
+    this.statusInterval = setInterval(() => {
+      this.statusVisible = false;
+
+      setTimeout(() => {
+        this.statusIndex = (this.statusIndex + 1) % LOAD_STATUSES.length;
+        this.statusText  = LOAD_STATUSES[this.statusIndex];
+        this.statusVisible = true;
+      }, 250);
+    }, 2000);
   }
 
-  private delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  private stopStatusCycle(): void {
+    if (this.statusInterval) {
+      clearInterval(this.statusInterval);
+    }
+  }
+
+  // ── Auth check ─────────────────────────────────────────
+  private async checkAuthState(): Promise<any> {
+    // Wait for the AuthService to establish current user state
+    return firstValueFrom(this.authService.currentUser);
+  }
+
+  // ── Content check ──────────────────────────────────────
+  // Determines if user should see the 'Welcome' tour or jump to Home
+  private async checkUserContent(): Promise<boolean> {
+    try {
+      const data = await firstValueFrom(forkJoin({
+        transactions: this.financialService.getTransactions().pipe(catchError(() => of([]))),
+        portfolio: this.financialService.getPortfolio().pipe(catchError(() => of([])))
+      }));
+      
+      // Returns true if user has existing financial records
+      return data.transactions.length > 0 || data.portfolio.length > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  // ── Minimum display timer ──────────────────────────────
+  private minDisplayTimer(): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, MIN_DISPLAY_MS));
+  }
+
+  // ── Navigation ─────────────────────────────────────────
+  private navigateNext(isAuthenticated: boolean, hasData: boolean = false): void {
+    this.stopStatusCycle();
+
+    if (!isAuthenticated) {
+      // Not logged in -> To Login Screen
+      this.router.navigate(['/auth'], { replaceUrl: true });
+    } else if (!hasData) {
+      // Logged in but new user -> To Welcome/Onboarding
+      this.router.navigate(['/welcome'], { replaceUrl: true });
+    } else {
+      // Logged in with data -> To Dashboard
+      this.router.navigate(['/tabs/home'], { replaceUrl: true });
+    }
   }
 }

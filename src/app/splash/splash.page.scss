@@ -1,192 +1,288 @@
-.splash-container {
+// ============================================================
+// splash.page.scss
+// WealthZer · Page 1 — Splash Screen
+// Midnight Teal + Copper · Light-first · Glassmorphism
+// ============================================================
+@use 'src/theme/variables' as *;
+
+// ── Host & content reset ────────────────────────────────────
+:host {
+  display: block;
   height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 60px 20px 40px;
-  background: radial-gradient(circle at center, #1a1a1a 0%, #101010 100%);
+}
+
+.splash-content {
+  --background: var(--wz-bg-base);
+  --padding-top: 0;
+  --padding-bottom: 0;
+  height: 100%;
+}
+
+// ── Root layout ─────────────────────────────────────────────
+.splash__layout {
+  @include flex-between(column);
+  @include safe-area-padding;
+  position: relative;
+  height: 100%;
+  padding-left: var(--wz-space-8);
+  padding-right: var(--wz-space-8);
+  z-index: 2;
+}
+
+// ── Mesh gradient orbs ──────────────────────────────────────
+// Three CSS radial-gradient divs create depth with zero images/JS
+.splash__orb {
+  z-index: 1;
+}
+
+.splash__orb--1 {
+  @include orb(rgba(13, 92, 82, 0.22), 320px);
+  top: -90px;
+  left: -70px;
+  animation: wz-orb-drift-1 9s ease-in-out infinite;
+}
+
+.splash__orb--2 {
+  @include orb(rgba(200, 113, 42, 0.16), 280px);
+  bottom: 40px;
+  right: -60px;
+  animation: wz-orb-drift-2 11s ease-in-out infinite;
+}
+
+.splash__orb--3 {
+  @include orb(rgba(13, 92, 82, 0.10), 200px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: wz-orb-drift-3 13s ease-in-out infinite;
+}
+
+// Dark mode orb overrides
+@media (prefers-color-scheme: dark) {
+  .splash__orb--1 {
+    background: radial-gradient(circle, rgba(61, 214, 188, 0.25) 0%, transparent 65%);
+  }
+  .splash__orb--2 {
+    background: radial-gradient(circle, rgba(232, 160, 100, 0.20) 0%, transparent 65%);
+  }
+  .splash__orb--3 {
+    background: radial-gradient(circle, rgba(61, 214, 188, 0.10) 0%, transparent 65%);
+  }
+}
+
+// ── Logo zone ───────────────────────────────────────────────
+.splash__logo-zone {
+  @include flex-center;
+  gap: var(--wz-space-5);
+  animation: wz-fade-up var(--wz-duration-slow) var(--wz-ease-out) 100ms both;
+}
+
+.splash__logo-box {
+  @include flex-center;
+  @include glass-panel;
+  width: 88px;
+  height: 88px;
+  border-radius: 26px;
   position: relative;
   overflow: hidden;
 
+  // Inner highlight sheen
   &::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('/assets/shapes.svg') no-repeat center;
-    opacity: 0.03;
-    filter: grayscale(1);
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      transparent 55%
+    );
+    border-radius: inherit;
     pointer-events: none;
   }
 }
 
-.logo-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
-.icon-box {
-  width: 80px;
-  height: 80px;
-  background: var(--ion-color-primary);
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 24px;
-  box-shadow: 0 10px 30px rgba(244, 211, 94, 0.2);
-}
-
-// Stylized Money/Wallet Icon in CSS
-.money-symbol {
+.splash__logo-svg {
+  width: 44px;
+  height: 44px;
   position: relative;
-  width: 40px;
-  height: 30px;
-}
-
-.bill-body {
-  width: 32px;
-  height: 20px;
-  background: #101010;
-  border-radius: 4px;
-  position: relative;
-  border: 2px solid #101010;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &::before, &::after {
-    content: '';
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border: 1px solid var(--ion-color-primary);
-    border-radius: 1px;
-    opacity: 0.5;
-  }
-  &::before { top: 2px; left: 2px; }
-  &::after { bottom: 2px; right: 2px; }
-}
-
-.bill-circle {
-  width: 8px;
-  height: 8px;
-  border: 2px solid var(--ion-color-primary);
-  border-radius: 50%;
-}
-
-.bill-shadow {
-  position: absolute;
-  width: 32px;
-  height: 20px;
-  background: rgba(16, 16, 16, 0.4);
-  border: 2px solid #101010;
-  border-radius: 4px;
-  top: 4px;
-  left: 4px;
   z-index: 1;
+  animation: wz-logo-breathe 3.2s ease-in-out infinite;
 }
 
-.brand-name {
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  margin-bottom: 8px;
-
-  .wealth {
-    color: #ffffff;
-  }
-  .zer {
-    color: var(--ion-color-primary);
-  }
+// ── Wordmark ────────────────────────────────────────────────
+.splash__wordmark {
+  text-align: center;
 }
 
-.tagline {
-  color: #888;
-  font-size: 11px;
-  letter-spacing: 2.5px;
-  font-weight: 500;
-  text-transform: uppercase;
-}
-
-.loading-section {
-  width: 100%;
-  max-width: 300px;
-  margin-bottom: 60px;
-}
-
-.status-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 8px;
-}
-
-.status-text {
-  color: #666;
-  font-size: 12px;
-  letter-spacing: 2px;
-  font-weight: 600;
-}
-
-.percentage {
-  color: var(--ion-color-primary);
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.progress-bar-container {
-  width: 100%;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background: var(--ion-color-primary);
-  transition: width 0.3s ease;
-  box-shadow: 0 0 10px rgba(244, 211, 94, 0.4);
-}
-
-.footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-
-.encryption-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 30px;
-  
-  ion-icon {
-    font-size: 16px;
-  }
+.splash__brand-name {
+  font-family: $font-display;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--wz-text-primary);
+  margin: 0;
 
   span {
-    color: #888;
-    font-size: 11px;
-    font-weight: 500;
+    color: var(--wz-color-accent); // Copper highlight on "Zer"
   }
 }
 
-.copyright {
-  color: #444;
+.splash__brand-sub {
+  font-family: $font-body;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--wz-text-muted);
+  margin: var(--wz-space-2) 0 0;
+}
+
+// ── Mid zone: status + progress + badge ─────────────────────
+.splash__mid-zone {
+  @include flex-center;
+  gap: var(--wz-space-4);
+  animation: wz-fade-up var(--wz-duration-slow) var(--wz-ease-out) 300ms both;
+}
+
+// Status text with opacity transition for smooth cycling
+.splash__status-text {
+  font-family: $font-body;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--wz-text-muted);
+  min-height: 18px;
+  transition: opacity 250ms ease;
+
+  &--hidden {
+    opacity: 0;
+  }
+}
+
+// Progress track + shimmer fill
+.splash__progress-track {
+  width: 180px;
+  height: 3px;
+  border-radius: var(--wz-radius-full);
+  background: var(--wz-color-primary-subtle);
+  overflow: hidden;
+  position: relative;
+}
+
+.splash__progress-fill {
+  height: 100%;
+  border-radius: var(--wz-radius-full);
+  background: linear-gradient(
+    90deg,
+    var(--wz-color-primary) 0%,
+    #3DD6BC 50%,
+    var(--wz-color-accent) 100%
+  );
+  background-size: 200% 100%;
+  animation:
+    wz-progress-load 2.4s var(--wz-ease-out) forwards,
+    wz-gradient-shift 2s linear infinite;
+  position: relative;
+  overflow: hidden;
+
+  // Shimmer overlay
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.55),
+      transparent
+    );
+    animation: wz-shimmer 1.8s ease-in-out infinite;
+  }
+}
+
+// Security badge
+.splash__sec-badge {
+  @include flex-center(row);
+  @include glass-panel;
+  gap: var(--wz-space-2);
+  padding: var(--wz-space-1) var(--wz-space-4);
+  border-radius: var(--wz-radius-full);
+}
+
+.splash__sec-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--wz-color-primary);
+  box-shadow: 0 0 0 3px var(--wz-color-primary-subtle);
+  animation: wz-pulse-dot 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.splash__sec-text {
+  font-family: $font-body;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--wz-text-muted);
+}
+
+// ── Version ─────────────────────────────────────────────────
+.splash__version {
+  font-family: $font-body;
   font-size: 10px;
-  letter-spacing: 1px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wz-text-muted);
+  opacity: 0.6;
+  animation: wz-fade-up var(--wz-duration-slow) var(--wz-ease-out) 500ms both;
+}
+
+// ── Keyframes ───────────────────────────────────────────────
+
+@keyframes wz-logo-breathe {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.06); }
+}
+
+@keyframes wz-orb-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%      { transform: translate(16px, -12px) scale(1.06); }
+  70%      { transform: translate(-8px, 9px) scale(0.96); }
+}
+
+@keyframes wz-orb-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  35%      { transform: translate(-12px, 14px) scale(1.08); }
+  65%      { transform: translate(9px, -7px) scale(0.94); }
+}
+
+@keyframes wz-orb-drift-3 {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50%      { transform: translate(-50%, -50%) scale(1.14); }
+}
+
+@keyframes wz-progress-load {
+  0%   { width: 0%; }
+  20%  { width: 22%; }
+  50%  { width: 56%; }
+  75%  { width: 78%; }
+  90%  { width: 90%; }
+  100% { width: 100%; }
+}
+
+@keyframes wz-gradient-shift {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes wz-shimmer {
+  0%   { transform: translateX(-50px); opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: translateX(230px); opacity: 0; }
 }

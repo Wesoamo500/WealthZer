@@ -1,36 +1,77 @@
-<ion-content [fullscreen]="true">
-  <div class="splash-container">
-    <div class="logo-section">
-      <div class="icon-box">
-        <div class="money-symbol">
-          <div class="bill-body">
-            <div class="bill-circle"></div>
-          </div>
-          <div class="bill-shadow"></div>
-        </div>
+<ion-content [fullscreen]="true" [scrollY]="false" class="splash-content">
+
+  <!-- ── Mesh gradient orbs (CSS-only, zero images) ─────── -->
+  <div class="splash__orb splash__orb--1" aria-hidden="true"></div>
+  <div class="splash__orb splash__orb--2" aria-hidden="true"></div>
+  <div class="splash__orb splash__orb--3" aria-hidden="true"></div>
+
+  <!-- ── Main layout ────────────────────────────────────── -->
+  <div class="splash__layout">
+
+    <!-- Logo + wordmark -->
+    <div class="splash__logo-zone" aria-label="WealthZer">
+      <div class="splash__logo-box">
+        <svg class="splash__logo-svg"
+             viewBox="0 0 40 40"
+             fill="none"
+             aria-hidden="true"
+             focusable="false">
+          <!-- Primary teal path — wealth chart line -->
+          <path d="M6 20L13 9L19 17L25 7L34 20"
+                stroke="url(#wz-grad-primary)"
+                stroke-width="2.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+          <!-- Secondary copper path — support trend -->
+          <path d="M6 30L16 24L24 28L34 21"
+                stroke="url(#wz-grad-accent)"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                opacity="0.6"/>
+          <defs>
+            <linearGradient id="wz-grad-primary"
+                            x1="6" y1="7" x2="34" y2="20"
+                            gradientUnits="userSpaceOnUse">
+              <stop stop-color="var(--wz-color-primary)"/>
+              <stop offset="1" stop-color="#3DD6BC"/>
+            </linearGradient>
+            <linearGradient id="wz-grad-accent"
+                            x1="6" y1="21" x2="34" y2="30"
+                            gradientUnits="userSpaceOnUse">
+              <stop stop-color="var(--wz-color-accent)"/>
+              <stop offset="1" stop-color="#E8A064"/>
+            </linearGradient>
+          </defs>
+        </svg>
       </div>
-      <div class="brand-name">
-        <span class="wealth">wealth</span><span class="zer">Zer</span>
+
+      <div class="splash__wordmark">
+        <h1 class="splash__brand-name">Wealth<span>Zer</span></h1>
+        <p class="splash__brand-sub">Your AI Financial Partner</p>
       </div>
-      <div class="tagline">EMPOWERING YOUR FINANCIAL FUTURE</div>
     </div>
 
-    <div class="loading-section">
-      <div class="status-header">
-        <span class="status-text">{{ statusText }}</span>
-        <span class="percentage">{{ progress }}%</span>
+    <!-- Progress + status -->
+    <div class="splash__mid-zone" role="status" aria-live="polite">
+      <p class="splash__status-text"
+         [class.splash__status-text--hidden]="!statusVisible">
+        {{ statusText }}
+      </p>
+
+      <div class="splash__progress-track" role="progressbar" aria-label="Loading">
+        <div class="splash__progress-fill"></div>
       </div>
-      <div class="progress-bar-container">
-        <div class="progress-bar-fill" [style.width.%]="progress"></div>
+
+      <div class="splash__sec-badge">
+        <span class="splash__sec-dot" aria-hidden="true"></span>
+        <span class="splash__sec-text">AES-256 · Bank-Grade Encrypted</span>
       </div>
     </div>
 
-    <div class="footer">
-      <div class="encryption-badge">
-        <ion-icon name="shield-checkmark" color="primary"></ion-icon>
-        <span>AES-256 Bank-Grade Encryption</span>
-      </div>
-      <div class="copyright">© 2024 WEALTHZER GLOBAL INC.</div>
-    </div>
-  </div>
+    <!-- Version -->
+    <p class="splash__version">WealthZer · v1.0.0</p>
+
+  </div><!-- /.splash__layout -->
+
 </ion-content>
