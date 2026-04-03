@@ -270,14 +270,42 @@
           WealthZer will display all amounts in your preferred currency.
           You can change this anytime in Settings.
         </p>
-        <div class="currency-options">
-          <div *ngFor="let c of ['USD','GHS','EUR','GBP','NGN','KES']"
-               class="currency-chip"
-               [class.currency-chip--selected]="registerForm.get('currency')?.value === c"
-               (click)="registerForm.get('currency')?.setValue(c)"
-               [attr.aria-pressed]="registerForm.get('currency')?.value === c"
+
+        <!-- Search Bar -->
+        <div class="currency-search-wrap">
+          <ion-icon name="search-outline" class="search-icon"></ion-icon>
+          <ion-input
+            type="text"
+            placeholder="Search currency..."
+            (ionInput)="onSearchCurrency($event)"
+            class="currency-search-input">
+          </ion-input>
+        </div>
+
+        <!-- Full Grid (Tiles) -->
+        <div class="wz-currency-grid scroll-shadow">
+          <div *ngFor="let c of filteredCurrencies"
+               class="wz-currency-tile"
+               [class.wz-currency-tile--selected]="registerForm.get('currency')?.value === c.code"
+               (click)="selectCurrency(c.code)"
                role="button" tabindex="0">
-            {{ c }}
+            <div class="wz-currency-tile__flag-wrap">
+              <img [src]="getFlagUrl(c.code)" 
+                   [alt]="c.name + ' flag'"
+                   class="wz-currency-tile__flag"
+                   loading="lazy">
+            </div>
+            <span class="wz-currency-tile__code">{{ c.code }}</span>
+            <div class="wz-currency-tile__check" *ngIf="registerForm.get('currency')?.value === c.code">
+              <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+                <path d="M3 7L6 10L11 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div class="wz-currency-empty" *ngIf="filteredCurrencies.length === 0">
+            No currencies matching "{{ searchTerm }}"
           </div>
         </div>
       </ng-container>

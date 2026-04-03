@@ -14,7 +14,7 @@ import { addIcons } from 'ionicons';
 import {
   mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline,
   fingerPrintOutline, logoGoogle, arrowForwardOutline,
-  chevronBackOutline, phonePortraitOutline,
+  chevronBackOutline, phonePortraitOutline, searchOutline, close,
 } from 'ionicons/icons';
 import { interval, Subscription, firstValueFrom } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -28,6 +28,7 @@ import { BiometricAuth } from '@aparajita/capacitor-biometric-auth';
 // ── Real services ──────────────────────────────────────────
 import { AuthService } from '../core/services/auth.service';
 import { StorageService } from '../core/services/storage.service';
+import { CurrencyService, SUPPORTED_CURRENCIES, CurrencyInfo } from '../core/services/currency.service';
 
 // ── Password strength scorer (lightweight, no zxcvbn dep) ─
 function scorePassword(pw: string): { score: number; hint: string } {
@@ -110,6 +111,17 @@ export class AuthPage implements OnInit, OnDestroy {
   loginForm!    : FormGroup;
   registerForm! : FormGroup;
 
+  // Currency selection
+  searchTerm = '';
+  filteredCurrencies: CurrencyInfo[] = SUPPORTED_CURRENCIES;
+
+  private countryMap: Record<string, string> = {
+    'GHS': 'gh', 'USD': 'us', 'EUR': 'eu', 'GBP': 'gb',
+    'NGN': 'ng', 'JPY': 'jp', 'CAD': 'ca', 'AUD': 'au',
+    'CHF': 'ch', 'CNY': 'cn', 'INR': 'in', 'BRL': 'br',
+    'ZAR': 'za', 'AED': 'ae', 'SAR': 'sa', 'KES': 'ke'
+  };
+
   constructor(
     private fb       : FormBuilder,
     private router   : Router,
@@ -120,7 +132,7 @@ export class AuthPage implements OnInit, OnDestroy {
     addIcons({
       mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline,
       fingerPrintOutline, logoGoogle, arrowForwardOutline,
-      chevronBackOutline, phonePortraitOutline,
+      chevronBackOutline, phonePortraitOutline, searchOutline, close,
     });
   }
 
@@ -373,6 +385,26 @@ export class AuthPage implements OnInit, OnDestroy {
   fieldError(form: FormGroup, field: string, error = 'required'): boolean {
     const ctrl = form.get(field);
     return !!(ctrl?.touched && ctrl?.hasError(error));
+  }
+
+  // ── Currency Search (Step 3) ────────────────────────────
+  onSearchCurrency(event: any): void {
+    const term = (event.target.value || '').toLowerCase();
+    this.searchTerm = term;
+    this.filteredCurrencies = SUPPORTED_CURRENCIES.filter(c =>
+      c.name.toLowerCase().includes(term) ||
+      c.code.toLowerCase().includes(term)
+    );
+  }
+
+  async selectCurrency(code: string): Promise<void> {
+    this.registerForm.get('currency')?.setValue(code);
+    await Haptics.impact({ style: ImpactStyle.Light });
+  }
+
+  getFlagUrl(code: string): string {
+    const cc = this.countryMap[code] || 'us';
+    return `https://flagcdn.com/${cc}.svg`;
   }
 
   private navigateToDashboard(): Promise<boolean> {
