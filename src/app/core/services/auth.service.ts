@@ -56,10 +56,11 @@ export class AuthService {
 
   login(credentials: { email: string; password: string; deviceId?: string }): Observable<AuthResponse | { requires2fa: true; tempToken: string }> {
     return this.apiService.post<any>('auth/login', credentials).pipe(
-      tap(async (res: any) => {
+      switchMap(async (res: any) => {
         if (!res.requires2fa) {
           await this.handleAuth(res);
         }
+        return res;
       })
     );
   }
@@ -70,7 +71,10 @@ export class AuthService {
 
   verify2fa(email: string, code: string, deviceId?: string): Observable<AuthResponse> {
     return this.apiService.post<AuthResponse>('auth/verify-2fa', { email, code, deviceId }).pipe(
-      tap(async (res) => await this.handleAuth(res))
+      switchMap(async (res) => {
+        await this.handleAuth(res);
+        return res;
+      })
     );
   }
 
@@ -80,7 +84,10 @@ export class AuthService {
 
   socialLogin(provider: 'GOOGLE' | 'APPLE', idToken: string, fullName?: string): Observable<AuthResponse> {
     return this.apiService.post<AuthResponse>('auth/social-login', { provider, idToken, fullName }).pipe(
-      tap(async (res) => await this.handleAuth(res))
+      switchMap(async (res) => {
+        await this.handleAuth(res);
+        return res;
+      })
     );
   }
 

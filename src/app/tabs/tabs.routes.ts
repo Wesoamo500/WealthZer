@@ -4,11 +4,14 @@ import { TabsPage } from './tabs.page';
 export const routes: Routes = [
   {
     path: '',
-    component: TabsPage,
+    loadComponent: () =>
+      import('./tabs.page').then(m => m.TabsPage),
     children: [
       {
-        path: 'home',
-        loadComponent: () => import('../home/home.page').then(m => m.HomePage)
+        path: 'dashboard',
+        loadComponent: () =>
+          import('../dashboard/dashboard.page').then(m => m.DashboardPage),
+        title: 'Home — WealthZer',
       },
       {
         path: 'portfolio',
@@ -36,14 +39,14 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/tabs/home',
+        redirectTo: '/tabs/dashboard',
         pathMatch: 'full'
       }
     ]
   },
   {
     path: '',
-    redirectTo: '/tabs/home',
+    redirectTo: '/tabs/dashboard',
     pathMatch: 'full'
   }
 ];

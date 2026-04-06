@@ -1,100 +1,128 @@
-ion-tab-bar {
-  --background: #1C1C1E;
-  --border: 0;
-  padding-bottom: env(safe-area-inset-bottom);
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-}
+// ============================================================
+// tabs.page.scss — WealthZer · Root Tab Bar
+// ============================================================
+@use 'src/theme/variables' as *;
 
-ion-tab-button {
-  --color: rgba(255, 255, 255, 0.5);
-  --color-selected: var(--ion-color-primary);
-  
-  ion-icon {
-    font-size: 24px;
-  }
-  
-  ion-label {
-    font-size: 11px;
-    font-weight: 500;
-    margin-top: 4px;
-  }
-}
+:host { display: block; height: 100%; }
 
-.main-fab {
-  margin-bottom: calc(env(safe-area-inset-bottom) + 80px);
-  margin-inline-end: 20px;
-  z-index: 999;
-  
-  ion-fab-button {
-    --background: var(--ion-color-primary);
-    --color: black;
-    --box-shadow: 0 8px 24px rgba(244, 211, 94, 0.4);
-    width: 60px;
-    height: 60px;
-    
-    .main-icon {
-      font-size: 28px;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-  }
+// ── Tab bar container ─────────────────────────────────────────
+.wz-tab-bar {
+  --background     : var(--wz-bg-card);
+  --border         : none;
+  --color          : var(--wz-text-muted);
+  --color-selected : var(--wz-color-primary);
 
-  &.fab-activated {
-    .main-icon {
-      transform: rotate(90deg) scale(0.8);
-    }
+  height: calc(60px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-top: 1px solid var(--wz-border-subtle);
+  box-shadow: 0 -4px 24px rgba(13, 92, 82, 0.06);
+
+  // Dark mode
+  @media (prefers-color-scheme: dark) {
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
   }
 }
 
-ion-fab-list {
+// ── Individual tab button ─────────────────────────────────────
+.wz-tab-btn {
+  --color          : var(--wz-text-muted);
+  --color-selected : var(--wz-color-primary);
+  --ripple-color   : var(--wz-color-primary-subtle);
+
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 16px;
-  margin-bottom: 24px;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding-top: 10px;
+  max-width: none;
+  position: relative;
+  transition: opacity var(--wz-duration-fast) ease;
 
-  .sub-fab-btn {
-    --background: #2C2C2E;
-    --color: white;
-    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    width: 52px;
-    height: 52px;
-    margin: 0;
-    position: relative;
-    overflow: visible;
-
-    &.advisor-btn {
-      --background: #1C1C1E;
-      --color: var(--ion-color-primary);
-      border: 1px solid rgba(244, 211, 94, 0.2);
-    }
-
-    ion-icon {
-      font-size: 24px;
-    }
-
-    .fab-label {
-      position: absolute;
-      right: 64px;
-      background: rgba(44, 44, 46, 0.95);
-      backdrop-filter: blur(10px);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
-      pointer-events: none;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      opacity: 0;
-      transform: translateX(10px);
-      transition: all 0.3s ease;
-    }
+  &::part(native) {
+    padding: 0;
+    background: transparent;
   }
 
-  &.fab-list-active {
-    .fab-label {
-      opacity: 1;
-      transform: translateX(0);
-    }
+  &:active { opacity: 0.7; }
+}
+
+// ── Icons ─────────────────────────────────────────────────────
+.wz-tab-icon {
+  font-size: 22px;
+  transition: color var(--wz-duration-fast) ease,
+              transform var(--wz-duration-fast) var(--wz-ease-spring);
+
+  ion-tab-button.tab-selected & {
+    color: var(--wz-color-primary);
+    transform: translateY(-1px);
   }
+}
+
+// ── Labels ────────────────────────────────────────────────────
+.wz-tab-label {
+  font-family: $font-body;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: color var(--wz-duration-fast) ease;
+  margin: 0;
+
+  ion-tab-button.tab-selected & {
+    color: var(--wz-color-primary);
+    font-weight: 600;
+  }
+}
+
+// ── Active pip indicator ──────────────────────────────────────
+.wz-tab-pip {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 3px;
+  border-radius: var(--wz-radius-full);
+  background: var(--wz-color-primary);
+  animation: wz-pip-in var(--wz-duration-base) var(--wz-ease-spring) both;
+}
+
+@keyframes wz-pip-in {
+  from { width: 0; opacity: 0; }
+  to   { width: 18px; opacity: 1; }
+}
+
+// ── Centre FAB tab button ─────────────────────────────────────
+.wz-tab-btn--fab {
+  // disable the default tab button behaviour
+  pointer-events: none;
+
+  &::part(native) { background: transparent; }
+}
+
+.wz-fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--wz-color-accent), #E8A064);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(200, 113, 42, 0.38);
+  margin-bottom: 6px;
+  pointer-events: all;
+  cursor: pointer;
+  transition: transform var(--wz-duration-fast) var(--wz-ease-spring),
+              box-shadow var(--wz-duration-fast) ease;
+
+  &:active {
+    transform: scale(0.93);
+    box-shadow: 0 2px 8px rgba(200, 113, 42, 0.25);
+  }
+}
+
+.wz-fab-icon {
+  font-size: 26px;
+  color: #fff;
 }

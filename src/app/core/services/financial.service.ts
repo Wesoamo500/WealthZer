@@ -58,12 +58,15 @@ export class FinancialService {
   getNetWorth(): Observable<{ 
     totalNetWorth: number; 
     totalInvestments: number;
+    totalGainLoss: number;
+    totalGainLossPercent: number;
     totalIncome: number;
     totalExpenses: number;
     dailyChange: number;
     dailyChangePercent: number;
     budgets: any[];
     currency: string; 
+    updatedAt?: string;
   }> {
     return this.apiService.get<any>('financial/net-worth');
   }
@@ -93,6 +96,8 @@ export class FinancialService {
   getHealthScore(): Observable<{
     score: number;
     grade: string;
+    scoreDelta?: number;
+    tipsCount?: number;
     pillars: { name: string; score: number; max: number }[];
     tip: string;
     comparisonText: string;

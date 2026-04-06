@@ -1,66 +1,50 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, NavigationEnd, Event } from '@angular/router';
-import { IonicModule, ModalController } from '@ionic/angular';
-import { AddTransactionModalComponent } from '../transactions/add-transaction-modal.component';
-import { FinancialService } from '../core/services/financial.service';
+// ============================================================
+// tabs.page.ts — WealthZer · Root Tab Layout
+// Tabs: Dashboard · Portfolio · Quick Add (FAB) · Advisor · Markets
+// ============================================================
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import {
+  IonTabs, IonTabBar, IonTabButton,
+  IonIcon, IonLabel, IonFab, IonFabButton,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  homeOutline,        home,
+  barChartOutline,    barChart,
+  addOutline,
+  personOutline,      person,
+  trendingUpOutline,  trendingUp,
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
-  templateUrl: 'tabs.page.html',
-  styleUrls: ['tabs.page.scss'],
+  templateUrl: './tabs.page.html',
+  styleUrls: ['./tabs.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [
+    CommonModule, RouterModule,
+    IonTabs, IonTabBar, IonTabButton,
+    IonIcon, IonLabel, IonFab, IonFabButton,
+  ],
 })
-export class TabsPage implements OnInit, OnDestroy {
-  isHomePage = true;
-  private routerSubscription: any;
+export class TabsPage {
 
-  constructor(
-    private modalCtrl: ModalController,
-    private financialService: FinancialService,
-    private router: Router
-  ) {}
+  // Track active tab for active-state icon swap (filled vs outline)
+  activeTab = 'dashboard';
 
-  ngOnInit() {
-    this.checkCurrentRoute();
-    this.routerSubscription = this.router.events.subscribe((event: Event) => {
-      if (event instanceof NavigationEnd) {
-        this.checkCurrentRoute();
-      }
+  constructor() {
+    addIcons({
+      homeOutline, home,
+      barChartOutline, barChart,
+      addOutline,
+      personOutline, person,
+      trendingUpOutline, trendingUp,
     });
   }
 
-  ngOnDestroy() {
-    if (this.routerSubscription) {
-      this.routerSubscription.unsubscribe();
-    }
+  onTabChange(event: { tab: string }): void {
+    this.activeTab = event.tab;
   }
-
-  private checkCurrentRoute() {
-    this.isHomePage = this.router.url.includes('/home') || this.router.url.includes('/transactions') || this.router.url === '/tabs' || this.router.url === '/';
-  }
-
-  async openAddTransaction() {
-    const modal = await this.modalCtrl.create({
-      component: AddTransactionModalComponent,
-      breakpoints: [0, 0.9, 1.0],
-      initialBreakpoint: 0.9,
-      cssClass: 'add-transaction-modal'
-    });
-
-    await modal.present();
-
-    const { data, role } = await modal.onWillDismiss();
-    if (role === 'confirm') {
-      this.financialService.addTransaction(data).subscribe(() => {
-        console.log('Transaction added and notified');
-      });
-    }
-  }
-
-  navigateToAdvisor() {
-    this.router.navigate(['/tabs/advisor']);
-  }
-
 }

@@ -1,0 +1,308 @@
+<ion-content [fullscreen]="true" class="dashboard-content" scrollY="true">
+
+  <!-- Pull-to-refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content pullingText="Pull to refresh"
+                           refreshingSpinner="crescent">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- TOP BAR                                             -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="dash-topbar">
+    <div class="dash-greet-wrap">
+      <p class="dash-greet">Good morning,</p>
+      <h1 class="dash-name">{{ userName }} 👋</h1>
+    </div>
+    <div class="dash-actions">
+      <button class="icon-btn" (click)="navigateTo('/notifications')"
+              aria-label="Notifications">
+        <ion-icon name="notifications-outline"></ion-icon>
+        <span *ngIf="unreadNotifs > 0" class="notif-badge">{{ unreadNotifs }}</span>
+      </button>
+      <div class="avatar" aria-label="Profile" (click)="navigateTo('/tabs/profile')">
+        {{ userName.slice(0,2).toUpperCase() }}
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- HERO — NET WORTH                                    -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <section class="hero wz-stagger-1" aria-label="Net worth summary">
+
+    <!-- Mesh depth orbs -->
+    <div class="hero__orb hero__orb--1" aria-hidden="true"></div>
+    <div class="hero__orb hero__orb--2" aria-hidden="true"></div>
+
+    <!-- Skeleton -->
+    <ng-container *ngIf="isLoading">
+      <ion-skeleton-text animated class="sk-hero-label"></ion-skeleton-text>
+      <ion-skeleton-text animated class="sk-hero-amount"></ion-skeleton-text>
+      <ion-skeleton-text animated class="sk-hero-change"></ion-skeleton-text>
+    </ng-container>
+
+    <!-- Real data -->
+    <ng-container *ngIf="!isLoading && netWorth">
+      <p class="hero__label">Total Net Worth</p>
+      <div class="hero__amount">
+        <span>{{ netWorth.total | currency:'USD':'symbol':'1.0-0' }}</span>
+        <span class="hero__cents">.{{ (netWorth.total % 1 * 100).toFixed(0).padStart(2,'0') }}</span>
+      </div>
+
+      <div class="hero__change"
+           [class.hero__change--up]="netWorth.changePct >= 0"
+           [class.hero__change--dn]="netWorth.changePct < 0">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path [attr.d]="netWorth.changePct >= 0 ? 'M2 9l4-6 4 6' : 'M2 3l4 6 4-6'"
+                stroke="currentColor" stroke-width="1.6"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ isPositive(netWorth.changePct) ? '+' : '' }}{{ netWorth.changeAmount | currency:'USD':'symbol':'1.0-0' }}
+        · {{ isPositive(netWorth.changePct) ? '+' : '' }}{{ netWorth.changePct | number:'1.2-2' }}% today
+      </div>
+
+      <p class="hero__date">Updated just now · {{ netWorth.updatedAt | date:'MMM d, y' }}</p>
+
+      <!-- Bottom stat row -->
+      <div class="hero__stats" role="list">
+        <div class="hero__stat" role="listitem">
+          <span class="hero__stat-label">Income</span>
+          <span class="hero__stat-value">{{ netWorth.income | currency:'USD':'symbol':'1.0-0' }}</span>
+          <span class="hero__stat-sub">▲ this month</span>
+        </div>
+        <div class="hero__divider" aria-hidden="true"></div>
+        <div class="hero__stat" role="listitem">
+          <span class="hero__stat-label">Expenses</span>
+          <span class="hero__stat-value">{{ netWorth.expenses | currency:'USD':'symbol':'1.0-0' }}</span>
+          <span class="hero__stat-sub hero__stat-sub--copper">▼ −8% vs last</span>
+        </div>
+        <div class="hero__divider" aria-hidden="true"></div>
+        <div class="hero__stat" role="listitem">
+          <span class="hero__stat-label">Saved</span>
+          <span class="hero__stat-value">{{ netWorth.saved | currency:'USD':'symbol':'1.0-0' }}</span>
+          <span class="hero__stat-sub">{{ netWorth.savingsRate }}% rate</span>
+        </div>
+      </div>
+    </ng-container>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- FINANCIAL HEALTH SCORE                              -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="section-row wz-stagger-2">
+    <span class="section-label">Financial Health</span>
+    <button class="section-link" (click)="navigateTo('/tabs/health')">See Analysis →</button>
+  </div>
+
+  <div class="health-card wz-stagger-2" *ngIf="!isLoading && healthScore"
+       (click)="navigateTo('/tabs/health')" role="button" tabindex="0"
+       aria-label="Financial Health Score {{ healthScore.score }}">
+    <!-- SVG Gauge -->
+    <div class="gauge-wrap" aria-hidden="true">
+      <svg width="72" height="72" viewBox="0 0 72 72">
+        <circle cx="36" cy="36" r="28" fill="none"
+                stroke="var(--wz-color-primary-subtle)"
+                stroke-width="8"/>
+        <circle cx="36" cy="36" r="28" fill="none"
+                stroke="url(#gauge-grad)"
+                stroke-width="8"
+                stroke-dasharray="175.9"
+                [attr.stroke-dashoffset]="gaugeOffset"
+                stroke-linecap="round"
+                transform="rotate(-90 36 36)"
+                style="transition: stroke-dashoffset 1.2s cubic-bezier(.16,1,.3,1)"/>
+        <defs>
+          <linearGradient id="gauge-grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="var(--wz-color-primary)"/>
+            <stop offset="1" stop-color="#3DD6BC"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="gauge-label">
+        <span class="gauge-num">{{ healthScore.score }}</span>
+        <span class="gauge-denom">/ 100</span>
+      </div>
+    </div>
+
+    <div class="health-info">
+      <p class="health-title">{{ healthScore.label }}</p>
+      <p class="health-sub">
+        +{{ healthScore.delta }} pts this month ·
+        {{ healthScore.tipsCount }} tips to reach Excellent
+      </p>
+      <span class="health-chip">View Breakdown →</span>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- STAT SWIPER                                         -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="section-row wz-stagger-3">
+    <span class="section-label">Overview</span>
+  </div>
+
+  <div class="stat-scroll wz-stagger-3" role="list" aria-label="Financial overview">
+    <ng-container *ngIf="isLoading">
+      <div *ngFor="let s of [1,2,3,4]" class="stat-card stat-card--skeleton">
+        <ion-skeleton-text animated style="height:30px;width:30px;border-radius:10px;margin-bottom:10px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="height:10px;width:60%;margin-bottom:6px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="height:20px;width:80%;"></ion-skeleton-text>
+      </div>
+    </ng-container>
+
+    <div *ngFor="let card of statCards"
+         class="stat-card"
+         [class.stat-card--teal]="card.variant === 'teal'"
+         [class.stat-card--copper]="card.variant === 'copper'"
+         role="listitem">
+      <div class="stat-icon" [class]="'stat-icon--' + card.variant" aria-hidden="true">
+        <ion-icon [name]="card.icon"></ion-icon>
+      </div>
+      <p class="stat-label">{{ card.label }}</p>
+      <p class="stat-value">
+        {{ card.label === 'Daily P&L' && card.value > 0 ? '+' : '' }}{{ card.value | currency:'USD':'symbol':'1.0-0' }}
+      </p>
+      <p class="stat-change" [class.positive]="card.change >= 0" [class.negative]="card.change < 0">
+        {{ card.change >= 0 ? '▲' : '▼' }} {{ card.change | number:'1.1-1' }}%
+      </p>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- AI INSIGHT BUBBLE                                   -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="ai-bubble-wrap wz-stagger-4" *ngIf="!isLoading && aiInsight">
+    <div class="ai-bubble">
+      <div class="ai-avatar" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="3" fill="var(--wz-text-on-primary)"/>
+          <path d="M12 5v2M12 17v2M5 12H3M21 12h-2M7.05 7.05L5.64 5.64M18.36 18.36l-1.41-1.41M7.05 16.95l-1.41 1.41M18.36 5.64l-1.41 1.41"
+                stroke="var(--wz-text-on-primary)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="ai-dot" aria-hidden="true"></span>
+      </div>
+      <div class="ai-body">
+        <p class="ai-tag">AI Insight</p>
+        <p class="ai-message">{{ aiInsight }}</p>
+        <button class="ai-cta" (click)="navigateTo('/tabs/budgets')">
+          Adjust Budget →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- BUDGET SNAPSHOT                                     -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="section-row wz-stagger-4">
+    <span class="section-label">Budget Snapshot</span>
+    <button class="section-link" (click)="navigateTo('/tabs/budgets')">Manage →</button>
+  </div>
+
+  <div class="budget-card wz-stagger-4" *ngIf="!isLoading">
+    <div class="budget-card__header">
+      <span class="budget-card__title">{{ netWorth.updatedAt | date:'MMMM y' }}</span>
+      <span class="budget-card__badge">{{ budgetsOnTrack }} of {{ budgets.length }} on track</span>
+    </div>
+
+    <div class="budget-list" role="list">
+      <div *ngFor="let cat of budgets" class="budget-row" role="listitem">
+        <div class="budget-row__top">
+          <span class="budget-cat-name">{{ cat.emoji }} {{ cat.name }}</span>
+          <span class="budget-amounts">
+            {{ cat.spent | currency:'USD':'symbol':'1.0-0' }} /
+            {{ cat.limit | currency:'USD':'symbol':'1.0-0' }}
+          </span>
+        </div>
+        <div class="budget-track" role="progressbar"
+             [attr.aria-valuenow]="budgetFillPct(cat)"
+             [attr.aria-valuemax]="100"
+             [attr.aria-label]="cat.name + ' budget'">
+          <div class="budget-fill"
+               [class.budget-fill--ok]="cat.status === 'ok'"
+               [class.budget-fill--warning]="cat.status === 'warning'"
+               [class.budget-fill--over]="cat.status === 'over'"
+               [style.width.%]="budgetFillPct(cat)">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="budget-total">
+      <span class="budget-total__label">Total Spent</span>
+      <span class="budget-total__value">
+        {{ budgetTotalSpent | currency:'USD':'symbol':'1.0-0' }}
+        <span class="budget-total__limit">of {{ budgetTotalLimit | currency:'USD':'symbol':'1.0-0' }}</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- TOP ASSETS (preview — max 3)                        -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="section-row wz-stagger-5">
+    <span class="section-label">Top Assets</span>
+    <button class="section-link" (click)="navigateTo('/tabs/portfolio')">Portfolio →</button>
+  </div>
+
+  <div class="card-list wz-stagger-5" role="list" aria-label="Top assets">
+    <div *ngFor="let asset of topAssets"
+         class="asset-row"
+         (click)="navigateTo('/tabs/portfolio')"
+         role="listitem" tabindex="0">
+      <div class="asset-icon" [class]="'asset-icon--' + asset.symbol.toLowerCase()" aria-hidden="true">
+        {{ asset.symbol }}
+      </div>
+      <div class="asset-info">
+        <p class="asset-name">{{ asset.name }}</p>
+        <p class="asset-meta">{{ asset.symbol }} · {{ asset.type }}</p>
+      </div>
+      <div class="asset-right">
+        <p class="asset-value">{{ asset.value | currency:'USD':'symbol':'1.0-0' }}</p>
+        <p class="asset-change" [class.positive]="asset.changePct >= 0" [class.negative]="asset.changePct < 0">
+          {{ asset.changePct >= 0 ? '▲' : '▼' }} {{ asset.changePct | number:'1.1-1' }}%
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- RECENT TRANSACTIONS (preview — max 3)               -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="section-row wz-stagger-6">
+    <span class="section-label">Recent Transactions</span>
+    <button class="section-link" (click)="navigateTo('/tabs/transactions')">All →</button>
+  </div>
+
+  <div class="card-list card-list--last wz-stagger-6" role="list" aria-label="Recent transactions">
+    <div *ngFor="let txn of recentTxns"
+         class="txn-row"
+         (click)="navigateTo('/tabs/transactions')"
+         role="listitem" tabindex="0">
+      <div class="txn-icon"
+           [class.txn-icon--expense]="txn.amount < 0"
+           [class.txn-icon--income]="txn.amount >= 0"
+           aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path *ngIf="txn.amount < 0" d="M18 6L6 18M6 6l12 12"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path *ngIf="txn.amount >= 0" d="M12 19V5M5 12l7-7 7 7"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="txn-info">
+        <p class="txn-name">{{ txn.name }}</p>
+        <p class="txn-meta">{{ txn.category }} · {{ txn.date | date:'MMM d' }}</p>
+      </div>
+      <p class="txn-amount"
+         [class.positive]="txn.amount >= 0"
+         [class.negative]="txn.amount < 0">
+        {{ txn.amount >= 0 ? '+' : '' }}{{ txn.amount | currency:'USD':'symbol':'1.2-2' }}
+      </p>
+    </div>
+  </div>
+
+</ion-content>

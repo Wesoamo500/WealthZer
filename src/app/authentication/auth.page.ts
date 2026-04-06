@@ -211,7 +211,9 @@ export class AuthPage implements OnInit, OnDestroy {
       }
     } catch (err: any) {
       console.error('Login error', err);
-      this.showToast(err.error?.message || 'Login failed. Please check your credentials.');
+      // Better error message extraction (NestJS usually returns {message, error, statusCode})
+      const errMsg = err?.message || (typeof err === 'string' ? err : 'Login failed. Please check your credentials.');
+      this.showToast(errMsg);
     } finally {
       this.isLoading = false;
     }
@@ -279,7 +281,8 @@ export class AuthPage implements OnInit, OnDestroy {
       this.view = 'login';
     } catch (err: any) {
       console.error('Register error', err);
-      this.showToast(err.error?.message || 'Registration failed. Please try again.');
+      const errMsg = err?.message || (typeof err === 'string' ? err : 'Registration failed. Please try again.');
+      this.showToast(errMsg);
     } finally {
       this.isLoading = false;
     }
@@ -337,7 +340,8 @@ export class AuthPage implements OnInit, OnDestroy {
       await this.navigateToDashboard();
     } catch (err: any) {
       console.error('OTP Verification failed', err);
-      this.showToast(err.error?.message || 'Invalid code. Please try again.');
+      const errMsg = err?.message || (typeof err === 'string' ? err : 'Invalid code. Please try again.');
+      this.showToast(errMsg);
       this.otpValues = ['', '', '', '', '', ''];
       this.focusOtpBox(0);
     } finally {
@@ -408,7 +412,7 @@ export class AuthPage implements OnInit, OnDestroy {
   }
 
   private navigateToDashboard(): Promise<boolean> {
-    return this.router.navigate(['/tabs/home'], { replaceUrl: true });
+    return this.router.navigate(['/tabs/dashboard'], { replaceUrl: true });
   }
 
   private simulateAsync(ms: number): Promise<void> {
