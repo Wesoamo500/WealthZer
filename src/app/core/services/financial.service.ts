@@ -25,6 +25,8 @@ export interface PortfolioAsset {
   purchaseValue?: number;
   gainLoss?: number;
   gainLossPercent?: number;
+  allocationPct?: number; // Added
+  color?: string; // Added (to be mapped in frontend based on type/symbol)
 }
 
 export interface Budget {
@@ -65,10 +67,16 @@ export class FinancialService {
     dailyChange: number;
     dailyChangePercent: number;
     budgets: any[];
+    assets: PortfolioAsset[];
+    allocations: { type: string; value: number; percentage: number }[];
     currency: string; 
     updatedAt?: string;
   }> {
     return this.apiService.get<any>('financial/net-worth');
+  }
+
+  getHistoricalNetWorth(period: string): Observable<any[]> {
+    return this.apiService.get<any[]>(`financial/historical-net-worth?period=${period}`);
   }
 
   getBudgets(): Observable<Budget[]> {

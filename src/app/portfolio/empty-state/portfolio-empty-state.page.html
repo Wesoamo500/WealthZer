@@ -1,0 +1,219 @@
+<!-- ========================================================
+  portfolio-empty-state.component.html
+  Renders one of 4 empty state variants based on [variant]
+  ======================================================== -->
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- VARIANT 1: no-assets — brand new user                   -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div *ngIf="variant === 'no-assets'" class="es-wrap es-wrap--full" role="status">
+
+  <!-- SVG Illustration: ghost chart + donut ring with plus -->
+  <div class="es-illustration" aria-hidden="true">
+    <svg width="180" height="160" viewBox="0 0 180 160" fill="none">
+      <!-- Ghost bar chart -->
+      <rect x="22" y="100" width="136" height="8" rx="4" class="es-svg-muted"/>
+      <rect x="34"  y="90" width="20" height="18" rx="6" class="es-svg-muted"/>
+      <rect x="62"  y="70" width="20" height="38" rx="6" class="es-svg-muted"/>
+      <rect x="90"  y="80" width="20" height="28" rx="6" class="es-svg-muted"/>
+      <rect x="118" y="58" width="20" height="50" rx="6" class="es-svg-muted"/>
+      <!-- Donut ghost ring -->
+      <circle cx="90" cy="52" r="32" fill="none" stroke-width="12"
+              class="es-svg-ring"/>
+      <!-- Plus in donut centre -->
+      <circle cx="90" cy="52" r="14" class="es-svg-centre"/>
+      <path d="M90 46v12M84 52h12" stroke-width="2.2"
+            stroke-linecap="round" class="es-svg-plus"/>
+      <!-- Accent sparkles -->
+      <circle cx="142" cy="28" r="4.5" class="es-svg-spark-copper"/>
+      <circle cx="38"  cy="34" r="3.5" class="es-svg-spark-teal"/>
+      <circle cx="158" cy="78" r="3"   class="es-svg-spark-accent"/>
+    </svg>
+  </div>
+
+  <h2 class="es-title">Your portfolio awaits</h2>
+  <p class="es-subtitle">
+    Add your first asset to start tracking performance,
+    allocation, and real-time returns.
+  </p>
+
+  <button class="es-cta es-cta--primary"
+          (click)="addAsset.emit()"
+          aria-label="Add first asset">
+    <ion-icon name="add-outline"></ion-icon>
+    Add First Asset
+  </button>
+
+  <button class="es-cta es-cta--secondary"
+          (click)="importExchange.emit()">
+    Import from Exchange
+  </button>
+
+  <!-- Pro tip card -->
+  <div class="tip-card" role="note">
+    <div class="tip-card__icon" aria-hidden="true">💡</div>
+    <div class="tip-card__body">
+      <p class="tip-card__title">Pro tip</p>
+      <p class="tip-card__text">
+        Connect your exchange account to auto-sync all holdings in seconds.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- VARIANT 2: filter-empty — active filter yields nothing  -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div *ngIf="variant === 'filter-empty'" class="es-wrap" role="status">
+
+  <!-- Icon -->
+  <div class="es-icon-box" aria-hidden="true">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+      <path d="M3 6h18M7 12h10M11 18h2"
+            stroke="var(--wz-color-primary)"
+            stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <h2 class="es-title es-title--sm">
+    No {{ filterLabel }} in your portfolio
+  </h2>
+  <p class="es-subtitle">
+    You don't hold any {{ filterLabel }} assets yet.
+    Add one or switch to a different filter.
+  </p>
+
+  <div class="es-action-row">
+    <button class="es-cta es-cta--primary es-cta--sm"
+            (click)="addFilteredAsset.emit(filterLabel)">
+      <ion-icon name="add-outline"></ion-icon>
+      Add {{ filterLabel }}
+    </button>
+    <button class="es-cta es-cta--secondary es-cta--sm"
+            (click)="clearFilter.emit()">
+      View All Assets
+    </button>
+  </div>
+
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- VARIANT 3: search-empty — search query yields nothing   -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div *ngIf="variant === 'search-empty'" class="es-wrap" role="status">
+
+  <!-- Magnifier SVG illustration -->
+  <div class="es-illustration" aria-hidden="true">
+    <svg width="120" height="110" viewBox="0 0 120 110" fill="none">
+      <circle cx="50" cy="46" r="30" class="es-svg-muted"/>
+      <circle cx="50" cy="46" r="22" class="es-svg-ring"/>
+      <text x="50" y="52" text-anchor="middle"
+            font-family="Outfit, sans-serif"
+            font-size="16" font-weight="700"
+            class="es-svg-text">?</text>
+      <path d="M72 68l18 18"
+            stroke="var(--wz-border-strong)"
+            stroke-width="6" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <h2 class="es-title es-title--sm">No results for "{{ searchQuery }}"</h2>
+  <p class="es-subtitle">
+    You don't hold any assets matching this symbol.
+    Try a different name or add it to your portfolio.
+  </p>
+
+  <!-- Suggestion chips -->
+  <div class="suggestion-chips" *ngIf="suggestions.length > 0"
+       role="group" aria-label="Suggested assets">
+    <button *ngFor="let s of suggestions"
+            class="suggestion-chip"
+            (click)="tapSuggestion.emit(s)">
+      {{ s }}
+    </button>
+    <button class="es-cta es-cta--primary es-cta--sm"
+            (click)="addSearchedAsset.emit(searchQuery)">
+      <ion-icon name="add-outline"></ion-icon>
+      Add {{ searchQuery }}
+    </button>
+  </div>
+
+  <button class="es-cta es-cta--secondary"
+          (click)="clearSearch.emit()">
+    Clear Search
+  </button>
+
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- VARIANT 4: load-error — network / API failure           -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div *ngIf="variant === 'load-error' || variant === 'offline'"
+     class="es-wrap es-wrap--error" role="alert">
+
+  <!-- Error badge -->
+  <span class="error-badge"
+        [class.error-badge--offline]="variant === 'offline'">
+    {{ variant === 'offline' ? '● OFFLINE' : '● CONNECTION ERROR' }}
+  </span>
+
+  <!-- Error SVG illustration -->
+  <div class="es-illustration" aria-hidden="true">
+    <svg width="120" height="110" viewBox="0 0 120 110" fill="none">
+      <circle cx="60" cy="52" r="36" class="es-svg-error-bg"/>
+      <circle cx="60" cy="52" r="36" fill="none"
+              stroke="var(--wz-color-error)" stroke-width="1"
+              opacity="0.2"/>
+      <!-- Wifi arcs -->
+      <path d="M41 57c5.2-5.2 12.4-8.4 19.5-8.4s14.3 3.2 19.5 8.4"
+            stroke="var(--wz-color-error)" stroke-width="2.2"
+            stroke-linecap="round" opacity="0.35"/>
+      <path d="M46 62c3.8-3.8 9-6.2 14-6.2s10.2 2.4 14 6.2"
+            stroke="var(--wz-color-error)" stroke-width="2.2"
+            stroke-linecap="round" opacity="0.55"/>
+      <circle cx="60" cy="70" r="3.5" fill="var(--wz-color-error)" opacity="0.65"/>
+      <!-- X mark top -->
+      <path d="M52 32l16 16M68 32L52 48"
+            stroke="var(--wz-color-error)"
+            stroke-width="2.8" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <h2 class="es-title es-title--sm es-title--error">
+    {{ variant === 'offline' ? 'You\'re offline' : 'Couldn\'t load portfolio' }}
+  </h2>
+
+  <p class="es-subtitle">
+    <ng-container *ngIf="variant === 'offline'">
+      No internet connection. We'll show your last saved data.
+    </ng-container>
+    <ng-container *ngIf="variant === 'load-error'">
+      We couldn't fetch your portfolio data. Check your connection and try again.
+    </ng-container>
+  </p>
+
+  <!-- Error detail pill -->
+  <div class="error-detail" *ngIf="errorMessage || lastSynced">
+    <span *ngIf="errorMessage">{{ errorMessage }}</span>
+    <span *ngIf="errorMessage && lastSynced"> · </span>
+    <span *ngIf="lastSynced">Last synced {{ lastSynced }}</span>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="error-actions">
+    <button class="es-cta es-cta--primary es-cta--full"
+            (click)="retry.emit()">
+      <ion-icon name="refresh-outline"></ion-icon>
+      Try Again
+    </button>
+    <button class="es-cta es-cta--secondary es-cta--full"
+            (click)="viewCached.emit()">
+      View Cached Data
+    </button>
+  </div>
+
+</div>

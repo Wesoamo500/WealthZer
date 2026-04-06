@@ -1,174 +1,171 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar color="background">
-    <ion-buttons slot="start">
-      <ion-back-button text="" icon="chevron-back" defaultHref="/tabs/home"></ion-back-button>
-    </ion-buttons>
-    <ion-title class="ion-text-center">
-      <div class="advisor-title">
-        <ion-icon name="hardware-chip-outline" color="primary"></ion-icon>
-        <span>WealthZer AI</span>
-      </div>
-      <span class="subtitle"><span class="status-dot"></span> ONLINE</span>
-    </ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="clearChat()" color="medium">
-        <ion-icon name="trash"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" [scrollY]="false" class="advisor-content">
 
-<ion-content [fullscreen]="true" class="ion-padding" #content>
-  
+  <div class="advisor-layout">
 
-  <div class="chat-list">
-    <!-- Skeleton Loading State -->
-    <ng-container *ngIf="isLoading">
-      <div class="message-wrapper ai">
-        <div class="avatar">
-          <ion-skeleton-text animated style="width: 100%; height: 100%; border-radius: 50%;"></ion-skeleton-text>
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- HEADER                                            -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <div class="adv-header">
+      <button class="icon-btn" aria-label="Go back" routerLink="/tabs/dashboard">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+
+      <div class="adv-avatar-wrap" aria-hidden="true">
+        <div class="adv-avatar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="3" fill="var(--wz-text-on-primary)"/>
+            <path d="M12 5v2M12 17v2M5 12H3M21 12h-2M7.05 7.05L5.64 5.64M18.36 18.36l-1.41-1.41M7.05 16.95l-1.41 1.41M18.36 5.64l-1.41 1.41"
+                  stroke="var(--wz-text-on-primary)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
         </div>
-        <div class="message-content">
-          <div class="message-bubble skeleton">
-            <ion-skeleton-text animated style="width: 180px; height: 16px; margin-bottom: 8px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 120px; height: 16px;"></ion-skeleton-text>
-          </div>
-        </div>
+        <span class="adv-status-dot"
+              [class.adv-status-dot--thinking]="isAiTyping"
+              aria-hidden="true">
+        </span>
       </div>
 
-      <div class="message-wrapper user">
-        <div class="message-bubble skeleton">
-          <ion-skeleton-text animated style="width: 140px; height: 16px;"></ion-skeleton-text>
-        </div>
+      <div class="adv-info">
+        <p class="adv-name">Zara — AI Advisor</p>
+        <p class="adv-sub">
+          <span *ngIf="!isAiTyping">Online · Powered by WealthZer AI</span>
+          <span *ngIf="isAiTyping" class="adv-typing-lbl">Thinking...</span>
+        </p>
       </div>
 
-      <div class="message-wrapper ai">
-        <div class="avatar">
-          <ion-skeleton-text animated style="width: 100%; height: 100%; border-radius: 50%;"></ion-skeleton-text>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- CHAT BODY                                         -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <div class="chat-body" role="log" aria-live="polite" aria-label="Conversation with Zara">
+
+      <!-- Date groups -->
+      <ng-container *ngFor="let group of dateGroups; trackBy: trackByGroupDate">
+
+        <!-- Date separator -->
+        <div class="date-separator" aria-label="Messages from {{ group.label }}">
+          <span class="date-sep-line" aria-hidden="true"></span>
+          <span class="date-sep-text">{{ group.label | uppercase }}</span>
+          <span class="date-sep-line" aria-hidden="true"></span>
         </div>
-        <div class="message-content">
-          <div class="message-bubble skeleton">
-            <ion-skeleton-text animated style="width: 200px; height: 16px; margin-bottom: 8px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 160px; height: 16px; margin-bottom: 8px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 100px; height: 16px;"></ion-skeleton-text>
-          </div>
-        </div>
-      </div>
-    </ng-container>
 
-    <!-- Welcome State -->
-    <ng-container *ngIf="isChatEmpty">
-      <div class="welcome-state">
-        <div class="robot-icon">
-           <ion-icon name="logo-reddit" color="primary"></ion-icon>
-        </div>
-        <h2>Hello! I'm WealthZer AI.</h2>
-        <p>Ask me anything about your budgets, investments, or how to save more.</p>
+        <!-- Messages in group -->
+        <ng-container *ngFor="let msg of group.messages; trackBy: trackByMsgId">
 
-        <div class="suggestions-container">
-          <span class="suggestions-label">SUGGESTED QUESTIONS</span>
-          
-          <div class="suggestion-card" (click)="selectSuggestedQuestion('How can I save $500 this month?')">
-            <div class="sugg-icon text-center">
-              <ion-icon name="wallet"></ion-icon>
-            </div>
-            <div class="sugg-text">
-              <span>How can I save $500 this month?</span>
-            </div>
-            <ion-icon name="chevron-forward" class="sugg-chevron"></ion-icon>
-          </div>
+          <!-- ── AI message (assistant) ── -->
+          <div *ngIf="msg.role === 'assistant'"
+               class="msg-row msg-row--ai"
+               [class.msg-row--thinking]="msg.isThinking">
 
-          <div class="suggestion-card" (click)="selectSuggestedQuestion('Analyze my portfolio risk.')">
-            <div class="sugg-icon text-center">
-              <ion-icon name="bar-chart"></ion-icon>
+            <!-- AI avatar -->
+            <div class="ai-avatar-sm" aria-hidden="true">
+              <ion-icon name="sparkles-outline" style="font-size:12px;color:var(--wz-text-on-primary);"></ion-icon>
             </div>
-            <div class="sugg-text">
-              <span>Analyze my portfolio risk.</span>
-            </div>
-            <ion-icon name="chevron-forward" class="sugg-chevron"></ion-icon>
-          </div>
 
-          <div class="suggestion-card" (click)="selectSuggestedQuestion('Where did I spend the most last week?')">
-            <div class="sugg-icon text-center">
-              <ion-icon name="receipt"></ion-icon>
+            <div class="msg-col">
+              <!-- Thinking dots -->
+              <div *ngIf="msg.isThinking" class="ai-bubble ai-bubble--thinking" role="status" aria-label="Zara is thinking">
+                <span class="think-dot"></span>
+                <span class="think-dot"></span>
+                <span class="think-dot"></span>
+              </div>
+
+              <!-- Real AI content -->
+              <div *ngIf="!msg.isThinking" class="ai-bubble">
+                <!-- Markdown-parsed content -->
+                <div class="msg-text"
+                     [innerHTML]="parseMd(msg.content)"
+                     aria-label="{{ msg.content }}">
+                </div>
+                <time class="msg-time"
+                      [attr.datetime]="msg.timestamp.toISOString()">
+                  {{ msg.timestamp | date:'h:mm a' }}
+                </time>
+              </div>
             </div>
-            <div class="sugg-text">
-              <span>Where did I spend the most last week?</span>
-            </div>
-            <ion-icon name="chevron-forward" class="sugg-chevron"></ion-icon>
           </div>
 
-        </div>
-      </div>
-    </ng-container>
-
-    <!-- Real Messages -->
-    <ng-container *ngIf="!isChatEmpty && !isLoading">
-      
-      <ng-container *ngFor="let msg of messages; let i = index">
-        
-        <!-- Dynamic Date Divider -->
-        <div class="date-divider" *ngIf="showDateDivider(msg, i)">
-          <span class="date-chip">{{ getDateLabel(msg.createdAt) }}</span>
-        </div>
-        
-        <!-- User Message -->
-        <div class="message-wrapper user" *ngIf="msg.sender === 'user'">
-          <div class="message-content">
-            <div class="message-bubble user-bubble">
-              <span class="msg-text">{{ msg.text }}</span>
-              <span class="msg-time">{{ msg.time }}</span>
+          <!-- ── User message ── -->
+          <div *ngIf="msg.role === 'user'"
+               class="msg-row msg-row--user">
+            <div class="user-bubble">
+              <div class="msg-text">{{ msg.content }}</div>
+              <time class="msg-time msg-time--user"
+                    [attr.datetime]="msg.timestamp.toISOString()">
+                {{ msg.timestamp | date:'h:mm a' }}
+                <span *ngIf="msg.status === 'sending'" class="msg-sending">·</span>
+                <ion-icon *ngIf="msg.status === 'sent'"
+                          name="checkmark-done-outline"
+                          style="font-size:12px;vertical-align:middle;">
+                </ion-icon>
+              </time>
             </div>
           </div>
-        </div>
 
-        <!-- AI Message -->
-        <div class="message-wrapper ai" *ngIf="msg.sender === 'ai'">
-          <div class="message-content">
-            <div class="message-bubble ai-bubble" [class.loading-bubble]="msg['isLoading']">
-              <span class="msg-text" [innerHTML]="msg.text"></span>
-              <span class="msg-time" *ngIf="!msg['isLoading']">{{ msg.time }}</span>
-            </div>
-          </div>
-        </div>
-
+        </ng-container>
       </ng-container>
-    </ng-container>
-  </div>
+
+      <!-- Invisible scroll anchor -->
+      <div #chatEnd class="chat-end-anchor" aria-hidden="true"></div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- SMART REPLY CHIPS                                 -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <div class="smart-replies"
+         role="group"
+         aria-label="Suggested replies">
+      <button
+        *ngFor="let reply of smartReplies"
+        class="smart-chip"
+        (click)="onSmartReply(reply)"
+        [disabled]="isAiTyping">
+        {{ reply.label }}
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- INPUT BAR                                         -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <div class="input-bar">
+
+      <!-- Voice button -->
+      <button class="voice-btn"
+              [class.voice-btn--listening]="isListening"
+              (click)="onVoiceInput()"
+              [attr.aria-label]="isListening ? 'Stop listening' : 'Start voice input'"
+              [attr.aria-pressed]="isListening">
+        <ion-icon name="mic-outline"
+                  [class.voice-icon--active]="isListening">
+        </ion-icon>
+      </button>
+
+      <!-- Text input -->
+      <div class="input-wrap"
+           [class.input-wrap--focused]="inputText.length > 0">
+        <textarea
+          #inputEl
+          class="chat-input"
+          [value]="inputText"
+          (input)="onInputChange($any($event.target).value)"
+          placeholder="Ask Zara anything about your finances..."
+          rows="1"
+          autocomplete="off"
+          aria-label="Message input">
+        </textarea>
+      </div>
+
+      <!-- Send button -->
+      <button class="send-btn"
+              [class.send-btn--active]="canSend()"
+              (click)="onSend()"
+              [disabled]="!canSend() || isAiTyping"
+              aria-label="Send message">
+        <ion-icon name="send-outline"></ion-icon>
+      </button>
+
+    </div><!-- /.input-bar -->
+
+  </div><!-- /.advisor-layout -->
 
 </ion-content>
-
-<ion-footer class="ion-no-border">
-  <div class="perfect-pill-footer">
-    <!-- Listening indicator bar -->
-    <div class="listening-bar" *ngIf="isListening">
-      <div class="pulse-dots">
-        <span></span><span></span><span></span>
-      </div>
-      <span class="listening-text">Listening...</span>
-    </div>
-
-    <div class="input-pill" [class.is-recording]="isListening">
-      <ion-icon 
-        [name]="isListening ? 'mic' : 'mic-outline'" 
-        class="mic-prefix" 
-        [class.mic-active]="isListening"
-        (click)="toggleVoice()"
-      ></ion-icon>
-      
-      <ion-input 
-        placeholder="{{ isListening ? 'Speak now...' : 'Ask WealthZer anything...' }}" 
-        [(ngModel)]="newMessage"
-        (keyup.enter)="sendMessage()"
-        class="chat-input"
-        mode="md"
-      ></ion-input>
-
-      <div class="send-action" (click)="isListening ? toggleVoice() : sendMessage()">
-        <div class="send-circle" [class.stop-circle]="isListening">
-          <ion-icon [name]="isListening ? 'stop' : 'send'" class="send-icon-gold"></ion-icon>
-        </div>
-      </div>
-    </div>
-  </div>
-</ion-footer>

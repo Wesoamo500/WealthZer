@@ -31,6 +31,10 @@ export class AuthService {
   public currentUser = this.currentUserSubject.asObservable();
   public isAuthenticated = this.currentUser.pipe(map(user => !!user));
 
+  get currentUserValue(): User | null {
+    return this.currentUserSubject.value;
+  }
+
   constructor(
     private apiService: ApiService,
     private storageService: StorageService,

@@ -1,92 +1,204 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar color="background">
-    <ion-title>Portfolio</ion-title>
-    <ion-buttons slot="end">
-      <ion-button>
-        <ion-icon name="eye-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="portfolio-content" scrollY="true">
 
-<ion-content [fullscreen]="true">
-  <div class="main-container">
-    <div class="balance-card">
-      <p class="balance-label">Total Balance</p>
-      <h1 *ngIf="!isLoading" class="balance-amount">{{ (totalBalance * exchangeRate) | currency:displayCurrency }}</h1>
-      <ion-skeleton-text *ngIf="isLoading" animated style="width: 60%; height: 36px; margin: 8px 0;"></ion-skeleton-text>
-    </div>
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content refreshingSpinner="crescent"></ion-refresher-content>
+  </ion-refresher>
 
-    <!-- Loading State for Assets -->
-    <div class="assets-section" *ngIf="isLoading">
-      <div class="section-header">
-        <ion-skeleton-text animated style="width: 30%; height: 24px;"></ion-skeleton-text>
-      </div>
-      <ion-list lines="none">
-        <ion-item *ngFor="let i of [1,2,3,4]" class="asset-item skeleton">
-          <ion-avatar slot="start">
-            <ion-skeleton-text animated></ion-skeleton-text>
-          </ion-avatar>
-          <ion-label>
-            <ion-skeleton-text animated style="width: 50%; height: 16px; margin-bottom: 8px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 30%; height: 12px;"></ion-skeleton-text>
-          </ion-label>
-          <div slot="end" style="width: 60px;">
-            <ion-skeleton-text animated style="width: 100%; height: 16px; margin-bottom: 8px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 60%; float: right; height: 12px;"></ion-skeleton-text>
-          </div>
-        </ion-item>
-      </ion-list>
-    </div>
-
-    <!-- Active Assets -->
-    <div class="assets-section" *ngIf="!isLoading && assets.length > 0">
-      <div class="section-header">
-        <h2>Your Assets</h2>
-        <ion-button fill="clear" color="primary" (click)="openAddAsset()">
-          <ion-icon name="add" slot="start"></ion-icon>
-          Add
-        </ion-button>
-      </div>
-
-      <ion-list lines="none">
-        <ion-item *ngFor="let asset of assets" class="asset-item">
-          <div class="icon-box" [style.background]="getBgForAsset(asset.type)" slot="start">
-            <ion-icon [name]="getIconForAsset(asset.type)" [style.color]="getColorForAsset(asset.type)"></ion-icon>
-          </div>
-          <ion-label>
-            <h3>{{ asset.name }}</h3>
-            <p>{{ asset.amount }} {{ asset.symbol }} • Buy: {{ (asset.purchasePrice * exchangeRate) | currency:displayCurrency }}</p>
-          </ion-label>
-          <div class="value" slot="end">
-            <h3>{{ ((asset.currentValue || asset.purchasePrice || 0) * exchangeRate) | currency:displayCurrency }}</h3>
-            <p [class.positive]="asset.gainLossPercent && asset.gainLossPercent > 0" [class.negative]="asset.gainLossPercent && asset.gainLossPercent < 0">
-              {{ asset.gainLossPercent ? (asset.gainLossPercent > 0 ? '+' : '') + asset.gainLossPercent.toFixed(2) + '%' : '+0.00%' }}
-            </p>
-          </div>
-        </ion-item>
-      </ion-list>
-    </div>
-
-    <!-- Empty State -->
-    <div class="empty-state-wrapper" *ngIf="!isLoading && assets.length === 0">
-      <div class="empty-state-content">
-        <div class="asset-icon-container">
-          <div class="cube-shape">
-            <div class="cube-face top"></div>
-            <div class="cube-face front"></div>
-            <div class="diag-line"></div>
-          </div>
-        </div>
-        
-        <h2 class="empty-title">No assets found</h2>
-        <p class="empty-subtitle">Start building your wealth by adding your first investment or savings account.</p>
-        
-        <ion-button class="add-asset-btn" (click)="openAddAsset()">
-          <ion-icon name="wallet-outline" slot="start"></ion-icon>
-          Add Asset
-        </ion-button>
-      </div>
+  <!-- HEADER -->
+  <div class="port-header wz-stagger-1">
+    <h1 class="port-title">Portfolio</h1>
+    <div class="period-row" role="group">
+      <button *ngFor="let p of periods" class="period-btn"
+              [class.period-btn--active]="activePeriod === p"
+              (click)="onPeriodChange(p)">{{ p }}</button>
     </div>
   </div>
+
+  <!-- SKELETON -->
+  <ng-container *ngIf="isLoading">
+    <div class="summary-row">
+      <div *ngFor="let s of [1,2,3]" class="summary-item">
+        <ion-skeleton-text animated style="height:10px;width:56px;border-radius:4px;margin-bottom:4px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="height:22px;width:80px;border-radius:6px;"></ion-skeleton-text>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center;padding:20px 0;">
+      <ion-skeleton-text animated style="width:200px;height:200px;border-radius:50%;"></ion-skeleton-text>
+    </div>
+    <div style="padding:0 16px;display:flex;flex-direction:column;gap:8px;">
+      <ion-skeleton-text *ngFor="let s of [1,2,3,4]" animated style="height:68px;border-radius:16px;"></ion-skeleton-text>
+    </div>
+  </ng-container>
+
+  <!-- EMPTY STATES -->
+  <ng-container *ngIf="!isLoading && showEmptyState">
+
+    <!-- State 1: No assets at all -->
+    <app-portfolio-empty-state *ngIf="isNoAssets" variant="no-assets"
+      (addAsset)="onAddAsset()" (importExchange)="onImportExchange()">
+    </app-portfolio-empty-state>
+
+    <!-- State 2: Filter has no matches (still show summary + donut dimmed + chips) -->
+    <ng-container *ngIf="isFilterEmpty">
+      <div class="summary-row wz-stagger-1">
+        <div class="summary-item">
+          <span class="summary-label">Total Value</span>
+          <span class="summary-value">{{ summary?.totalValue | currency:displayCurrency():'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="summary-item summary-item--center">
+          <span class="summary-label">Return</span>
+          <span class="summary-value positive">+{{ summary?.totalReturn | number:'1.1-1' }}%</span>
+        </div>
+        <div class="summary-item summary-item--right">
+          <span class="summary-label">Daily P&amp;L</span>
+          <span class="summary-value positive">+{{ summary?.dailyPnl | currency:displayCurrency():'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+      <div class="donut-section wz-stagger-2" style="opacity:.45;">
+        <div class="donut-wrap">
+          <svg width="200" height="200" viewBox="0 0 200 200" aria-hidden="true">
+            <circle cx="100" cy="100" r="70" fill="none" stroke="var(--wz-border-subtle)" stroke-width="28"/>
+            <circle *ngFor="let seg of donutSegments" cx="100" cy="100" r="70" fill="none"
+                    [attr.stroke]="seg.color" stroke-width="28"
+                    [attr.stroke-dasharray]="seg.dash + ' ' + CIRCUMFERENCE"
+                    [attr.stroke-dashoffset]="seg.offset"
+                    transform="rotate(-90 100 100)"/>
+          </svg>
+          <div class="donut-center">
+            <span class="donut-value">{{ filterLabel }}</span>
+            <span class="donut-label">No results</span>
+          </div>
+        </div>
+      </div>
+      <div class="filter-chips wz-stagger-3">
+        <button *ngFor="let tab of filterTabs" class="filter-chip"
+                [class.filter-chip--active]="activeFilter() === tab.value"
+                (click)="onFilterChange(tab.value)">{{ tab.label }}</button>
+      </div>
+      <app-portfolio-empty-state variant="filter-empty" [filterLabel]="filterLabel"
+        (addFilteredAsset)="onAddFilteredAsset($event)" (clearFilter)="onClearFilter()">
+      </app-portfolio-empty-state>
+    </ng-container>
+
+    <!-- State 3: Search returns nothing -->
+    <ng-container *ngIf="isSearchEmpty">
+      <div class="filter-chips wz-stagger-1" style="margin-top:12px;">
+        <button *ngFor="let tab of filterTabs" class="filter-chip"
+                [class.filter-chip--active]="activeFilter() === tab.value"
+                (click)="onFilterChange(tab.value)">{{ tab.label }}</button>
+      </div>
+      <app-portfolio-empty-state variant="search-empty" [searchQuery]="searchQuery"
+        [suggestions]="searchSuggestions"
+        (clearSearch)="onClearSearch()" (addSearchedAsset)="onAddSearchedAsset($event)"
+        (tapSuggestion)="onTapSuggestion($event)">
+      </app-portfolio-empty-state>
+    </ng-container>
+
+    <!-- State 4a: Load error -->
+    <app-portfolio-empty-state *ngIf="isLoadError" variant="load-error"
+      [errorMessage]="errorMessage" [lastSynced]="lastSynced"
+      (retry)="onRetry()" (viewCached)="onViewCached()">
+    </app-portfolio-empty-state>
+
+    <!-- State 4b: Offline -->
+    <app-portfolio-empty-state *ngIf="isOffline" variant="offline"
+      [lastSynced]="lastSynced"
+      (retry)="onRetry()" (viewCached)="onViewCached()">
+    </app-portfolio-empty-state>
+
+  </ng-container>
+
+  <!-- POPULATED STATE -->
+  <ng-container *ngIf="!isLoading && showAssetList">
+
+    <div class="summary-row wz-stagger-1">
+      <div class="summary-item">
+        <span class="summary-label">Total Value</span>
+        <span class="summary-value">{{ summary.totalValue | currency:displayCurrency():'symbol':'1.0-0' }}</span>
+        <span class="summary-change" [class.positive]="summary.dailyPnl >= 0">
+          {{ summary.dailyPnl >= 0 ? '▲' : '▼' }} {{ summary.dailyPnl | currency:displayCurrency():'symbol':'1.0-0' }} today
+        </span>
+      </div>
+      <div class="summary-item summary-item--center">
+        <span class="summary-label">Return</span>
+        <span class="summary-value positive">+{{ summary.totalReturn | number:'1.1-1' }}%</span>
+        <span class="summary-change">All time</span>
+      </div>
+      <div class="summary-item summary-item--right">
+        <span class="summary-label">Daily P&amp;L</span>
+        <span class="summary-value positive">+{{ summary.dailyPnl | currency:displayCurrency():'symbol':'1.0-0' }}</span>
+        <span class="summary-change positive">▲ {{ summary.dailyPnlPct | number:'1.2-2' }}%</span>
+      </div>
+    </div>
+
+    <div class="donut-section wz-stagger-2">
+      <div class="donut-wrap">
+        <svg width="200" height="200" viewBox="0 0 200 200" aria-hidden="true">
+          <circle cx="100" cy="100" r="70" fill="none" stroke="var(--wz-border-subtle)" stroke-width="28"/>
+          <circle *ngFor="let seg of donutSegments" cx="100" cy="100" r="70" fill="none"
+                  [attr.stroke]="seg.color" stroke-width="28"
+                  [attr.stroke-dasharray]="seg.dash + ' ' + CIRCUMFERENCE"
+                  [attr.stroke-dashoffset]="seg.offset"
+                  stroke-linecap="butt" transform="rotate(-90 100 100)"
+                  style="transition: stroke-dasharray 1s cubic-bezier(.16,1,.3,1)"/>
+          <circle *ngFor="let seg of donutSegments" cx="100" cy="100" r="70" fill="none"
+                  stroke="var(--wz-bg-base)" stroke-width="3"
+                  [attr.stroke-dasharray]="'2 ' + CIRCUMFERENCE"
+                  [attr.stroke-dashoffset]="seg.offset"
+                  transform="rotate(-90 100 100)"/>
+        </svg>
+        <div class="donut-center">
+          <span class="donut-value">{{ summary.totalValue | currency:displayCurrency():'symbol':'1.0-0' }}</span>
+          <span class="donut-label">Invested</span>
+        </div>
+      </div>
+      <div class="donut-legend">
+        <div *ngFor="let seg of allocations" class="legend-item">
+          <span class="legend-dot" [style.background]="seg.color"></span>
+          <span class="legend-name">{{ seg.label }}</span>
+          <span class="legend-value">{{ seg.value | currency:displayCurrency():'symbol':'1.0-0' }}</span>
+          <span class="legend-pct">{{ seg.pct }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-row wz-stagger-3">
+      <span class="section-label">Assets</span>
+      <button class="add-btn" (click)="onAddAsset()">
+        <ion-icon name="add-outline"></ion-icon> Add Asset
+      </button>
+    </div>
+
+    <div class="filter-chips wz-stagger-3">
+      <button *ngFor="let tab of filterTabs" class="filter-chip"
+              [class.filter-chip--active]="activeFilter() === tab.value"
+              (click)="onFilterChange(tab.value)">{{ tab.label }}</button>
+    </div>
+
+    <div class="asset-list wz-stagger-3">
+      <div *ngFor="let asset of filteredAssets(); trackBy: trackById"
+           class="asset-card" (click)="openAsset(asset)" role="button" tabindex="0">
+        <div class="asset-icon" [style.background]="asset.color + '22'" [style.color]="asset.color">
+          {{ asset.symbol.length > 4 ? asset.symbol.slice(0,4) : asset.symbol }}
+        </div>
+        <div class="asset-info">
+          <p class="asset-name">{{ asset.name }}</p>
+          <p class="asset-meta">{{ asset.symbol }} · {{ asset.type | titlecase }} · {{ asset.quantity }} {{ asset.unitLabel }}</p>
+          <div class="asset-bar-track">
+            <div class="asset-bar-fill" [style.width.%]="asset.allocationPct" [style.background]="barGradient(asset)"></div>
+          </div>
+        </div>
+        <div class="asset-right">
+          <p class="asset-value">{{ asset.value | currency:displayCurrency():'symbol':'1.0-0' }}</p>
+          <p class="asset-change" [class.positive]="asset.changePct >= 0" [class.negative]="asset.changePct < 0">
+            {{ asset.changePct >= 0 ? '▲' : '▼' }} {{ asset.changePct | number:'1.1-1' }}%
+          </p>
+          <p class="asset-alloc">{{ asset.allocationPct }}% of portfolio</p>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="asset-chevron"></ion-icon>
+      </div>
+    </div>
+
+  </ng-container>
+
 </ion-content>

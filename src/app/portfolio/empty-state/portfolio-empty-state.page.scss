@@ -1,0 +1,228 @@
+// ============================================================
+// portfolio-empty-state.component.scss
+// WealthZer · Portfolio Empty States
+// ============================================================
+@use 'src/theme/variables' as *;
+
+:host { display: block; }
+
+// ── Wrapper ───────────────────────────────────────────────────
+.es-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--wz-space-8) var(--wz-space-6) var(--wz-space-8);
+  gap: var(--wz-space-3);
+  animation: wz-fade-up var(--wz-duration-slow) var(--wz-ease-out) both;
+
+  &--full  { min-height: 460px; justify-content: center; }
+  &--error { padding-top: var(--wz-space-6); }
+}
+
+// ── SVG illustration shared classes ───────────────────────────
+// These are referenced by SVG elements via class= on SVG nodes.
+// Since SVG text nodes inherit colour, we set fill via CSS here.
+.es-svg-muted   { fill: var(--wz-color-primary-subtle); }
+.es-svg-ring    { stroke: var(--wz-border-default); fill: none; }
+.es-svg-centre  { fill: var(--wz-color-primary-subtle); }
+.es-svg-plus    { stroke: var(--wz-color-primary); }
+.es-svg-text    { fill: var(--wz-border-strong); }
+.es-svg-error-bg { fill: rgba(185, 53, 53, 0.07); }
+
+.es-svg-spark-copper { fill: rgba(200, 113, 42, 0.4); }
+.es-svg-spark-teal   { fill: rgba(13, 92, 82, 0.3); }
+.es-svg-spark-accent { fill: rgba(61, 214, 188, 0.45); }
+
+// ── Illustration container ────────────────────────────────────
+.es-illustration {
+  margin-bottom: var(--wz-space-2);
+  flex-shrink: 0;
+}
+
+// ── Icon box (filter-empty) ───────────────────────────────────
+.es-icon-box {
+  width: 68px;
+  height: 68px;
+  border-radius: 22px;
+  background: var(--wz-bg-glass);
+  border: 1.5px solid var(--wz-border-glass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--wz-space-2);
+  flex-shrink: 0;
+}
+
+// ── Title ─────────────────────────────────────────────────────
+.es-title {
+  @include font-display;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--wz-text-primary);
+  line-height: 1.15;
+
+  &--sm    { font-size: 17px; }
+  &--error { color: var(--wz-text-primary); }
+}
+
+// ── Subtitle ──────────────────────────────────────────────────
+.es-subtitle {
+  @include font-body;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--wz-text-muted);
+  max-width: 280px;
+}
+
+// ── CTA buttons ───────────────────────────────────────────────
+.es-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wz-space-2);
+  @include font-display;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: transform var(--wz-duration-fast) var(--wz-ease-spring),
+              opacity var(--wz-duration-fast) ease;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 16px; }
+  &:active { transform: scale(0.96); }
+
+  // Sizes
+  font-size: 14px;
+  padding: 13px 28px;
+  border-radius: var(--wz-radius-full);
+
+  &--sm {
+    font-size: 12px;
+    padding: 9px 18px;
+  }
+
+  &--full {
+    width: 100%;
+    border-radius: var(--wz-radius-md);
+    padding: 14px;
+  }
+
+  // Variants
+  &--primary {
+    background: var(--wz-color-primary);
+    color: var(--wz-text-on-primary);
+  }
+
+  &--secondary {
+    background: var(--wz-color-primary-subtle);
+    color: var(--wz-color-primary);
+    border: 1px solid var(--wz-color-primary-border);
+  }
+}
+
+// ── Action row (side by side) ─────────────────────────────────
+.es-action-row {
+  display: flex;
+  gap: var(--wz-space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+// ── Pro tip card ──────────────────────────────────────────────
+.tip-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--wz-space-3);
+  padding: var(--wz-space-4);
+  border-radius: var(--wz-radius-lg);
+  background: var(--wz-bg-glass-accent);
+  border: 1px solid var(--wz-color-accent-border);
+  text-align: left;
+  margin-top: var(--wz-space-2);
+  width: 100%;
+  max-width: 300px;
+}
+
+.tip-card__icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.tip-card__title {
+  @include font-display;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wz-color-accent);
+  margin-bottom: 4px;
+}
+
+.tip-card__text {
+  @include font-body;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--wz-text-muted);
+}
+
+// ── Suggestion chips (search-empty) ───────────────────────────
+.suggestion-chips {
+  display: flex;
+  gap: var(--wz-space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--wz-space-1);
+}
+
+.suggestion-chip {
+  @include font-display;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: var(--wz-radius-full);
+  background: var(--wz-bg-card);
+  border: 1.5px solid var(--wz-color-primary-border);
+  color: var(--wz-color-primary);
+  cursor: pointer;
+  transition: all var(--wz-duration-fast) ease;
+
+  &:active { transform: scale(0.95); }
+}
+
+// ── Error states ──────────────────────────────────────────────
+.error-badge {
+  @include font-body;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 4px 14px;
+  border-radius: var(--wz-radius-full);
+  background: rgba(185, 53, 53, 0.10);
+  color: var(--wz-color-error);
+
+  &--offline {
+    background: rgba(200, 113, 42, 0.10);
+    color: var(--wz-color-accent);
+  }
+}
+
+.error-detail {
+  @include font-body;
+  font-size: 11px;
+  color: var(--wz-text-muted);
+  padding: 8px 16px;
+  background: rgba(185, 53, 53, 0.05);
+  border-radius: var(--wz-radius-sm);
+  width: 100%;
+  max-width: 280px;
+}
+
+.error-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wz-space-2);
+  width: 100%;
+  max-width: 300px;
+  margin-top: var(--wz-space-2);
+}
