@@ -519,19 +519,6 @@
   &:active { transform: scale(0.93); }
 }
 
-.budget-fab {
-  position: fixed;
-  bottom: max(84px, calc(env(safe-area-inset-bottom) + 72px));
-  right: var(--wz-space-5);
-  --background: linear-gradient(135deg, var(--wz-color-accent), #E8A064);
-  --border-radius: 18px;
-  --box-shadow: 0 6px 20px rgba(200,113,42,0.4);
-  --padding-start: 0;
-  --padding-end: 0;
-  width: 54px;
-  height: 54px;
-  z-index: 10;
-}
 
 // ── Modal shared styles ───────────────────────────────────────
 .modal-content { --background: var(--wz-bg-card); }

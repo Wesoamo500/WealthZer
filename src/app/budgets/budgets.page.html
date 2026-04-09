@@ -1,8 +1,8 @@
-<ion-content [fullscreen]="true" class="budgets-content" scrollY="true">
-
-  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
-    <ion-refresher-content refreshingSpinner="crescent"></ion-refresher-content>
-  </ion-refresher>
+<ion-content [fullscreen]="true" class="budgets-content" [scrollY]="false">
+  <div class="txn-layout">
+    <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+      <ion-refresher-content refreshingSpinner="crescent"></ion-refresher-content>
+    </ion-refresher>
 
   <!-- ════════════════════════════════════════════════════ -->
   <!-- HEADER                                              -->
@@ -33,119 +33,121 @@
     </div>
   </div>
 
-  <!-- ════════════════════════════════════════════════════ -->
-  <!-- MONTHLY SUMMARY CARD                                -->
-  <!-- ════════════════════════════════════════════════════ -->
-  <div class="summary-card wz-stagger-2" *ngIf="!isLoading && summary">
-    <div class="summary-card__top">
-      <span class="summary-month">{{ summary.month }}</span>
-      <span class="summary-badge">
-        {{ summary.onTrackCount }} of {{ summary.totalCategories }} on track
-      </span>
-    </div>
+    <div class="txn-list">
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- MONTHLY SUMMARY CARD                                -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <div class="summary-card wz-stagger-2" *ngIf="!isLoading && summary">
+        <div class="summary-card__top">
+          <span class="summary-month">{{ summary.month }}</span>
+          <span class="summary-badge">
+            {{ summary.onTrackCount }} of {{ summary.totalCategories }} on track
+          </span>
+        </div>
 
-    <div class="summary-amounts">
-      <span class="summary-spent">{{ summary.totalSpent | currency:'USD':'symbol':'1.0-0' }}</span>
-      <span class="summary-limit">of {{ summary.totalLimit | currency:'USD':'symbol':'1.0-0' }} budget</span>
-    </div>
+        <div class="summary-amounts">
+          <span class="summary-spent">{{ summary.totalSpent | currency:'USD':'symbol':'1.0-0' }}</span>
+          <span class="summary-limit">of {{ summary.totalLimit | currency:'USD':'symbol':'1.0-0' }} budget</span>
+        </div>
 
-    <div class="summary-track"
-         role="progressbar"
-         [attr.aria-valuenow]="totalFillPct"
-         [attr.aria-valuemax]="100">
-      <div class="summary-fill" [style.width.%]="totalFillPct"></div>
-    </div>
+        <div class="summary-track"
+             role="progressbar"
+             [attr.aria-valuenow]="totalFillPct"
+             [attr.aria-valuemax]="100">
+          <div class="summary-fill" [style.width.%]="totalFillPct"></div>
+        </div>
 
-    <p class="summary-sub">
-      {{ (summary.totalLimit - summary.totalSpent) | currency:'USD':'symbol':'1.0-0' }} remaining ·
-      {{ summary.daysRemaining }} days left in {{ summary.month.split(' ')[0] }}
-    </p>
-  </div>
-
-  <!-- ════════════════════════════════════════════════════ -->
-  <!-- CATEGORY GRID                                       -->
-  <!-- ════════════════════════════════════════════════════ -->
-  <div class="section-row wz-stagger-3">
-    <span class="section-label">Categories</span>
-    <button class="section-link" (click)="openAddModal()">
-      <ion-icon name="add-outline" style="font-size:14px;"></ion-icon>
-      Add
-    </button>
-  </div>
-
-  <!-- Skeleton -->
-  <div class="cat-grid" *ngIf="isLoading">
-    <div *ngFor="let s of [1,2,3,4]" class="cat-card cat-card--skeleton">
-      <ion-skeleton-text animated style="height:24px;width:24px;border-radius:6px;"></ion-skeleton-text>
-      <ion-skeleton-text animated style="height:14px;width:70px;border-radius:4px;margin-top:6px;"></ion-skeleton-text>
-      <ion-skeleton-text animated style="height:10px;width:90px;border-radius:4px;margin-top:4px;"></ion-skeleton-text>
-      <ion-skeleton-text animated style="height:4px;width:100%;border-radius:99px;margin-top:8px;"></ion-skeleton-text>
-    </div>
-  </div>
-
-  <div class="cat-grid wz-stagger-3" *ngIf="!isLoading">
-    <!-- Category cards -->
-    <div
-      *ngFor="let cat of categories; trackBy: trackById"
-      class="cat-card"
-      [class.cat-card--over]="cat.status === 'over'"
-      [class.cat-card--warning]="cat.status === 'warning'"
-      (click)="openCategory(cat)"
-      role="button" tabindex="0"
-      [attr.aria-label]="cat.name + ' budget ' + cat.spent + ' of ' + cat.limit">
-
-      <div class="cat-card__top">
-        <span class="cat-emoji" aria-hidden="true">{{ cat.emoji }}</span>
-        <span class="cat-status-badge"
-              [class.cat-status-badge--ok]="cat.status === 'ok'"
-              [class.cat-status-badge--warning]="cat.status === 'warning'"
-              [class.cat-status-badge--over]="cat.status === 'over'"
-              [class.cat-status-badge--unused]="cat.status === 'unused'">
-          <ng-container [ngSwitch]="cat.status">
-            <span *ngSwitchCase="'ok'">On Track</span>
-            <span *ngSwitchCase="'warning'">Near Limit</span>
-            <span *ngSwitchCase="'over'">Over</span>
-            <span *ngSwitchCase="'unused'">Unused</span>
-          </ng-container>
-        </span>
+        <p class="summary-sub">
+          {{ (summary.totalLimit - summary.totalSpent) | currency:'USD':'symbol':'1.0-0' }} remaining ·
+          {{ summary.daysRemaining }} days left in {{ summary.month.split(' ')[0] }}
+        </p>
       </div>
 
-      <p class="cat-name">{{ cat.name }}</p>
-      <p class="cat-amounts">
-        {{ cat.spent | currency:'USD':'symbol':'1.0-0' }} of
-        {{ cat.limit | currency:'USD':'symbol':'1.0-0' }}
-      </p>
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- CATEGORY GRID                                       -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <div class="section-row wz-stagger-3">
+        <span class="section-label">Categories</span>
+        <button class="section-link" (click)="openAddModal()">
+          <ion-icon name="add-outline" style="font-size:14px;"></ion-icon>
+          Add
+        </button>
+      </div>
 
-      <div class="cat-track"
-           role="progressbar"
-           [attr.aria-valuenow]="fillPct(cat)"
-           [attr.aria-valuemax]="100">
-        <div class="cat-fill"
-             [class.cat-fill--ok]="cat.status === 'ok' || cat.status === 'unused'"
-             [class.cat-fill--warning]="cat.status === 'warning'"
-             [class.cat-fill--over]="cat.status === 'over'"
-             [style.width.%]="fillPct(cat)">
+      <!-- Skeleton -->
+      <div class="cat-grid" *ngIf="isLoading">
+        <div *ngFor="let s of [1,2,3,4]" class="cat-card cat-card--skeleton">
+          <ion-skeleton-text animated style="height:24px;width:24px;border-radius:6px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="height:14px;width:70px;border-radius:4px;margin-top:6px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="height:10px;width:90px;border-radius:4px;margin-top:4px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="height:4px;width:100%;border-radius:99px;margin-top:8px;"></ion-skeleton-text>
         </div>
       </div>
 
-      <p class="cat-remaining"
-         [class.cat-remaining--over]="cat.status === 'over'">
-        <ng-container *ngIf="cat.status !== 'over'">
-          {{ remaining(cat) | currency:'USD':'symbol':'1.0-0' }} remaining
-        </ng-container>
-        <ng-container *ngIf="cat.status === 'over'">
-          {{ (cat.spent - cat.limit) | currency:'USD':'symbol':'1.0-0' }} over limit
-        </ng-container>
-      </p>
-    </div>
+      <div class="cat-grid wz-stagger-3" *ngIf="!isLoading">
+        <!-- Category cards -->
+        <div
+          *ngFor="let cat of categories; trackBy: trackById"
+          class="cat-card"
+          [class.cat-card--over]="cat.status === 'over'"
+          [class.cat-card--warning]="cat.status === 'warning'"
+          (click)="openCategory(cat)"
+          role="button" tabindex="0"
+          [attr.aria-label]="cat.name + ' budget ' + cat.spent + ' of ' + cat.limit">
 
-    <!-- Add category card -->
-    <div class="cat-card cat-card--add" (click)="openAddModal()"
-         role="button" tabindex="0" aria-label="Add budget category">
-      <div class="cat-add-icon" aria-hidden="true">+</div>
-      <p class="cat-add-label">Add Category</p>
-    </div>
-  </div>
+          <div class="cat-card__top">
+            <span class="cat-emoji" aria-hidden="true">{{ cat.emoji }}</span>
+            <span class="cat-status-badge"
+                  [class.cat-status-badge--ok]="cat.status === 'ok'"
+                  [class.cat-status-badge--warning]="cat.status === 'warning'"
+                  [class.cat-status-badge--over]="cat.status === 'over'"
+                  [class.cat-status-badge--unused]="cat.status === 'unused'">
+              <ng-container [ngSwitch]="cat.status">
+                <span *ngSwitchCase="'ok'">On Track</span>
+                <span *ngSwitchCase="'warning'">Near Limit</span>
+                <span *ngSwitchCase="'over'">Over</span>
+                <span *ngSwitchCase="'unused'">Unused</span>
+              </ng-container>
+            </span>
+          </div>
+
+          <p class="cat-name">{{ cat.name }}</p>
+          <p class="cat-amounts">
+            {{ cat.spent | currency:'USD':'symbol':'1.0-0' }} of
+            {{ cat.limit | currency:'USD':'symbol':'1.0-0' }}
+          </p>
+
+          <div class="cat-track"
+               role="progressbar"
+               [attr.aria-valuenow]="fillPct(cat)"
+               [attr.aria-valuemax]="100">
+            <div class="cat-fill"
+                 [class.cat-fill--ok]="cat.status === 'ok' || cat.status === 'unused'"
+                 [class.cat-fill--warning]="cat.status === 'warning'"
+                 [class.cat-fill--over]="cat.status === 'over'"
+                 [style.width.%]="fillPct(cat)">
+            </div>
+          </div>
+
+          <p class="cat-remaining"
+             [class.cat-remaining--over]="cat.status === 'over'">
+            <ng-container *ngIf="cat.status !== 'over'">
+              {{ remaining(cat) | currency:'USD':'symbol':'1.0-0' }} remaining
+            </ng-container>
+            <ng-container *ngIf="cat.status === 'over'">
+              {{ (cat.spent - cat.limit) | currency:'USD':'symbol':'1.0-0' }} over limit
+            </ng-container>
+          </p>
+        </div>
+
+        <!-- Add category card -->
+        <div class="cat-card cat-card--add" (click)="openAddModal()"
+             role="button" tabindex="0" aria-label="Add budget category">
+          <div class="cat-add-icon" aria-hidden="true">+</div>
+          <p class="cat-add-label">Add Category</p>
+        </div>
+      </div>
+    </div><!-- /.txn-list -->
 
   <!-- ════════════════════════════════════════════════════ -->
   <!-- ADD BUDGET MODAL                                    -->
@@ -217,9 +219,10 @@
     </ng-template>
   </ion-modal>
 
-</ion-content>
+    <!-- FAB -->
+    <div class="txn-fab" (click)="openAddModal()" aria-label="Add budget">
+      <ion-icon name="add-outline" style="font-size:26px;color:#fff;"></ion-icon>
+    </div>
 
-<!-- FAB -->
-<ion-button class="budget-fab" (click)="openAddModal()" aria-label="Add budget">
-  <ion-icon name="add-outline" slot="icon-only"></ion-icon>
-</ion-button>
+  </div><!-- /.txn-layout -->
+</ion-content>
