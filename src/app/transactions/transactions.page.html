@@ -1,93 +1,252 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar color="background">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/home" icon="chevron-back-outline" text=""></ion-back-button>
-    </ion-buttons>
-    <ion-title>Transaction History</ion-title>
-    <ion-buttons slot="end">
-      <ion-button>
-        <ion-icon name="options-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+<ion-content [fullscreen]="true" class="txn-content" [scrollY]="false">
 
-  <ion-toolbar color="background" class="filters-toolbar">
-    <div class="filters-container">
-      <ion-chip [class.active]="selectedFilter === 'all'" (click)="setFilter('all')">
-        <ion-label>All</ion-label>
-      </ion-chip>
-      <ion-chip [class.active]="selectedFilter === 'income'" (click)="setFilter('income')">
-        <ion-label>Income</ion-label>
-      </ion-chip>
-      <ion-chip [class.active]="selectedFilter === 'expenses'" (click)="setFilter('expenses')">
-        <ion-label>Expenses</ion-label>
-      </ion-chip>
-      <ion-chip [class.active]="selectedFilter === 'transfers'" (click)="setFilter('transfers')">
-        <ion-label>Transfers</ion-label>
-      </ion-chip>
-    </div>
-  </ion-toolbar>
-</ion-header>
+  <div class="txn-layout">
 
-<ion-content [fullscreen]="true">
-  <div class="main-container">
-    <!-- Skeleton List -->
-    <div class="transactions-list-container" *ngIf="isLoading">
-      <ion-list lines="none">
-        <ion-item *ngFor="let i of [1,2,3,4,5,6]" class="transaction-item skeleton">
-          <ion-avatar slot="start" style="width: 44px; height: 44px; border-radius: 12px; border-radius: 12px;">
-            <ion-skeleton-text animated></ion-skeleton-text>
-          </ion-avatar>
-          <ion-label>
-            <ion-skeleton-text animated style="width: 60%; height: 16px; margin-bottom: 8px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-          </ion-label>
-          <ion-skeleton-text slot="end" animated style="width: 50px; height: 16px;"></ion-skeleton-text>
-        </ion-item>
-      </ion-list>
-    </div>
+    <!-- ════════════════════════════════════════════════════ -->
+    <!-- HEADER                                              -->
+    <!-- ════════════════════════════════════════════════════ -->
+    <div class="page-header wz-stagger-1">
+      <div class="page-header__row">
+        <h1 class="page-title">Transactions</h1>
+        <button class="add-btn" (click)="openAddModal()" aria-label="Add transaction">
+          <ion-icon name="add-outline"></ion-icon>
+          Add
+        </button>
+      </div>
 
-    <div class="transactions-list-container" *ngIf="!isLoading && groupedTransactions.length > 0">
-      <div *ngFor="let group of groupedTransactions" class="transaction-group">
-        <div class="timeline-label">{{ group.label }}</div>
-        <ion-list lines="none">
-          <ion-item *ngFor="let item of group.transactions" class="transaction-item">
-            <div class="icon-box" [style.background]="item.iconBg" slot="start">
-              <ion-icon [name]="item.icon" [style.color]="item.iconColor"></ion-icon>
-            </div>
-            <ion-label>
-              <h3>{{ item.title }}</h3>
-              <p>{{ item.subtitle }}</p>
-            </ion-label>
-            <div class="amount" slot="end" [class.positive]="item.amount > 0" [class.negative]="item.amount < 0">
-              {{ item.amount > 0 ? '+' : '' }}{{ (item.amount * exchangeRate) | currency:displayCurrency }}
-            </div>
-          </ion-item>
-        </ion-list>
+      <!-- Search bar -->
+      <div class="search-wrap" [class.search-wrap--active]="searchCtrl.value?.length">
+        <ion-icon name="search-outline" class="search-icon" aria-hidden="true"></ion-icon>
+        <input class="search-input"
+               type="search"
+               placeholder="Search transactions..."
+               [formControl]="searchCtrl"
+               autocomplete="off"
+               aria-label="Search transactions"/>
+        <button class="filter-icon-btn" aria-label="Filter options">
+          <ion-icon name="options-outline"></ion-icon>
+        </button>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="filter-tabs" role="tablist">
+        <button *ngFor="let tab of filterTabs"
+                class="filter-tab"
+                [class.filter-tab--active]="activeFilter() === tab.value"
+                (click)="setFilter(tab.value)"
+                role="tab"
+                [attr.aria-selected]="activeFilter() === tab.value">
+          {{ tab.label }}
+        </button>
       </div>
     </div>
 
-    <!-- Empty State -->
-    <div class="empty-state-wrapper" *ngIf="!isLoading && groupedTransactions.length === 0">
-      <div class="empty-state-content">
-        <div class="receipt-icon-container">
-          <div class="receipt-shape">
-            <div class="receipt-lines">
-              <div class="line"></div>
-              <div class="line"></div>
-            </div>
-            <div class="diag-line"></div>
+    <!-- ════════════════════════════════════════════════════ -->
+    <!-- TRANSACTION LIST (scrollable)                       -->
+    <!-- ════════════════════════════════════════════════════ -->
+
+    <!-- Skeleton -->
+    <div class="txn-list" *ngIf="isLoading">
+      <div *ngFor="let g of [1,2]" style="display:flex;flex-direction:column;gap:3px;margin-bottom:12px;">
+        <ion-skeleton-text animated style="height:14px;width:80px;border-radius:4px;margin-bottom:4px;"></ion-skeleton-text>
+        <div *ngFor="let r of [1,2]" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--wz-bg-card);border-radius:15px;border:1px solid var(--wz-border-subtle);">
+          <ion-skeleton-text animated style="width:38px;height:38px;border-radius:12px;flex-shrink:0;"></ion-skeleton-text>
+          <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+            <ion-skeleton-text animated style="height:14px;width:120px;border-radius:4px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="height:10px;width:90px;border-radius:4px;"></ion-skeleton-text>
           </div>
+          <ion-skeleton-text animated style="height:14px;width:60px;border-radius:4px;flex-shrink:0;"></ion-skeleton-text>
         </div>
-        
-        <h2 class="empty-title">No transactions found</h2>
-        <p class="empty-subtitle">Your spending and income history will appear here once you start using the app.</p>
-        
-        <ion-button class="add-transaction-btn" (click)="openAddTransaction()">
-          <ion-icon name="add-circle" slot="start"></ion-icon>
-          Add Transaction
-        </ion-button>
       </div>
     </div>
-  </div>
+
+    <!-- Real list -->
+    <div class="txn-list wz-stagger-2" *ngIf="!isLoading" role="list">
+
+      <!-- Empty state -->
+      <div class="empty-state" *ngIf="groups.length === 0">
+        <ion-icon name="search-outline" style="font-size:32px;color:var(--wz-text-muted);"></ion-icon>
+        <p class="empty-title">No transactions found</p>
+        <p class="empty-sub">Try a different search or filter</p>
+      </div>
+
+      <!-- Date groups -->
+      <div *ngFor="let group of groups; trackBy: trackByGroup"
+           class="txn-group" role="group"
+           [attr.aria-label]="group.dateLabel">
+
+        <!-- Group header -->
+        <div class="group-header">
+          <span class="group-date">{{ group.dateLabel }}</span>
+          <span class="group-total"
+                [class.positive]="group.dayTotal >= 0"
+                [class.negative]="group.dayTotal < 0">
+            {{ group.dayTotal >= 0 ? '+' : '' }}{{ group.dayTotal | currency:'USD':'symbol':'1.2-2' }}
+          </span>
+        </div>
+
+        <!-- Transaction rows -->
+        <div
+          *ngFor="let txn of group.items; trackBy: trackByTxn"
+          class="txn-row"
+          (click)="openDetail(txn)"
+          role="listitem" tabindex="0"
+          [attr.aria-label]="txn.name + ' ' + txn.amount">
+
+          <!-- Icon -->
+          <div class="txn-icon"
+               [class.txn-icon--expense]="txn.type === 'expense'"
+               [class.txn-icon--income]="txn.type === 'income'"
+               [class.txn-icon--transfer]="txn.type === 'transfer'"
+               aria-hidden="true">
+            {{ CATEGORY_EMOJI[txn.category] }}
+          </div>
+
+          <!-- Info -->
+          <div class="txn-info">
+            <p class="txn-name">{{ txn.name }}</p>
+            <p class="txn-meta">
+              {{ txn.time }}
+              <span class="cat-pill" [class]="CATEGORY_PILL[txn.category]">
+                {{ txn.category }}
+              </span>
+            </p>
+          </div>
+
+          <!-- Amount -->
+          <div class="txn-right">
+            <p class="txn-amount"
+               [class.positive]="txn.amount >= 0"
+               [class.negative]="txn.amount < 0"
+               [class.neutral]="txn.type === 'transfer'">
+              {{ txn.amount >= 0 ? '+' : '' }}{{ txn.amount | currency:'USD':'symbol':'1.2-2' }}
+            </p>
+            <p class="txn-method">{{ txn.method }}</p>
+          </div>
+
+          <ion-icon name="chevron-forward-outline" class="txn-chevron" aria-hidden="true"></ion-icon>
+
+        </div><!-- /.txn-row -->
+
+      </div><!-- /.txn-group -->
+
+    </div><!-- /.txn-list -->
+
+    <!-- FAB -->
+    <div class="txn-fab" (click)="openAddModal()" role="button" tabindex="0" aria-label="Add transaction">
+      <ion-icon name="add-outline" style="font-size:26px;color:#fff;"></ion-icon>
+    </div>
+
+  </div><!-- /.txn-layout -->
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- ADD TRANSACTION MODAL                               -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <ion-modal
+    [isOpen]="showAddModal"
+    (didDismiss)="closeAddModal()"
+    [breakpoints]="[0, 0.7, 1]"
+    [initialBreakpoint]="0.7"
+    [backdropDismiss]="true"
+    class="add-txn-modal">
+
+    <ng-template>
+      <ion-content class="modal-content">
+        <div class="modal-layout">
+          <div class="modal-handle" aria-hidden="true"></div>
+
+          <div class="modal-header">
+            <h2 class="modal-title">Add Transaction</h2>
+            <button class="modal-close" (click)="closeAddModal()" aria-label="Close">
+              <ion-icon name="close-outline" style="font-size:20px;"></ion-icon>
+            </button>
+          </div>
+
+          <form [formGroup]="addForm" (ngSubmit)="onSaveTransaction()" class="modal-form">
+
+            <!-- Type selector -->
+            <div class="type-selector" role="group" aria-label="Transaction type">
+              <button type="button" class="type-btn"
+                      [class.type-btn--expense]="addType() === 'expense'"
+                      (click)="selectType('expense')"
+                      [attr.aria-pressed]="addType() === 'expense'">
+                <ion-icon name="arrow-down-outline"></ion-icon> Expense
+              </button>
+              <button type="button" class="type-btn"
+                      [class.type-btn--income]="addType() === 'income'"
+                      (click)="selectType('income')"
+                      [attr.aria-pressed]="addType() === 'income'">
+                <ion-icon name="arrow-up-outline"></ion-icon> Income
+              </button>
+              <button type="button" class="type-btn"
+                      [class.type-btn--transfer]="addType() === 'transfer'"
+                      (click)="selectType('transfer')"
+                      [attr.aria-pressed]="addType() === 'transfer'">
+                <ion-icon name="swap-horizontal-outline"></ion-icon> Transfer
+              </button>
+            </div>
+
+            <!-- Amount -->
+            <div class="amount-wrap">
+              <span class="amount-currency">$</span>
+              <input type="number" class="amount-input"
+                     formControlName="amount"
+                     placeholder="0.00" inputmode="decimal"
+                     aria-label="Amount"/>
+            </div>
+
+            <!-- Name + Category row -->
+            <div class="fields-row">
+              <div class="field-wrap" style="flex:1.5">
+                <label class="field-label">Description</label>
+                <input type="text" class="field-input"
+                       formControlName="name"
+                       placeholder="e.g. Lunch" autocomplete="off"/>
+              </div>
+              <div class="field-wrap" style="flex:1">
+                <label class="field-label">Category</label>
+                <select class="field-input field-select" formControlName="category">
+                  <option *ngFor="let cat of categories" [value]="cat">
+                    {{ CATEGORY_EMOJI[cat] }} {{ cat }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Date + Method row -->
+            <div class="fields-row">
+              <div class="field-wrap">
+                <label class="field-label">Date</label>
+                <input type="date" class="field-input" formControlName="date"/>
+              </div>
+              <div class="field-wrap">
+                <label class="field-label">Method</label>
+                <select class="field-select field-input" formControlName="method">
+                  <option>Card</option>
+                  <option>Cash</option>
+                  <option>Bank Transfer</option>
+                  <option>Mobile Pay</option>
+                  <option>Wallet</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Note -->
+            <div class="field-wrap">
+              <label class="field-label">Note (optional)</label>
+              <input type="text" class="field-input" formControlName="note" placeholder="Add a note..."/>
+            </div>
+
+            <!-- Save -->
+            <ion-button expand="block" type="submit" class="modal-save-btn"
+                        [disabled]="addForm.invalid">
+              Save Transaction
+            </ion-button>
+
+          </form>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
 </ion-content>

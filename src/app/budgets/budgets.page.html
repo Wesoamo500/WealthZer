@@ -1,107 +1,225 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar color="background">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/home" icon="arrow-back-outline" text=""></ion-back-button>
-    </ion-buttons>
-    <ion-title>Create Budget</ion-title>
-    <ion-buttons slot="end">
-      <ion-button>
-        <ion-icon name="help-circle-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="budgets-content" scrollY="true">
 
-<ion-content [fullscreen]="true">
-  <div class="main-container">
-    <!-- Header Summary -->
-    <div class="summary-card ion-padding">
-      <div class="summary-grid">
-        <div class="summary-item">
-          <p class="label">TOTAL BUDGET</p>
-          <h2 *ngIf="!isLoading">{{ (totalBudgetLimit * exchangeRate) | currency:displayCurrency }}</h2>
-          <ion-skeleton-text *ngIf="isLoading" animated style="width: 80%; height: 24px;"></ion-skeleton-text>
-        </div>
-        <div class="summary-item">
-          <p class="label">TOTAL SPENT</p>
-          <h2 *ngIf="!isLoading" [class.danger]="totalSpent > totalBudgetLimit">{{ (totalSpent * exchangeRate) | currency:displayCurrency }}</h2>
-          <ion-skeleton-text *ngIf="isLoading" animated style="width: 80%; height: 24px;"></ion-skeleton-text>
-        </div>
-      </div>
-      
-      <div class="overall-progress" *ngIf="!isLoading && totalBudgetLimit > 0">
-        <div class="progress-info">
-          <span>{{ (totalSpent / totalBudgetLimit) * 100 | number:'1.0-0' }}% spent</span>
-          <span>{{ ((totalBudgetLimit - totalSpent) * exchangeRate) | currency:displayCurrency }} left</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" [style.width.%]="(totalSpent / totalBudgetLimit) * 100" [class.danger]="totalSpent > totalBudgetLimit"></div>
-        </div>
-      </div>
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content refreshingSpinner="crescent"></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- HEADER                                              -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="page-header wz-stagger-1">
+    <div class="page-header__row">
+      <h1 class="page-title">Budgets</h1>
+      <button class="add-btn" (click)="openAddModal()" aria-label="Add budget category">
+        <ion-icon name="add-outline"></ion-icon>
+        Add Budget
+      </button>
     </div>
 
-    <!-- Active Budgets List -->
-    <div class="budgets-section">
-      <div class="section-header">
-        <h2>Active Budgets</h2>
-        <ion-button fill="clear" color="primary" (click)="openAddBudget()">
-          <ion-icon name="add" slot="start"></ion-icon>
-          Add
-        </ion-button>
-      </div>
-
-      <!-- Skeleton List -->
-      <ion-list lines="none" *ngIf="isLoading" class="budgets-list">
-        <ion-item *ngFor="let i of [1,2,3]" class="budget-item skeleton">
-          <ion-avatar slot="start">
-            <ion-skeleton-text animated></ion-skeleton-text>
-          </ion-avatar>
-          <ion-label>
-            <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 80%; height: 8px; border-radius: 4px; border-radius: 4px; margin: 8px 0;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 30%;"></ion-skeleton-text>
-          </ion-label>
-        </ion-item>
-      </ion-list>
-
-      <!-- Empty State -->
-      <div class="empty-state" *ngIf="!isLoading && budgets.length === 0">
-        <div class="icon-box">
-          <ion-icon name="pie-chart-outline"></ion-icon>
-        </div>
-        <h3>No Budgets Set</h3>
-        <p>Set a monthly spending limit per category to track your financial health.</p>
-        <ion-button class="add-btn" (click)="openAddBudget()">
-          Create Your First Budget
-        </ion-button>
-      </div>
-
-      <!-- Logic List -->
-      <ion-list lines="none" *ngIf="!isLoading && budgets.length > 0" class="budgets-list">
-        <ion-item *ngFor="let budget of budgets" class="budget-item" (click)="openAddBudget()">
-          <div class="category-icon" slot="start">
-            <ion-icon [name]="getCategoryIcon(budget.category)"></ion-icon>
-          </div>
-          <ion-label>
-            <div class="item-header">
-              <h3>{{ budget.category | titlecase }}</h3>
-              <span class="limit">{{ (calculateSpentForCategory(budget.category) * exchangeRate) | currency:displayCurrency }} / {{ (budget.amount * exchangeRate) | currency:displayCurrency }}</span>
-            </div>
-            <div class="item-progress">
-              <div class="progress-track">
-                <div class="progress-fill" 
-                     [style.width.%]="getImpactPercentage(budget.category)"
-                     [class.warning]="getImpactPercentage(budget.category) > 80"
-                     [class.danger]="getImpactPercentage(budget.category) >= 100">
-                </div>
-              </div>
-            </div>
-            <p class="remaining" [class.danger]="getImpactPercentage(budget.category) >= 100">
-              {{ getImpactPercentage(budget.category) >= 100 ? 'Over Budget' : ((getRemainingAmount(budget.category) * exchangeRate) | currency:displayCurrency) + ' remaining' }}
-            </p>
-          </ion-label>
-        </ion-item>
-      </ion-list>
+    <!-- Segment: Overview / Categories -->
+    <div class="segment" role="tablist">
+      <button class="seg-btn"
+              [class.seg-btn--active]="activeSegment === 'overview'"
+              (click)="activeSegment = 'overview'"
+              role="tab" [attr.aria-selected]="activeSegment === 'overview'">
+        Overview
+      </button>
+      <button class="seg-btn"
+              [class.seg-btn--active]="activeSegment === 'categories'"
+              (click)="activeSegment = 'categories'"
+              role="tab" [attr.aria-selected]="activeSegment === 'categories'">
+        Categories
+      </button>
     </div>
   </div>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- MONTHLY SUMMARY CARD                                -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="summary-card wz-stagger-2" *ngIf="!isLoading && summary">
+    <div class="summary-card__top">
+      <span class="summary-month">{{ summary.month }}</span>
+      <span class="summary-badge">
+        {{ summary.onTrackCount }} of {{ summary.totalCategories }} on track
+      </span>
+    </div>
+
+    <div class="summary-amounts">
+      <span class="summary-spent">{{ summary.totalSpent | currency:'USD':'symbol':'1.0-0' }}</span>
+      <span class="summary-limit">of {{ summary.totalLimit | currency:'USD':'symbol':'1.0-0' }} budget</span>
+    </div>
+
+    <div class="summary-track"
+         role="progressbar"
+         [attr.aria-valuenow]="totalFillPct"
+         [attr.aria-valuemax]="100">
+      <div class="summary-fill" [style.width.%]="totalFillPct"></div>
+    </div>
+
+    <p class="summary-sub">
+      {{ (summary.totalLimit - summary.totalSpent) | currency:'USD':'symbol':'1.0-0' }} remaining ·
+      {{ summary.daysRemaining }} days left in {{ summary.month.split(' ')[0] }}
+    </p>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- CATEGORY GRID                                       -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="section-row wz-stagger-3">
+    <span class="section-label">Categories</span>
+    <button class="section-link" (click)="openAddModal()">
+      <ion-icon name="add-outline" style="font-size:14px;"></ion-icon>
+      Add
+    </button>
+  </div>
+
+  <!-- Skeleton -->
+  <div class="cat-grid" *ngIf="isLoading">
+    <div *ngFor="let s of [1,2,3,4]" class="cat-card cat-card--skeleton">
+      <ion-skeleton-text animated style="height:24px;width:24px;border-radius:6px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="height:14px;width:70px;border-radius:4px;margin-top:6px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="height:10px;width:90px;border-radius:4px;margin-top:4px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="height:4px;width:100%;border-radius:99px;margin-top:8px;"></ion-skeleton-text>
+    </div>
+  </div>
+
+  <div class="cat-grid wz-stagger-3" *ngIf="!isLoading">
+    <!-- Category cards -->
+    <div
+      *ngFor="let cat of categories; trackBy: trackById"
+      class="cat-card"
+      [class.cat-card--over]="cat.status === 'over'"
+      [class.cat-card--warning]="cat.status === 'warning'"
+      (click)="openCategory(cat)"
+      role="button" tabindex="0"
+      [attr.aria-label]="cat.name + ' budget ' + cat.spent + ' of ' + cat.limit">
+
+      <div class="cat-card__top">
+        <span class="cat-emoji" aria-hidden="true">{{ cat.emoji }}</span>
+        <span class="cat-status-badge"
+              [class.cat-status-badge--ok]="cat.status === 'ok'"
+              [class.cat-status-badge--warning]="cat.status === 'warning'"
+              [class.cat-status-badge--over]="cat.status === 'over'"
+              [class.cat-status-badge--unused]="cat.status === 'unused'">
+          <ng-container [ngSwitch]="cat.status">
+            <span *ngSwitchCase="'ok'">On Track</span>
+            <span *ngSwitchCase="'warning'">Near Limit</span>
+            <span *ngSwitchCase="'over'">Over</span>
+            <span *ngSwitchCase="'unused'">Unused</span>
+          </ng-container>
+        </span>
+      </div>
+
+      <p class="cat-name">{{ cat.name }}</p>
+      <p class="cat-amounts">
+        {{ cat.spent | currency:'USD':'symbol':'1.0-0' }} of
+        {{ cat.limit | currency:'USD':'symbol':'1.0-0' }}
+      </p>
+
+      <div class="cat-track"
+           role="progressbar"
+           [attr.aria-valuenow]="fillPct(cat)"
+           [attr.aria-valuemax]="100">
+        <div class="cat-fill"
+             [class.cat-fill--ok]="cat.status === 'ok' || cat.status === 'unused'"
+             [class.cat-fill--warning]="cat.status === 'warning'"
+             [class.cat-fill--over]="cat.status === 'over'"
+             [style.width.%]="fillPct(cat)">
+        </div>
+      </div>
+
+      <p class="cat-remaining"
+         [class.cat-remaining--over]="cat.status === 'over'">
+        <ng-container *ngIf="cat.status !== 'over'">
+          {{ remaining(cat) | currency:'USD':'symbol':'1.0-0' }} remaining
+        </ng-container>
+        <ng-container *ngIf="cat.status === 'over'">
+          {{ (cat.spent - cat.limit) | currency:'USD':'symbol':'1.0-0' }} over limit
+        </ng-container>
+      </p>
+    </div>
+
+    <!-- Add category card -->
+    <div class="cat-card cat-card--add" (click)="openAddModal()"
+         role="button" tabindex="0" aria-label="Add budget category">
+      <div class="cat-add-icon" aria-hidden="true">+</div>
+      <p class="cat-add-label">Add Category</p>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- ADD BUDGET MODAL                                    -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <ion-modal
+    [isOpen]="showAddModal"
+    (didDismiss)="closeAddModal()"
+    [breakpoints]="[0, 0.65, 0.9]"
+    [initialBreakpoint]="0.65"
+    [backdropDismiss]="true"
+    class="add-budget-modal">
+
+    <ng-template>
+      <ion-content class="modal-content">
+        <div class="modal-layout">
+          <div class="modal-handle" aria-hidden="true"></div>
+          <h2 class="modal-title">New Budget Category</h2>
+
+          <form [formGroup]="addForm" (ngSubmit)="onSaveBudget()" class="modal-form">
+
+            <!-- Emoji picker -->
+            <div class="field-group">
+              <label class="field-label">Choose an icon</label>
+              <div class="emoji-grid" role="group" aria-label="Category icon">
+                <button
+                  type="button"
+                  *ngFor="let emoji of emojiOptions"
+                  class="emoji-btn"
+                  [class.emoji-btn--selected]="addForm.get('emoji')?.value === emoji"
+                  (click)="addForm.get('emoji')?.setValue(emoji)"
+                  [attr.aria-pressed]="addForm.get('emoji')?.value === emoji">
+                  {{ emoji }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Category name -->
+            <div class="field-group">
+              <label class="field-label" for="cat-name">Category name</label>
+              <div class="field-input-wrap">
+                <input id="cat-name" type="text"
+                       class="field-input" formControlName="name"
+                       placeholder="e.g. Groceries" autocomplete="off"/>
+              </div>
+            </div>
+
+            <!-- Monthly limit -->
+            <div class="field-group">
+              <label class="field-label" for="cat-limit">Monthly limit</label>
+              <div class="field-input-wrap field-input-wrap--amount">
+                <span class="field-currency">$</span>
+                <input id="cat-limit" type="number"
+                       class="field-input field-input--amount"
+                       formControlName="limit"
+                       placeholder="0.00"
+                       inputmode="decimal" min="1"/>
+              </div>
+            </div>
+
+            <ion-button expand="block" type="submit"
+                        class="modal-save-btn"
+                        [disabled]="addForm.invalid">
+              Save Category
+            </ion-button>
+
+          </form>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
 </ion-content>
+
+<!-- FAB -->
+<ion-button class="budget-fab" (click)="openAddModal()" aria-label="Add budget">
+  <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+</ion-button>

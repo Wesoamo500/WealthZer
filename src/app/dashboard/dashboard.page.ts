@@ -183,15 +183,15 @@ export class DashboardPage implements OnInit, OnDestroy {
         { label: 'Cash', value: nw.totalNetWorth - nw.totalInvestments, change: 0, icon: 'wallet-outline', variant: 'neutral' },
       ];
 
-      // 6. Map Budgets
-      this.budgets = budgets.map(b => ({
-        name: b.category,
-        emoji: (b as any).emoji || '📦',
-        spent: b.spent,
-        limit: b.amount,
+      // 6. Map Budgets (using pre-calculated stats from getNetWorth)
+      this.budgets = nw.budgets.map((b: any) => ({
+        name: this.formatCategoryName(b.category),
+        emoji: b.emoji || '📦',
+        spent: Math.abs(b.spent),
+        limit: Number(b.amount),
         status: b.spent > b.amount ? 'over' : (b.spent > b.amount * 0.8 ? 'warning' : 'ok')
       }));
-      this.budgetsOnTrack = this.budgets.filter(b => b.status === 'ok').length;
+      this.budgetsOnTrack = nw.budgetSummary?.onTrackCount || 0;
 
       // 7. Map Top Assets
       this.topAssets = portfolio.slice(0, 3).map(a => ({
@@ -269,6 +269,11 @@ export class DashboardPage implements OnInit, OnDestroy {
     } catch {
       return false;
     }
+  }
+
+  private formatCategoryName(cat: string): string {
+    if (!cat) return '';
+    return cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
   }
 
   // ── Gauge animation ──────────────────────────────────────

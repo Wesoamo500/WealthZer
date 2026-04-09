@@ -1,105 +1,201 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar color="background">
-    <ion-title>Markets</ion-title>
-    <ion-buttons slot="end">
-      <ion-button>
-        <ion-icon name="search" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-  <ion-toolbar color="background">
-    <div class="categories-wrapper">
-      <ion-chip color="primary" mode="ios" outline="false">
-        <ion-label>All</ion-label>
-      </ion-chip>
-      <ion-chip mode="ios" outline="true">
-        <ion-label>Crypto</ion-label>
-      </ion-chip>
-      <ion-chip mode="ios" outline="true">
-        <ion-label>Stocks</ion-label>
-      </ion-chip>
-      <ion-chip mode="ios" outline="true">
-        <ion-label>Commodities</ion-label>
-      </ion-chip>
+<ion-content [fullscreen]="true" class="markets-content" [scrollY]="false">
+
+  <div class="markets-layout">
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- HEADER                                            -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <div class="mkt-header wz-stagger-1">
+      <div class="mkt-header__row">
+        <div>
+          <h1 class="mkt-title">Markets</h1>
+          <p class="mkt-date">{{ todayLabel }} · NYSE Open</p>
+        </div>
+        <button class="icon-btn" aria-label="Filter options">
+          <ion-icon name="options-outline"></ion-icon>
+        </button>
+      </div>
+
+      <!-- Search bar -->
+      <div class="search-wrap" [class.search-wrap--active]="searchCtrl.value?.length">
+        <ion-icon name="search-outline" class="search-icon" aria-hidden="true"></ion-icon>
+        <input
+          type="search"
+          class="search-input"
+          placeholder="Search stocks, crypto, ETFs..."
+          [formControl]="searchCtrl"
+          autocomplete="off"
+          aria-label="Search markets"/>
+      </div>
+
+      <!-- Category tabs -->
+      <div class="cat-tabs" role="tablist" aria-label="Market categories">
+        <button
+          *ngFor="let cat of categories"
+          class="cat-tab"
+          role="tab"
+          [class.cat-tab--active]="activeCategory() === cat.value"
+          [attr.aria-selected]="activeCategory() === cat.value"
+          (click)="setCategory(cat.value)">
+          {{ cat.label }}
+        </button>
+      </div>
     </div>
-  </ion-toolbar>
-</ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- MARQUEE TICKER STRIP                              -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <div class="marquee-wrap wz-stagger-2" aria-hidden="true">
+      <div class="marquee-inner">
+        <!-- Doubled for seamless infinite scroll -->
+        <ng-container *ngFor="let repeat of [1, 2]">
+          <div *ngFor="let item of marqueeItems" class="marquee-chip">
+            <span class="marquee-sym">{{ item.symbol }}</span>
+            <span class="marquee-chg"
+                  [class.positive]="item.changePct >= 0"
+                  [class.negative]="item.changePct < 0">
+              {{ item.changePct >= 0 ? '▲' : '▼' }}
+              {{ item.changePct | number:'1.1-1' }}%
+            </span>
+          </div>
+        </ng-container>
+      </div>
+    </div>
 
-  <div class="section-header">
-    <h2>Trending</h2>
-    <ion-button fill="clear" size="small" color="primary">See All</ion-button>
-  </div>
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- SECTION ROW                                       -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <div class="section-row wz-stagger-2">
+      <span class="section-label">
+        {{ activeCategory() === 'all' ? 'Top Movers' : (activeCategory() | titlecase) }}
+      </span>
+      <button class="watchlist-btn" aria-label="Add to watchlist">
+        <ion-icon name="star-outline" style="font-size:14px;"></ion-icon>
+        Watchlist
+      </button>
+    </div>
 
-  <ion-list lines="none">
-    <!-- Skeleton Items -->
-    <ng-container *ngIf="isLoading">
-      <ion-item *ngFor="let i of [1,2,3,4,5]" class="market-item skeleton">
-        <div class="rank" slot="start" style="width: 20px; height: 16px;">
-          <ion-skeleton-text animated></ion-skeleton-text>
-        </div>
-        <ion-avatar slot="start" style="width: 32px; height: 32px;">
-          <ion-skeleton-text animated></ion-skeleton-text>
-        </ion-avatar>
-        <ion-label>
-          <ion-skeleton-text animated style="width: 40%; height: 16px; margin-bottom: 8px;"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 20%; height: 12px;"></ion-skeleton-text>
-        </ion-label>
-        <div slot="end" style="width: 80px; text-align: right;">
-          <ion-skeleton-text animated style="width: 100%; height: 16px; margin-bottom: 8px;"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 40%; float: right; height: 12px;"></ion-skeleton-text>
-        </div>
-      </ion-item>
-    </ng-container>
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- TICKER LIST                                       -->
+    <!-- ══════════════════════════════════════════════════ -->
 
-    <!-- Real Market Items -->
-    <ng-container *ngIf="!isLoading">
-      <ion-item class="market-item">
-        <div class="rank" slot="start">1</div>
-        <div class="coin-icon" slot="start">
-          <ion-icon name="logo-bitcoin" style="color: #f7931a;"></ion-icon>
+    <!-- Skeleton state -->
+    <div class="ticker-list" *ngIf="isLoading" role="status" aria-label="Loading markets">
+      <div *ngFor="let s of [1,2,3,4,5,6]" class="ticker-row ticker-row--skeleton">
+        <ion-skeleton-text animated style="width:18px;height:14px;border-radius:4px;flex-shrink:0"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width:38px;height:38px;border-radius:12px;flex-shrink:0"></ion-skeleton-text>
+        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+          <ion-skeleton-text animated style="height:14px;width:80px;border-radius:4px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="height:10px;width:110px;border-radius:4px;"></ion-skeleton-text>
         </div>
-        <ion-label>
-          <h3>Bitcoin</h3>
-          <p>BTC</p>
-        </ion-label>
-        <div class="price-info" slot="end">
-          <h3>$54,231.20</h3>
-          <p class="positive">+3.2%</p>
+        <ion-skeleton-text animated style="width:60px;height:30px;border-radius:6px;flex-shrink:0"></ion-skeleton-text>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+          <ion-skeleton-text animated style="height:14px;width:64px;border-radius:4px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="height:10px;width:44px;border-radius:4px;"></ion-skeleton-text>
         </div>
-      </ion-item>
+      </div>
+    </div>
 
-      <ion-item class="market-item">
-        <div class="rank" slot="start">2</div>
-        <div class="coin-icon" slot="start">
-          <ion-icon name="logo-electron" style="color: #627eea;"></ion-icon>
-        </div>
-        <ion-label>
-          <h3>Ethereum</h3>
-          <p>ETH</p>
-        </ion-label>
-        <div class="price-info" slot="end">
-          <h3>$12,145.00</h3>
-          <p class="negative">-1.4%</p>
-        </div>
-      </ion-item>
+    <!-- Real ticker list -->
+    <div class="ticker-list wz-stagger-3"
+         *ngIf="!isLoading"
+         role="list"
+         aria-label="Market tickers">
 
-      <ion-item class="market-item">
-        <div class="rank" slot="start">3</div>
-        <div class="coin-icon" slot="start">
-          <ion-icon name="logo-apple" style="color: #A2AAAD;"></ion-icon>
+      <!-- Empty state -->
+      <div class="empty-state" *ngIf="displayedTickers().length === 0">
+        <ion-icon name="search-outline" style="font-size:32px;color:var(--wz-text-muted);"></ion-icon>
+        <p class="empty-title">No results for "{{ searchCtrl.value }}"</p>
+        <p class="empty-sub">Try a different symbol or company name</p>
+      </div>
+
+      <!-- Ticker rows -->
+      <div
+        *ngFor="let ticker of displayedTickers(); trackBy: trackBySymbol"
+        class="ticker-row"
+        (click)="openDetail(ticker)"
+        role="listitem"
+        tabindex="0"
+        [attr.aria-label]="ticker.name + ' ' + ticker.price">
+
+        <!-- Rank -->
+        <span class="ticker-rank" aria-hidden="true">{{ ticker.rank }}</span>
+
+        <!-- Icon -->
+        <div class="ticker-icon"
+             [style.background]="ticker.color + '22'"
+             [style.color]="ticker.color"
+             aria-hidden="true">
+          {{ ticker.symbol.length > 4 ? ticker.symbol.slice(0, 4) : ticker.symbol }}
         </div>
-        <ion-label>
-          <h3>Apple Inc.</h3>
-          <p>AAPL</p>
-        </ion-label>
-        <div class="price-info" slot="end">
-          <h3>$186.20</h3>
-          <p class="positive">+0.8%</p>
+
+        <!-- Info -->
+        <div class="ticker-info">
+          <p class="ticker-name">{{ ticker.name }}</p>
+          <p class="ticker-sub">
+            {{ ticker.symbol }}
+            <span *ngIf="ticker.exchange"> · {{ ticker.exchange }}</span>
+            · {{ ticker.marketCap }}
+          </p>
         </div>
-      </ion-item>
-    </ng-container>
-  </ion-list>
+
+        <!-- Sparkline SVG -->
+        <svg class="ticker-spark"
+             [attr.viewBox]="'0 0 ' + SPARK_W + ' ' + SPARK_H"
+             fill="none"
+             aria-hidden="true">
+
+          <!-- Area fill gradient -->
+          <defs>
+            <linearGradient [id]="'grad-' + ticker.symbol" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" [attr.stop-color]="ticker.color" stop-opacity="0.18"/>
+              <stop offset="1" [attr.stop-color]="ticker.color" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Fill polygon -->
+          <polygon
+            [attr.points]="sparklineFill(ticker.sparkline)"
+            [attr.fill]="'url(#grad-' + ticker.symbol + ')'"/>
+
+          <!-- Stroke line -->
+          <polyline
+            [attr.points]="sparklinePoints(ticker.sparkline)"
+            [attr.stroke]="ticker.color"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+
+        </svg>
+
+        <!-- Price + change -->
+        <div class="ticker-right">
+          <p class="ticker-price">
+            {{ ticker.price | currency:'USD':'symbol':(ticker.price >= 100 ? '1.0-2' : '1.2-4') }}
+          </p>
+          <p class="ticker-change"
+             [class.positive]="ticker.changePct >= 0"
+             [class.negative]="ticker.changePct < 0">
+            {{ ticker.changePct >= 0 ? '▲' : '▼' }}
+            {{ ticker.changePct | number:'1.1-1' }}%
+          </p>
+        </div>
+
+        <!-- Watchlist star -->
+        <button class="star-btn"
+                (click)="toggleWatchlist(ticker, $event)"
+                [attr.aria-label]="(ticker.inWatchlist ? 'Remove from' : 'Add to') + ' watchlist'"
+                [attr.aria-pressed]="ticker.inWatchlist">
+          <ion-icon
+            [name]="ticker.inWatchlist ? 'star' : 'star-outline'"
+            [class.star-btn__icon--active]="ticker.inWatchlist">
+          </ion-icon>
+        </button>
+
+      </div>
+
+    </div><!-- /.ticker-list -->
+
+  </div><!-- /.markets-layout -->
 
 </ion-content>

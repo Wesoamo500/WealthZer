@@ -1,175 +1,307 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonicModule, ModalController } from '@ionic/angular';
+// ============================================================
+// transactions.page.ts — WealthZer · Page 7b: Transactions
+// Sections: Search/Filter Header · Grouped Date List ·
+//           Add Transaction Bottom-Sheet Modal
+// ============================================================
+import {
+  Component, OnInit, OnDestroy,
+  ChangeDetectionStrategy, ChangeDetectorRef, signal,
+} from '@angular/core';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
+import {
+  IonContent, IonRefresher, IonRefresherContent,
+  IonModal, IonIcon, IonButton, IonSkeletonText,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  addOutline, searchOutline, optionsOutline,
+  arrowUpOutline, arrowDownOutline, swapHorizontalOutline,
+  chevronForwardOutline, closeOutline,
+} from 'ionicons/icons';
+import { Subject } from 'rxjs';
+import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { FinancialService } from '../core/services/financial.service';
-import { AddTransactionModalComponent } from './add-transaction-modal.component';
-import { CurrencyService } from '../core/services/currency.service';
+
+// ── Models ─────────────────────────────────────────────────
+export type TxnType     = 'expense' | 'income' | 'transfer';
+export type TxnCategory =
+  'Dining' | 'Transport' | 'Shopping' | 'Bills' | 'Income' |
+  'Health' | 'Entertainment' | 'Travel' | 'Transfer' | 'Other';
+
+export interface Transaction {
+  id        : string;
+  name      : string;
+  type      : TxnType;
+  category  : TxnCategory;
+  amount    : number;        // negative = expense, positive = income/transfer
+  date      : Date;
+  time      : string;        // '09:14 AM'
+  method    : string;        // 'Card' | 'Bank Transfer' | 'Mobile Pay' | etc.
+  note?     : string;
+}
+
+export interface TxnGroup {
+  dateLabel : string;        // 'Today' | 'Yesterday' | 'Apr 1'
+  date      : Date;
+  dayTotal  : number;        // net for the day
+  items     : Transaction[];
+}
+
+export type FilterType = 'all' | 'income' | 'expense' | 'transfer';
+
+const CATEGORY_EMOJI: Record<TxnCategory, string> = {
+  Dining: '🍽', Transport: '🚗', Shopping: '🛍', Bills: '💡',
+  Income: '💰', Health: '💊', Entertainment: '🎮',
+  Travel: '✈️', Transfer: '↕', Other: '📦',
+};
+
+const CATEGORY_PILL: Record<TxnCategory, string> = {
+  Dining: 'pill-dining', Transport: 'pill-transport', Shopping: 'pill-shopping',
+  Bills: 'pill-bills', Income: 'pill-income', Health: 'pill-health',
+  Entertainment: 'pill-entertainment', Travel: 'pill-travel',
+  Transfer: 'pill-transfer', Other: 'pill-other',
+};
+
+let txnId = 0;
+const uid = () => `txn-${Date.now()}-${++txnId}`;
 
 @Component({
   selector: 'app-transactions',
-  templateUrl: 'transactions.page.html',
-  styleUrls: ['transactions.page.scss'],
+  templateUrl: './transactions.page.html',
+  styleUrls: ['./transactions.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [
+    CommonModule, CurrencyPipe, DatePipe, ReactiveFormsModule,
+    IonContent, IonRefresher, IonRefresherContent,
+    IonModal, IonIcon, IonButton, IonSkeletonText,
+  ],
 })
-export class TransactionsPage implements OnInit {
+export class TransactionsPage implements OnInit, OnDestroy {
 
-  allTransactions: any[] = [];
-  groupedTransactions: { label: string; transactions: any[] }[] = [];
-  selectedFilter: string = 'all';
-  isLoading: boolean = true;
+  // ── State ────────────────────────────────────────────────
+  isLoading    = true;
+  showAddModal = false;
+  activeFilter = signal<FilterType>('all');
 
-  displayCurrency: string = 'USD';
-  exchangeRate: number = 1;
+  // ── Data ─────────────────────────────────────────────────
+  allTransactions: Transaction[] = [];
+  groups         : TxnGroup[]    = [];
+
+  // ── Search ───────────────────────────────────────────────
+  searchCtrl = new FormControl('');
+
+  // ── Add transaction form ──────────────────────────────────
+  addForm!: FormGroup;
+  addType  = signal<TxnType>('expense');
+
+  readonly filterTabs: { label: string; value: FilterType }[] = [
+    { label: 'All',      value: 'all'      },
+    { label: 'Income',   value: 'income'   },
+    { label: 'Expenses', value: 'expense'  },
+    { label: 'Transfer', value: 'transfer' },
+  ];
+
+  readonly categories: TxnCategory[] = [
+    'Dining','Transport','Shopping','Bills',
+    'Income','Health','Entertainment','Travel','Transfer','Other',
+  ];
+
+  readonly CATEGORY_EMOJI  = CATEGORY_EMOJI;
+  readonly CATEGORY_PILL   = CATEGORY_PILL;
+
+  private destroy$ = new Subject<void>();
 
   constructor(
+    private fb    : FormBuilder,
+    private router: Router,
+    private cdr   : ChangeDetectorRef,
     private financialService: FinancialService,
-    private modalCtrl: ModalController,
-    public currencyService: CurrencyService
-  ) {}
-
-  ngOnInit() {
-    this.loadTransactions();
-    this.financialService.transactionUpdate$.subscribe(() => {
-      this.loadTransactions();
-    });
-
-    this.currencyService.currencyCode$.subscribe(code => {
-      this.displayCurrency = code;
-    });
-    this.currencyService.exchangeRate$.subscribe(rate => {
-      this.exchangeRate = rate;
+  ) {
+    addIcons({
+      addOutline, searchOutline, optionsOutline,
+      arrowUpOutline, arrowDownOutline, swapHorizontalOutline,
+      chevronForwardOutline, closeOutline,
     });
   }
 
-  loadTransactions() {
+  // ────────────────────────────────────────────────────────
+  async ngOnInit(): Promise<void> {
+    this.buildForm();
+    await this.loadTransactions();
+    this.watchSearch();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private buildForm(): void {
+    this.addForm = this.fb.group({
+      type    : ['expense'],
+      name    : ['', [Validators.required, Validators.minLength(2)]],
+      amount  : [null, [Validators.required, Validators.min(0.01)]],
+      category: ['Dining'],
+      date    : [new Date().toISOString().split('T')[0]],
+      note    : [''],
+      method  : ['Card'],
+    });
+  }
+
+  // ── Load ─────────────────────────────────────────────────
+  async loadTransactions(): Promise<void> {
     this.isLoading = true;
-    this.financialService.getTransactions().subscribe({
-      next: (res) => {
-        this.allTransactions = res.map(t => ({
-          ...t,
-          subtitle: `${t.account} • ${new Date(t.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+    try {
+      const data = await this.financialService.getTransactions().toPromise();
+      if (data) {
+        this.allTransactions = data.map((t: any) => ({
+          id: t.id,
+          name: t.title, // Mapping title to name
+          type: this.deriveType(t),
+          category: t.category,
           amount: Number(t.amount),
           date: new Date(t.date),
-          icon: this.getIconForCategory(t.category),
-          iconBg: this.getBgForCategory(t.category),
-          iconColor: this.getColorForCategory(t.category)
+          time: new Date(t.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+          method: t.account || 'Card',
+          note: t.note
         }));
-        this.applyFilter();
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading transactions:', err);
-        this.isLoading = false;
+        this.rebuildGroups();
       }
+    } catch (error) {
+      console.error('Failed to load transactions', error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  private deriveType(t: any): TxnType {
+    if (t.category === 'INCOME') return 'income';
+    if (t.category === 'TRANSFER') return 'transfer';
+    return 'expense';
+  }
+
+  async onRefresh(event: CustomEvent): Promise<void> {
+    await this.loadTransactions();
+    (event.detail as any).complete();
+  }
+
+  // ── Filter ───────────────────────────────────────────────
+  setFilter(f: FilterType): void {
+    this.activeFilter.set(f);
+    this.rebuildGroups();
+  }
+
+  // ── Search ───────────────────────────────────────────────
+  private watchSearch(): void {
+    this.searchCtrl.valueChanges.pipe(
+      debounceTime(250),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$),
+    ).subscribe(() => { this.rebuildGroups(); });
+  }
+
+  // ── Group builder ─────────────────────────────────────────
+  private rebuildGroups(): void {
+    const f = this.activeFilter();
+    const q = (this.searchCtrl.value ?? '').toLowerCase().trim();
+
+    const filtered = this.allTransactions.filter(t => {
+      const typeOk = f === 'all' || t.type === f;
+      const qOk    = !q || t.name.toLowerCase().includes(q) || t.category.toLowerCase().includes(q);
+      return typeOk && qOk;
     });
-  }
 
-  setFilter(filter: string) {
-    this.selectedFilter = filter;
-    this.applyFilter();
-  }
-
-  applyFilter() {
-    let filtered = this.allTransactions;
-    
-    if (this.selectedFilter === 'income') {
-      filtered = this.allTransactions.filter(t => t.amount > 0);
-    } else if (this.selectedFilter === 'expenses') {
-      filtered = this.allTransactions.filter(t => t.amount < 0);
-    } else if (this.selectedFilter === 'transfers') {
-      filtered = this.allTransactions.filter(t => 
-        t.category.toLowerCase() === 'transfer' || t.category.toLowerCase() === 'transfers'
-      );
-    } else if (this.selectedFilter !== 'all') {
-      filtered = this.allTransactions.filter(t => 
-        t.category.toLowerCase() === this.selectedFilter.toLowerCase()
-      );
+    const map = new Map<string, TxnGroup>();
+    for (const txn of filtered) {
+      const key   = this.dateKey(txn.date);
+      const label = this.dateLabel(txn.date);
+      if (!map.has(key)) {
+        map.set(key, { dateLabel: label, date: txn.date, dayTotal: 0, items: [] });
+      }
+      const g = map.get(key)!;
+      g.items.push(txn);
+      g.dayTotal += txn.amount;
     }
 
-    this.groupedTransactions = this.groupByTimeline(filtered);
+    this.groups = Array.from(map.values());
+    this.cdr.markForCheck();
   }
 
-  groupByTimeline(transactions: any[]): { label: string; transactions: any[] }[] {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+  // ── Add transaction modal ─────────────────────────────────
+  async openAddModal(): Promise<void> {
+    await Haptics.impact({ style: ImpactStyle.Light });
+    this.showAddModal = true;
+    this.cdr.markForCheck();
+  }
 
-    const groups: { [key: string]: any[] } = {};
+  closeAddModal(): void {
+    this.showAddModal = false;
+    this.addForm.reset({ type: 'expense', category: 'Dining', date: new Date().toISOString().split('T')[0], method: 'Card' });
+    this.addType.set('expense');
+    this.cdr.markForCheck();
+  }
 
-    transactions.forEach(t => {
-      const txDate = new Date(t.date);
-      const txDay = new Date(txDate.getFullYear(), txDate.getMonth(), txDate.getDate());
+  selectType(type: TxnType): void {
+    this.addType.set(type);
+    this.addForm.get('type')?.setValue(type);
+    if (type === 'income') this.addForm.get('category')?.setValue('Income');
+    if (type === 'transfer') this.addForm.get('category')?.setValue('Transfer');
+  }
+
+  async onSaveTransaction(): Promise<void> {
+    if (this.addForm.invalid) { this.addForm.markAllAsTouched(); return; }
+    try {
+      const val = this.addForm.value;
+      const amount = val.type === 'expense' ? -Math.abs(val.amount) : Math.abs(val.amount);
       
-      let label: string;
-      if (txDay.getTime() === today.getTime()) {
-        label = 'Today';
-      } else if (txDay.getTime() === yesterday.getTime()) {
-        label = 'Yesterday';
-      } else {
-        label = txDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      }
+      await this.financialService.addTransaction({
+        title: val.name,
+        amount: amount,
+        category: val.category.toUpperCase(),
+        account: val.method,
+        note: val.note,
+        date: val.date
+      }).toPromise();
 
-      if (!groups[label]) groups[label] = [];
-      groups[label].push(t);
-    });
-
-    return Object.keys(groups).map(label => ({ label, transactions: groups[label] }));
-  }
-
-  async openAddTransaction() {
-    const modal = await this.modalCtrl.create({
-      component: AddTransactionModalComponent,
-      breakpoints: [0, 0.9, 1.0],
-      initialBreakpoint: 0.9
-    });
-    
-    await modal.present();
-
-    const { data, role } = await modal.onWillDismiss();
-    if (role === 'confirm') {
-      this.financialService.addTransaction(data).subscribe(() => {
-        this.loadTransactions();
-      });
+      await Haptics.impact({ style: ImpactStyle.Medium });
+      this.closeAddModal();
+      await this.loadTransactions();
+    } catch (error) {
+      console.error('Failed to save transaction', error);
     }
   }
 
-  private getIconForCategory(cat: string): string {
-    const map: any = { 
-      'income': 'trending-up',
-      'transfer': 'swap-horizontal',
-      'dining': 'restaurant', 
-      'groceries': 'cart', 
-      'transport': 'car', 
-      'fun': 'game-controller',
-      'others': 'ellipsis-horizontal'
-    };
-    return map[cat.toLowerCase()] || 'cash-outline';
+  // ── Navigation ────────────────────────────────────────────
+  openDetail(txn: Transaction): void {
+    this.router.navigate(['/tabs/transactions', txn.id]);
   }
 
-  private getBgForCategory(cat: string): string {
-    const map: any = { 
-      'income': 'rgba(52, 199, 89, 0.2)',
-      'transfer': 'rgba(0, 122, 255, 0.2)',
-      'dining': 'rgba(255, 149, 0, 0.2)', 
-      'groceries': 'rgba(52, 199, 89, 0.2)', 
-      'transport': 'rgba(0, 122, 255, 0.2)', 
-      'fun': 'rgba(175, 82, 222, 0.2)' 
-    };
-    return map[cat.toLowerCase()] || 'rgba(142, 142, 147, 0.2)';
+  // ── Helpers ───────────────────────────────────────────────
+  isPositive(val: number): boolean { return val >= 0; }
+
+  private dateKey(d: Date): string {
+    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
   }
 
-  private getColorForCategory(cat: string): string {
-    const map: any = { 
-      'income': '#34C759',
-      'transfer': '#007AFF',
-      'dining': '#FF9500', 
-      'groceries': '#34C759', 
-      'transport': '#007AFF', 
-      'fun': '#AF52DE' 
-    };
-    return map[cat.toLowerCase()] || '#8E8E93';
+  private dateLabel(d: Date): string {
+    const today     = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    if (this.dateKey(d) === this.dateKey(today))     return 'Today';
+    if (this.dateKey(d) === this.dateKey(yesterday)) return 'Yesterday';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  trackByGroup(_: number, g: TxnGroup): string  { return g.dateLabel; }
+  trackByTxn  (_: number, t: Transaction): string { return t.id; }
+
+  // ── Mock data ─────────────────────────────────────────────
+  private simulateAsync(ms: number): Promise<void> {
+    return new Promise(r => setTimeout(r, ms));
   }
 }

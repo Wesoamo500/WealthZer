@@ -71,6 +71,14 @@ export class FinancialService {
     allocations: { type: string; value: number; percentage: number }[];
     currency: string; 
     updatedAt?: string;
+    budgetSummary: {
+      month: string;
+      totalSpent: number;
+      totalLimit: number;
+      onTrackCount: number;
+      totalCategories: number;
+      daysRemaining: number;
+    };
   }> {
     return this.apiService.get<any>('financial/net-worth');
   }

@@ -129,6 +129,9 @@ $color-gold-dark     : #D4AF60;
   --wz-space-10 : 40px;
   --wz-space-12 : 48px;
   --wz-space-16 : 64px;
+  
+  // ── Header Spacing (Global)
+  --wz-header-pt: calc(env(safe-area-inset-top, 0px) + 16px);
 
   // ── Animation
   --wz-ease-out   : cubic-bezier(0.16, 1, 0.3, 1);
