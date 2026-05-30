@@ -1,317 +1,195 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/home" text="" color="light"></ion-back-button>
-    </ion-buttons>
-    <ion-title>App Settings</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="profile-content" scrollY="true">
 
-<ion-content class="ion-padding">
-  <div class="profile-container">
-    
-    <!-- Skeleton Loading State -->
-    <ng-container *ngIf="isLoading">
-      <div class="user-card skeleton-card">
-        <div class="avatar-box">
-          <ion-skeleton-text animated style="width: 100%; height: 100%; border-radius: 16px;"></ion-skeleton-text>
-        </div>
-        <div class="user-info">
-          <div class="name-row">
-            <ion-skeleton-text animated style="width: 120px; height: 24px;"></ion-skeleton-text>
-          </div>
-          <ion-skeleton-text animated style="width: 180px; height: 16px; margin-top: 8px;"></ion-skeleton-text>
-        </div>
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- PROFILE HERO                                        -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="prof-hero wz-stagger-1">
+
+    <!-- Edit button -->
+    <button class="edit-btn"
+            (click)="navigateTo('/tabs/profile/edit')"
+            aria-label="Edit profile">
+      <ion-icon name="create-outline"></ion-icon>
+    </button>
+
+    <!-- Avatar -->
+    <div class="avatar-ring" aria-hidden="true">
+      <div class="avatar-inner">
+        <img *ngIf="profile?.avatar" [src]="profile.avatar" [alt]="userInitials" class="avatar-img"/>
+        <span *ngIf="!profile?.avatar">{{ userInitials }}</span>
       </div>
+    </div>
 
-      <div class="settings-section" *ngFor="let i of [1, 2, 3]">
-        <ion-skeleton-text animated style="width: 100px; height: 14px; margin-bottom: 12px; margin-left: 8px;"></ion-skeleton-text>
-        <div class="items-card">
-          <ion-item lines="none" class="settings-item" *ngFor="let j of [1, 2]">
-            <div class="icon-box" slot="start">
-              <ion-skeleton-text animated style="width: 100%; height: 100%; border-radius: 10px;"></ion-skeleton-text>
-            </div>
-            <ion-label>
-              <ion-skeleton-text animated style="width: 140px; height: 18px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 200px; height: 14px; margin-top: 6px;"></ion-skeleton-text>
-            </ion-label>
-          </ion-item>
-        </div>
-      </div>
-    </ng-container>
+    <!-- Name + email -->
+    <h1 class="prof-name">{{ profile?.firstName }} {{ profile?.lastName }}</h1>
+    <p class="prof-email">{{ profile?.email }}</p>
 
-    <!-- Real Content -->
-    <ng-container *ngIf="!isLoading">
-      <!-- Profile Header Card -->
-      <div class="user-card">
-        <div class="avatar-section">
-          <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (user?.email || 'default')" class="avatar-img" alt="Profile Avatar">
-        </div>
-        <div class="user-info">
-          <div class="name-row">
-            <h2>{{ user?.fullName || 'User' }}</h2>
-            <span class="pro-badge">PRO</span>
-          </div>
-          <p>{{ user?.email }}</p>
-        </div>
-        <ion-icon name="shield-checkmark" class="verified-icon"></ion-icon>
-      </div>
+    <!-- Pro badge -->
+    <div class="pro-badge" *ngIf="profile?.isPro" role="status" aria-label="Pro subscriber">
+      <span class="pro-badge__star" aria-hidden="true">★</span>
+      <span class="pro-badge__text">WealthZer Pro · Active</span>
+    </div>
 
-      <!-- Account Section -->
-      <div class="settings-section">
-        <span class="section-label">ACCOUNT</span>
-        <div class="items-card">
-          <ion-item button detail="false" class="settings-item" (click)="openPersonalDetails()">
-            <div class="icon-box" slot="start">
-              <ion-icon name="person"></ion-icon>
-            </div>
-            <ion-label>
-              <h3>Personal Details</h3>
-              <p>Manage your core identity info</p>
-            </ion-label>
-            <ion-icon name="chevron-forward" slot="end"></ion-icon>
-          </ion-item>
+    <!-- Free badge -->
+    <button class="upgrade-badge" *ngIf="!profile?.isPro"
+            (click)="navigateTo('/tabs/profile/upgrade')">
+      Upgrade to Pro →
+    </button>
 
-          <ion-item button detail="false" class="settings-item" (click)="openAiAdvisor()">
-            <div class="icon-box" slot="start">
-              <ion-icon name="bulb"></ion-icon>
-            </div>
-            <ion-label>
-              <h3>AI Advisor Mode</h3>
-              <p>{{ settings.aiAdvisorMode }} Mode</p>
-            </ion-label>
-            <ion-icon name="chevron-forward" slot="end"></ion-icon>
-          </ion-item>
-
-          <ion-item button detail="false" class="settings-item" (click)="openCurrency()">
-            <div class="icon-box" slot="start">
-              <ion-icon name="cash"></ion-icon>
-            </div>
-            <ion-label>
-              <h3>Currency</h3>
-              <p>{{ currencyService.getCurrencyInfo(settings.preferredCurrency).flag }} {{ settings.preferredCurrency }}</p>
-            </ion-label>
-            <ion-icon name="chevron-forward" slot="end"></ion-icon>
-          </ion-item>
-        </div>
-      </div>
-
-      <!-- Security Section -->
-      <div class="settings-section">
-        <span class="section-label">SECURITY</span>
-        <div class="items-card">
-          <ion-item button detail="false" class="settings-item" (click)="openTwoFactor()">
-            <div class="icon-box" slot="start">
-              <ion-icon name="phone-portrait"></ion-icon>
-            </div>
-            <ion-label>
-              <h3>Two-Factor Auth</h3>
-              <p class="status" [class.enabled]="settings.twoFactorEnabled">{{ settings.twoFactorEnabled ? 'Enabled' : 'Disabled' }}</p>
-            </ion-label>
-            <ion-icon name="chevron-forward" slot="end"></ion-icon>
-          </ion-item>
-
-          <ion-item lines="none" class="settings-item">
-            <div class="icon-box" slot="start">
-              <ion-icon name="finger-print"></ion-icon>
-            </div>
-            <ion-label>
-              <h3>Biometrics (FaceID)</h3>
-              <p>Unlock app with FaceID</p>
-            </ion-label>
-            <ion-toggle slot="end" [(ngModel)]="settings.biometrics" (ionChange)="updateSetting('biometrics', settings.biometrics)"></ion-toggle>
-          </ion-item>
-        </div>
-      </div>
-
-      <!-- Notifications Section -->
-      <div class="settings-section">
-        <span class="section-label">NOTIFICATIONS</span>
-        <div class="items-card">
-          <ion-item lines="inset" class="settings-item">
-            <div class="icon-box" slot="start">
-              <ion-icon name="notifications"></ion-icon>
-            </div>
-            <ion-label>
-              <h3>Push Notifications</h3>
-            </ion-label>
-            <ion-toggle slot="end" [(ngModel)]="settings.pushNotifications" (ionChange)="updateSetting('pushNotifications', settings.pushNotifications)"></ion-toggle>
-          </ion-item>
-
-          <ion-item button detail="false" class="settings-item" (click)="openInsights()">
-            <div class="icon-box" slot="start">
-              <ion-icon name="analytics"></ion-icon>
-            </div>
-            <ion-label>
-              <h3>AI Insights Frequency</h3>
-              <p>{{ settings.aiInsightsFrequency }}</p>
-            </ion-label>
-            <ion-icon name="chevron-forward" slot="end"></ion-icon>
-          </ion-item>
-        </div>
-      </div>
-
-      <!-- Logout -->
-      <div class="logout-container">
-        <ion-button fill="clear" class="logout-btn" (click)="logout()">
-          <ion-icon name="log-out-outline" slot="start"></ion-icon>
-          Log Out
-        </ion-button>
-      </div>
-
-      <!-- Modals -->
-      <!-- Personal Details Modal -->
-      <ion-modal [isOpen]="isPersonalDetailsOpen" (didDismiss)="isPersonalDetailsOpen = false" class="profile-modal form-modal">
-        <ng-template>
-          <ion-header class="ion-no-border">
-            <ion-toolbar>
-              <ion-title>Personal Details</ion-title>
-              <ion-buttons slot="end">
-                <ion-button (click)="isPersonalDetailsOpen = false">Close</ion-button>
-              </ion-buttons>
-            </ion-toolbar>
-          </ion-header>
-          <ion-content class="ion-padding modal-content">
-            <div class="form-group">
-              <ion-label class="form-label">Full Name</ion-label>
-              <ion-input type="text" [(ngModel)]="editFullName" class="custom-input" placeholder="Enter your full name"></ion-input>
-            </div>
-            <ion-button expand="block" class="primary-btn ion-margin-top" (click)="savePersonalDetails()">Save Changes</ion-button>
-          </ion-content>
-        </ng-template>
-      </ion-modal>
-
-      <!-- AI Advisor Modal -->
-      <ion-modal [isOpen]="isAiAdvisorOpen" (didDismiss)="isAiAdvisorOpen = false" class="profile-modal bottom-sheet" initialBreakpoint="0.6" [breakpoints]="[0, 0.6]">
-        <ng-template>
-          <ion-header class="ion-no-border">
-            <ion-toolbar>
-              <ion-title>AI Advisor Mode</ion-title>
-              <ion-buttons slot="end">
-                <ion-button (click)="isAiAdvisorOpen = false" class="close-btn-round"><ion-icon name="close"></ion-icon></ion-button>
-              </ion-buttons>
-            </ion-toolbar>
-          </ion-header>
-          <ion-content class="ion-padding modal-content">
-            <p class="modal-description">Select how your AI handles recommendations and insights.</p>
-            <ion-radio-group [(ngModel)]="editAiMode">
-              <ion-item class="radio-item" lines="none">
-                <ion-label>Conservative</ion-label>
-                <ion-radio slot="start" value="Conservative"></ion-radio>
-              </ion-item>
-              <ion-item class="radio-item" lines="none">
-                <ion-label>Balanced</ion-label>
-                <ion-radio slot="start" value="Balanced"></ion-radio>
-              </ion-item>
-              <ion-item class="radio-item" lines="none">
-                <ion-label>Aggressive</ion-label>
-                <ion-radio slot="start" value="Aggressive"></ion-radio>
-              </ion-item>
-            </ion-radio-group>
-            <ion-button expand="block" class="primary-btn ion-margin-top" (click)="saveAiAdvisor()">Save Mode</ion-button>
-          </ion-content>
-        </ng-template>
-      </ion-modal>
-
-      <!-- Two-Factor Modal -->
-      <ion-modal [isOpen]="isTwoFactorOpen" (didDismiss)="isTwoFactorOpen = false" class="profile-modal bottom-sheet" initialBreakpoint="0.5" [breakpoints]="[0, 0.5]">
-        <ng-template>
-          <ion-header class="ion-no-border">
-            <ion-toolbar>
-              <ion-title>Two-Factor Auth</ion-title>
-              <ion-buttons slot="end">
-                <ion-button (click)="isTwoFactorOpen = false" class="close-btn-round"><ion-icon name="close"></ion-icon></ion-button>
-              </ion-buttons>
-            </ion-toolbar>
-          </ion-header>
-          <ion-content class="ion-padding modal-content">
-            <div class="illustration-box">
-               <ion-icon name="shield-checkmark" class="illustration-icon"></ion-icon>
-            </div>
-            <p class="modal-description">Enhance your account security with two-factor authentication.</p>
-            <ion-item lines="none" class="settings-item standalone-toggle">
-              <ion-label>
-                <h3>Enable 2FA</h3>
-              </ion-label>
-              <ion-toggle slot="end" [(ngModel)]="editTwoFactor"></ion-toggle>
-            </ion-item>
-            <ion-button expand="block" class="primary-btn ion-margin-top" (click)="saveTwoFactor()">Update Security</ion-button>
-          </ion-content>
-        </ng-template>
-      </ion-modal>
-
-      <!-- Insights Frequency Modal -->
-      <ion-modal [isOpen]="isInsightsOpen" (didDismiss)="isInsightsOpen = false" class="profile-modal bottom-sheet" initialBreakpoint="0.6" [breakpoints]="[0, 0.6]">
-        <ng-template>
-          <ion-header class="ion-no-border">
-            <ion-toolbar>
-              <ion-title>Insights Frequency</ion-title>
-              <ion-buttons slot="end">
-                <ion-button (click)="isInsightsOpen = false" class="close-btn-round"><ion-icon name="close"></ion-icon></ion-button>
-              </ion-buttons>
-            </ion-toolbar>
-          </ion-header>
-          <ion-content class="ion-padding modal-content">
-            <p class="modal-description">How often do you want AI financial summaries?</p>
-            <ion-radio-group [(ngModel)]="editInsightsFreq">
-              <ion-item class="radio-item" lines="none">
-                <ion-label>Daily Summary</ion-label>
-                <ion-radio slot="start" value="Daily"></ion-radio>
-              </ion-item>
-              <ion-item class="radio-item" lines="none">
-                <ion-label>Weekly Digest</ion-label>
-                <ion-radio slot="start" value="Weekly"></ion-radio>
-              </ion-item>
-              <ion-item class="radio-item" lines="none">
-                <ion-label>Monthly Report</ion-label>
-                <ion-radio slot="start" value="Monthly"></ion-radio>
-              </ion-item>
-            </ion-radio-group>
-            <ion-button expand="block" class="primary-btn ion-margin-top" (click)="saveInsights()">Save Preference</ion-button>
-          </ion-content>
-        </ng-template>
-      </ion-modal>
-
-      <!-- Currency Selector Modal -->
-      <ion-modal [isOpen]="isCurrencyOpen" (didDismiss)="isCurrencyOpen = false" class="profile-modal bottom-sheet" initialBreakpoint="0.75" [breakpoints]="[0, 0.75]">
-        <ng-template>
-          <ion-header class="ion-no-border">
-            <ion-toolbar>
-              <ion-title>Select Currency</ion-title>
-              <ion-buttons slot="end">
-                <ion-button (click)="isCurrencyOpen = false" class="close-btn-round"><ion-icon name="close"></ion-icon></ion-button>
-              </ion-buttons>
-            </ion-toolbar>
-          </ion-header>
-          <ion-content class="ion-padding modal-content">
-            <div class="search-box">
-              <ion-searchbar 
-                [(ngModel)]="searchTerm" 
-                (ionInput)="filterCurrencies()" 
-                placeholder="Search currency..."
-                class="currency-search">
-              </ion-searchbar>
-            </div>
-            <div class="currency-list">
-              <ion-item 
-                *ngFor="let cur of filteredCurrencies" 
-                button 
-                detail="false"
-                class="currency-item" 
-                [class.selected]="cur.code === editCurrency"
-                (click)="selectCurrency(cur.code)"
-                lines="none">
-                <div class="currency-flag" slot="start">{{ cur.flag }}</div>
-                <ion-label>
-                  <h3>{{ cur.name }}</h3>
-                  <p>{{ cur.code }} • {{ cur.symbol }}</p>
-                </ion-label>
-                <ion-icon *ngIf="cur.code === editCurrency" name="checkmark-circle" slot="end" class="check-icon"></ion-icon>
-              </ion-item>
-            </div>
-          </ion-content>
-        </ng-template>
-      </ion-modal>
-    </ng-container>
   </div>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- STATS STRIP                                         -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="stats-strip wz-stagger-1" *ngIf="!isLoading && stats" role="list">
+    <div class="stats-item" role="listitem">
+      <span class="stats-value">${{ stats.netWorth >= 1000 ? (stats.netWorth / 1000).toFixed(1) + 'K' : stats.netWorth }}</span>
+      <span class="stats-label">Net Worth</span>
+    </div>
+    <div class="stats-div" aria-hidden="true"></div>
+    <div class="stats-item" role="listitem">
+      <span class="stats-value">{{ stats.healthScore }}</span>
+      <span class="stats-label">Health Score</span>
+    </div>
+    <div class="stats-div" aria-hidden="true"></div>
+    <div class="stats-item" role="listitem">
+      <span class="stats-value">{{ stats.assetCount }}</span>
+      <span class="stats-label">Assets</span>
+    </div>
+    <div class="stats-div" aria-hidden="true"></div>
+    <div class="stats-item" role="listitem">
+      <span class="stats-value">{{ stats.txnCount }}</span>
+      <span class="stats-label">Transactions</span>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- SETTINGS SECTIONS                                   -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <ng-container *ngFor="let section of settingsSections; trackBy: trackBySection">
+    <div class="settings-group wz-stagger-2">
+      <p class="group-label">{{ section.label }}</p>
+      <div class="settings-card">
+        <div
+          *ngFor="let row of section.rows; trackBy: trackByRow"
+          class="settings-row"
+          [class.settings-row--danger]="row.danger"
+          (click)="onRowTap(row)"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="row.label">
+
+          <!-- Icon -->
+          <div class="row-icon" [class]="row.iconClass" aria-hidden="true">
+            <ion-icon [name]="row.icon"></ion-icon>
+          </div>
+
+          <!-- Label -->
+          <span class="row-label">{{ row.label }}</span>
+
+          <!-- Value (for 'value' type rows) -->
+          <span *ngIf="row.type === 'value' && row.value"
+                class="row-value">
+            {{ row.id === 'currency' ? prefs.currency + ' · ' + prefs.currencySymbol : row.value }}
+          </span>
+
+          <!-- Chevron (for 'nav' and 'value' rows) -->
+          <ion-icon
+            *ngIf="row.type !== 'toggle'"
+            name="chevron-forward-outline"
+            class="row-chevron"
+            aria-hidden="true">
+          </ion-icon>
+
+          <!-- Toggle (for 'toggle' rows) -->
+          <div *ngIf="row.type === 'toggle'"
+               class="toggle-track"
+               [class.toggle-track--on]="getPrefValue(row)"
+               role="switch"
+               [attr.aria-checked]="getPrefValue(row)">
+            <div class="toggle-thumb"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- SIGN OUT                                            -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <div class="signout-section wz-stagger-3">
+    <button class="signout-btn" (click)="onSignOut()" aria-label="Sign out">
+      <ion-icon name="log-out-outline"></ion-icon>
+      Sign Out
+    </button>
+  </div>
+
+  <!-- App version -->
+  <p class="app-version">WealthZer v1.0.0 · Build 2026.04</p>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- CURRENCY SELECTOR MODAL                             -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <ion-modal
+    [isOpen]="showCurrencyModal"
+    (didDismiss)="closeCurrencyModal()"
+    [breakpoints]="[0, 0.65, 0.92]"
+    [initialBreakpoint]="0.65"
+    [backdropDismiss]="true"
+    class="currency-modal">
+
+    <ng-template>
+      <ion-content class="currency-modal-content">
+        <div class="currency-modal-layout">
+
+          <div class="modal-handle" aria-hidden="true"></div>
+          <h2 class="modal-title">Select Currency</h2>
+
+          <!-- Search -->
+          <div class="currency-search">
+            <ion-icon name="search-outline" class="currency-search__icon" aria-hidden="true"></ion-icon>
+            <input
+              type="search"
+              class="currency-search__input"
+              placeholder="Search currencies..."
+              [formControl]="currencySearch"
+              autocomplete="off"
+              aria-label="Search currencies"/>
+          </div>
+
+          <!-- Currency list -->
+          <div class="currency-list" role="listbox" aria-label="Currencies">
+            <div
+              *ngFor="let currency of filteredCurrencies; trackBy: trackByCurrency"
+              class="currency-row"
+              [class.currency-row--selected]="prefs.currency === currency.code"
+              (click)="selectCurrency(currency)"
+              role="option"
+              [attr.aria-selected]="prefs.currency === currency.code"
+              tabindex="0">
+
+              <span class="currency-flag" aria-hidden="true">{{ currency.flag }}</span>
+              <span class="currency-name">{{ currency.name }}</span>
+              <span class="currency-code">{{ currency.code }}</span>
+
+              <div *ngIf="prefs.currency === currency.code"
+                   class="currency-check"
+                   aria-hidden="true">
+                <ion-icon name="checkmark-outline" style="font-size:13px;color:#fff;"></ion-icon>
+              </div>
+
+            </div>
+
+            <!-- Empty search state -->
+            <div class="currency-empty" *ngIf="filteredCurrencies.length === 0">
+              <p>No currencies match "{{ currencySearch.value }}"</p>
+            </div>
+
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
 </ion-content>

@@ -157,6 +157,7 @@ import {
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { FinancialService } from '../core/services/financial.service';
+import { CurrencyService } from '../core/services/currency.service';
 
 // ── Models ─────────────────────────────────────────────────
 export type BudgetStatus = 'ok' | 'warning' | 'over' | 'unused';
@@ -214,6 +215,7 @@ export class BudgetsPage implements OnInit {
     private router: Router,
     private cdr   : ChangeDetectorRef,
     private financialService: FinancialService,
+    public currencyService: CurrencyService,
   ) {
     addIcons({
       addOutline, chevronForwardOutline,

@@ -9,12 +9,33 @@ export interface User {
   id: string;
   email: string;
   fullName?: string;
-  isBiometricsEnabled?: boolean;
-  pushNotificationsEnabled?: boolean;
-  aiAdvisorMode?: string;
-  twoFactorEnabled?: boolean;
-  aiInsightsFrequency?: string;
-  preferredCurrency?: string;
+  role: string;
+  avatarUrl?: string;
+  advisorMode: string;
+  aiInsightsFrequency: string;
+  preferredCurrency: string;
+  language: string;
+  isPro: boolean;
+  proExpiresAt?: string;
+  darkMode: boolean;
+  isBiometricsEnabled: boolean;
+  pushNotificationsEnabled: boolean;
+  budgetAlerts: boolean;
+  priceAlerts: boolean;
+  weeklyReport: boolean;
+  createdAt: string;
+}
+
+export interface ProfileStats {
+  netWorth: number;
+  healthScore: number;
+  assetCount: number;
+  txnCount: number;
+}
+
+export interface ProfileResponse {
+  profile: User;
+  stats: ProfileStats;
 }
 
 export interface AuthResponse {
@@ -94,8 +115,14 @@ export class AuthService {
     return this.apiService.post('auth/reset-password', data);
   }
 
-  getProfile(): Observable<any> {
-    return this.apiService.get('auth/profile');
+  getProfile(): Observable<ProfileResponse> {
+    return this.apiService.get<ProfileResponse>('auth/profile').pipe(
+      tap(async (res) => {
+        // Sync the profile part to current user subject
+        await this.storageService.set('user', JSON.stringify(res.profile));
+        this.currentUserSubject.next(res.profile);
+      })
+    );
   }
 
   updateProfile(data: any): Observable<any> {
@@ -203,9 +230,10 @@ export class AuthService {
 
       // Also refresh profile data
       this.getProfile().subscribe({
-        next: (profile) => {
-          this.storageService.set('user', JSON.stringify(profile));
-          this.currentUserSubject.next(profile);
+        next: (res) => {
+          // res is ProfileResponse, which contains { profile, stats }
+          this.storageService.set('user', JSON.stringify(res.profile));
+          this.currentUserSubject.next(res.profile);
         },
         error: (err) => {
           console.warn('[Auth] Initial profile refresh failed, likely expired token.');

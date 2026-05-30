@@ -188,7 +188,7 @@
 
             <!-- Amount -->
             <div class="amount-wrap">
-              <span class="amount-currency">$</span>
+              <span class="amount-currency">{{ currencyService.getCurrencyInfo().symbol }}</span>
               <input type="number" class="amount-input"
                      formControlName="amount"
                      placeholder="0.00" inputmode="decimal"

@@ -198,7 +198,7 @@
             <div class="field-group">
               <label class="field-label" for="cat-limit">Monthly limit</label>
               <div class="field-input-wrap field-input-wrap--amount">
-                <span class="field-currency">$</span>
+                <span class="field-currency">{{ currencyService.getCurrencyInfo().symbol }}</span>
                 <input id="cat-limit" type="number"
                        class="field-input field-input--amount"
                        formControlName="limit"
